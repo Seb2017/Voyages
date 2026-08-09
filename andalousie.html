@@ -67,7 +67,7 @@ const LEG = {
 
 const DAYS = [
   { id:1, date:"15 SEP", weekday:"MARDI", ville:"Départ", color:LEG.malaga, hotel:"Hôtel Romerito, Málaga", stops:[
-    {time:"21:55", title:"Vol Lyon → Málaga", desc:"Décollage de Lyon.", tip:null, loc:"Aéroport de Lyon-Saint Exupéry"},
+    {time:"21:55", title:"Vol Lyon → Málaga — EJU7048", desc:"easyJet, terminal T1 à Lyon. Arrivée 00h15 à Málaga (terminal non précisé). 3 adultes.", tip:"Enregistrement en ligne ouvre 30 jours avant le vol.", loc:"Aéroport de Lyon-Saint Exupéry"},
     {time:"00:15", title:"Atterrissage à Málaga (16/09)", desc:"Arrivée de nuit.", tip:null, loc:"Aeropuerto de Málaga-Costa del Sol"},
     {time:"00:30", title:"Récupération voiture — Thrifty", desc:"Réservation #762525400 — Peugeot 3008 (cat. Intermédiaire) ou similaire. Comptoir Thrifty, hall de location de voitures du terminal aéroport de Málaga.", tip:"Automatique, climatisation, 5 places, 4 portes, 1 grande + 1 petite valise. Thrifty : +34 647 617 992. Vérifier le plein et l'état des lieux avant de partir.", loc:"Thrifty, Avenida del Comandante García Morato, Málaga"},
     {time:"01:15", title:"Check-in Hôtel Romerito", desc:"Málaga.", tip:null, loc:"Hôtel Romerito, Málaga"},
@@ -126,7 +126,7 @@ const DAYS = [
     {time:"11:30", title:"Croisière à Puerto Banús", desc:"Marbella — durée 2h30, réservée sur GetYourGuide.", tip:null, loc:"Puerto Banús, Marbella"},
     {time:"14:30", title:"Route retour vers Málaga", desc:"~60 km, compter 45-60 min.", tip:null, loc:"Málaga, España"},
     {time:"17:00", title:"Restitution voiture — Thrifty", desc:"Réservation #762525400. Agence Thrifty, hall de location de voitures du terminal aéroport de Málaga.", tip:"Procédure de restitution expliquée sur place à l'agence. Thrifty : +34 647 617 992. Vérifier plein d'essence et état des lieux avant restitution.", loc:"Thrifty, Avenida del Comandante García Morato, Málaga"},
-    {time:"19:05", title:"Vol Málaga → Lyon", desc:"Décollage.", tip:null, loc:"Aeropuerto de Málaga-Costa del Sol"},
+    {time:"19:05", title:"Vol Málaga → Lyon — EJU7047", desc:"easyJet, terminal non précisé à Málaga. Arrivée 21h20 à Lyon, terminal T1. 3 adultes.", tip:null, loc:"Aeropuerto de Málaga-Costa del Sol"},
     {time:"21:20", title:"Atterrissage à Lyon", desc:"Fin du séjour.", tip:null, loc:"Aéroport de Lyon-Saint Exupéry"},
   ]},
 ];
@@ -144,8 +144,8 @@ const STAGES = [
 
 const RESERVATIONS_RECAP = [
   {cat:"Vols", items:[
-    {label:"Lyon → Málaga", note:"15/09, 21h55 → 00h15"},
-    {label:"Málaga → Lyon", note:"26/09, 19h05 → 21h20"},
+    {label:"Lyon → Málaga — easyJet EJU7048", note:"15/09, 21h55 (Lyon T1) → 16/09, 00h15 (Málaga) — 3 adultes, Flex Pass"},
+    {label:"Málaga → Lyon — easyJet EJU7047", note:"26/09, 19h05 (Málaga) → 21h20 (Lyon T1) — 3 adultes, Flex Pass"},
   ]},
   {cat:"Voiture de location", items:[
     {label:"Rentalcars.com — réservation #762525400", note:"Peugeot 3008 (cat. Intermédiaire) ou similaire, automatique, clim, 5 places — Agence Thrifty, Avenida del Comandante García Morato, Málaga (+34 647 617 992). Prise en charge 16/09 00h30, restitution 26/09 17h00"},
@@ -660,8 +660,9 @@ function renderLieux() {
             <p class="text-[#F1E9DC]/60 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.ville}</p>
             ${p.note ? `<p class="text-[#F1E9DC]/70 text-xs mt-1">${p.note}</p>` : ""}
             <div class="flex items-center gap-2 mt-2 flex-wrap">
-              <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.custom ? "Resto ajouté" : p.category}</span>
+              <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.category}</span>
               ${p.badge ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#2A3A1E;color:#9FD671">${icon("thumbs-up",10)} ${p.badge}</span>` : ""}
+              ${p.custom ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#2E241B;color:#C9972C">${icon("user",10)} Ajouté par vous</span>` : ""}
               ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
               ${p.custom && p.link ? linkChip(p.link, "Lien", "external-link") : ""}
             </div>
