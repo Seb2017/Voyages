@@ -192,7 +192,6 @@ const PLACE_CATEGORY_COLORS = {
   Mirador: "#1B6B93",
   Plage: "#2A7F7E",
   Tapas: "#8C2F39",
-  Resto: "#E8833A",
 };
 
 const PLACES = [
@@ -229,13 +228,13 @@ const PLACES = [
   {name:"Zahara de la Sierra", ville:"Ronda (villages blancs)", category:"Mirador"},
   {name:"Arcos de la Frontera", ville:"Ronda (villages blancs)", category:"Mirador"},
   // Recommandations locales (pas touristiques) — un resto/bar à tapas par ville
-  {name:"Casa de Botes", ville:"Málaga", category:"Resto", note:"Gazpachuelo malagueño — l'une des adresses les mieux gardées par les locaux, longtemps restée hors des radars touristiques.", badge:"Avis locaux"},
-  {name:"Bar Ávila", ville:"Grenade", category:"Resto", note:"Jambon rôti réputé — l'un des grands favoris des Grenadins.", badge:"Avis locaux"},
-  {name:"Taberna Góngora", ville:"Cordoue", category:"Resto", note:"Rabo de toro et aubergines au miel — ambiance traditionnelle plébiscitée par les Cordouans.", badge:"Avis locaux"},
-  {name:"Casa Cuesta", ville:"Séville (Triana)", category:"Resto", note:"Près de 140 ans d'histoire à Triana, à côté du marché — institution du quartier, azulejos et queue de bœuf réputée.", badge:"Avis locaux"},
-  {name:"La Viña", ville:"Cadix", category:"Resto", note:"Cuisine gaditane de qualité depuis 5 décennies — référence pour les habitants de Cadix.", badge:"Avis locaux"},
-  {name:"Los Melli", ville:"Tarifa", category:"Resto", note:"Spécialiste du thon rouge (albóndigas, adobo) — institution locale ouverte toute l'année, prix très accessibles.", badge:"Avis locaux"},
-  {name:"El Lechuguita (Bar Moreno)", ville:"Ronda", category:"Resto", note:"Le bar le plus emblématique de Ronda, près du Puente Nuevo — tapas à prix mini depuis des générations. Fermé le dimanche.", badge:"Avis locaux"},
+  {name:"Casa de Botes", ville:"Málaga", category:"Tapas", note:"Gazpachuelo malagueño — l'une des adresses les mieux gardées par les locaux, longtemps restée hors des radars touristiques.", badge:"Avis locaux"},
+  {name:"Bar Ávila", ville:"Grenade", category:"Tapas", note:"Jambon rôti réputé — l'un des grands favoris des Grenadins.", badge:"Avis locaux"},
+  {name:"Taberna Góngora", ville:"Cordoue", category:"Tapas", note:"Rabo de toro et aubergines au miel — ambiance traditionnelle plébiscitée par les Cordouans.", badge:"Avis locaux"},
+  {name:"Casa Cuesta", ville:"Séville (Triana)", category:"Tapas", note:"Près de 140 ans d'histoire à Triana, à côté du marché — institution du quartier, azulejos et queue de bœuf réputée.", badge:"Avis locaux"},
+  {name:"La Viña", ville:"Cadix", category:"Tapas", note:"Cuisine gaditane de qualité depuis 5 décennies — référence pour les habitants de Cadix.", badge:"Avis locaux"},
+  {name:"Los Melli", ville:"Tarifa", category:"Tapas", note:"Spécialiste du thon rouge (albóndigas, adobo) — institution locale ouverte toute l'année, prix très accessibles.", badge:"Avis locaux"},
+  {name:"El Lechuguita (Bar Moreno)", ville:"Ronda", category:"Tapas", note:"Le bar le plus emblématique de Ronda, près du Puente Nuevo — tapas à prix mini depuis des générations. Fermé le dimanche.", badge:"Avis locaux"},
 ];
 
 const INFOS_PRATIQUES = [
@@ -633,8 +632,8 @@ function renderReservations() {
 }
 
 function renderLieux() {
-  const cats = ["Toutes","Monument","Mirador","Plage","Tapas","Resto"];
-  const allPlaces = [...PLACES, ...state.customPlaces.map(p => ({ ...p, category: "Resto", custom: true }))];
+  const cats = ["Toutes","Monument","Mirador","Plage","Tapas"];
+  const allPlaces = [...PLACES, ...state.customPlaces.map(p => ({ ...p, category: "Tapas", custom: true }))];
   const filtered = state.placeFilter==="Toutes" ? allPlaces : allPlaces.filter(p => p.category===state.placeFilter);
   return `
     <button id="btn-addplace" class="w-full flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2 mb-4 border border-dashed" style="border-color:#3A2E23;color:#F1E9DC">
@@ -659,9 +658,10 @@ function renderLieux() {
           <div class="min-w-0 flex-1">
             <p class="font-semibold text-sm">${p.name}</p>
             <p class="text-[#F1E9DC]/60 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.ville}</p>
-            ${p.custom && p.note ? `<p class="text-[#F1E9DC]/70 text-xs mt-1">${p.note}</p>` : ""}
+            ${p.note ? `<p class="text-[#F1E9DC]/70 text-xs mt-1">${p.note}</p>` : ""}
             <div class="flex items-center gap-2 mt-2 flex-wrap">
               <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.custom ? "Resto ajouté" : p.category}</span>
+              ${p.badge ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#2A3A1E;color:#9FD671">${icon("thumbs-up",10)} ${p.badge}</span>` : ""}
               ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
               ${p.custom && p.link ? linkChip(p.link, "Lien", "external-link") : ""}
             </div>
