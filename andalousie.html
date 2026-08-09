@@ -69,10 +69,10 @@ const DAYS = [
   { id:1, date:"15 SEP", weekday:"MARDI", ville:"Départ", color:LEG.malaga, hotel:"Hôtel Romerito, Málaga", stops:[
     {time:"21:55", title:"Vol Lyon → Málaga", desc:"Décollage de Lyon.", tip:null, loc:"Aéroport de Lyon-Saint Exupéry"},
     {time:"00:15", title:"Atterrissage à Málaga (16/09)", desc:"Arrivée de nuit.", tip:null, loc:"Aeropuerto de Málaga-Costa del Sol"},
-    {time:"01:00", title:"Check-in Hôtel Romerito", desc:"Málaga.", tip:null, loc:"Hôtel Romerito, Málaga"},
+    {time:"00:30", title:"Récupération voiture — Rentalcars.com", desc:"Réservation #762525400 — Peugeot 3008 (cat. Intermédiaire) ou similaire. Prise en charge dans le terminal de l'aéroport de Málaga.", tip:"Automatique, climatisation, 5 places, 4 portes, 1 grande + 1 petite valise. Vérifier le plein et l'état des lieux avant de partir.", loc:"Aeropuerto de Málaga-Costa del Sol"},
+    {time:"01:15", title:"Check-in Hôtel Romerito", desc:"Málaga.", tip:null, loc:"Hôtel Romerito, Málaga"},
   ]},
   { id:2, date:"16 SEP", weekday:"MERCREDI", ville:"Málaga → Grenade", color:LEG.grenade, hotel:"Mercader de Sedas by Maxi Hoteles, Grenade", stops:[
-    {time:"10:00", title:"Récupération voiture de location", desc:"Rentalcar — réservée du 16 au 26/09.", tip:"Vérifier le plein et l'état des lieux avant de partir.", loc:"Rentalcar, Málaga"},
     {time:"11:00", title:"Route vers Grenade", desc:"~130 km depuis Málaga.", tip:null, loc:"Granada, España"},
     {time:"14:00", title:"Check-in — Mercader de Sedas", desc:"Grenade.", tip:"L'hôtel a un parking, mais non réservable (premier arrivé, premier servi) — arriver plutôt tôt dans l'après-midi. En dépannage : parking San Cristóbal, hors centre restreint.", loc:"Mercader de Sedas by Maxi Hoteles, Granada"},
   ]},
@@ -125,7 +125,7 @@ const DAYS = [
     {time:"10:00", title:"Route vers Puerto Banús", desc:"~60 km depuis Málaga (Marbella), compter 45-60 min selon trafic.", tip:null, loc:"Puerto Banús, Marbella"},
     {time:"11:30", title:"Croisière à Puerto Banús", desc:"Marbella — durée 2h30, réservée sur GetYourGuide.", tip:null, loc:"Puerto Banús, Marbella"},
     {time:"14:30", title:"Route retour vers Málaga", desc:"~60 km, compter 45-60 min.", tip:null, loc:"Málaga, España"},
-    {time:"16:00", title:"Restitution voiture de location", desc:"Vérifier plein d'essence et état des lieux.", tip:null, loc:"Rentalcar, Málaga"},
+    {time:"17:00", title:"Restitution voiture — Rentalcars.com", desc:"Réservation #762525400. Restitution dans le terminal de l'aéroport de Málaga.", tip:"Vérifier plein d'essence et état des lieux avant restitution.", loc:"Aeropuerto de Málaga-Costa del Sol"},
     {time:"19:05", title:"Vol Málaga → Lyon", desc:"Décollage.", tip:null, loc:"Aeropuerto de Málaga-Costa del Sol"},
     {time:"21:20", title:"Atterrissage à Lyon", desc:"Fin du séjour.", tip:null, loc:"Aéroport de Lyon-Saint Exupéry"},
   ]},
@@ -148,7 +148,7 @@ const RESERVATIONS_RECAP = [
     {label:"Málaga → Lyon", note:"26/09, 19h05 → 21h20"},
   ]},
   {cat:"Voiture de location", items:[
-    {label:"Rentalcar", note:"Du 16 au 26 septembre — réservée"},
+    {label:"Rentalcars.com — réservation #762525400", note:"Peugeot 3008 (cat. Intermédiaire) ou similaire, automatique, clim, 5 places — Prise en charge 16/09 00h30, restitution 26/09 17h00, Málaga Aéroport"},
   ]},
   {cat:"Hébergements", items: STAGES.map(s => ({label: s.ville, note: `${s.logement} (${s.dates})`}))},
   {cat:"Activités (GetYourGuide)", items:[
