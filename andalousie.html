@@ -42,7 +42,7 @@
 </script>
 
 <!-- Onglets de navigation entre voyages -->
-<div style="background:#000;border-bottom:1px solid #2E241B">
+<div style="background:#000;border-bottom:1px solid #2E241B;padding-top:env(safe-area-inset-top)">
   <div class="max-w-4xl mx-auto flex text-xs font-bold uppercase tracking-wide">
     <a href="index.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🗽 New York</a>
     <a href="andalousie.html" class="flex-1 text-center py-2.5" style="color:#fff;border-bottom:2px solid #C1502E">☀️ Andalousie</a>
@@ -73,7 +73,7 @@ const DAYS = [
     {time:"01:15", title:"Check-in Hôtel Romerito", desc:"Málaga.", tip:null, loc:"Hôtel Romerito, Málaga"},
   ]},
   { id:2, date:"16 SEP", weekday:"MERCREDI", ville:"Málaga → Grenade", color:LEG.grenade, hotel:"Mercader de Sedas by Maxi Hoteles, Grenade", stops:[
-    {time:"11:00", title:"Route vers Grenade", desc:"~130 km depuis Málaga.", tip:null, loc:"Granada, España"},
+    {time:"10:00", title:"Route vers Grenade", desc:"~130 km depuis Málaga.", tip:null, loc:"Granada, España"},
     {time:"14:00", title:"Check-in — Mercader de Sedas", desc:"Grenade.", tip:"L'hôtel a un parking, mais non réservable (premier arrivé, premier servi) — arriver plutôt tôt dans l'après-midi. En dépannage : parking San Cristóbal, hors centre restreint.", loc:"Mercader de Sedas by Maxi Hoteles, Granada"},
   ]},
   { id:3, date:"17 SEP", weekday:"JEUDI", ville:"Grenade → Cordoue", color:LEG.grenade, hotel:"Los Patios de la Judería, Cordoue", stops:[
@@ -85,7 +85,7 @@ const DAYS = [
     {time:"10:15", title:"Visite guidée de Cordoue", desc:"Réservée sur GetYourGuide.", tip:"Prévoir de l'eau — les patios peuvent être bondés en fin de matinée.", loc:"Mezquita-Catedral de Córdoba"},
   ]},
   { id:5, date:"19 SEP", weekday:"SAMEDI", ville:"Cordoue → Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", stops:[
-    {time:"11:00", title:"Route vers Séville", desc:"~140 km depuis Cordoue.", tip:null, loc:"Sevilla, España"},
+    {time:"10:00", title:"Route vers Séville", desc:"~140 km depuis Cordoue.", tip:null, loc:"Sevilla, España"},
     {time:"14:00", title:"Check-in — Hôtel Alcázar", desc:"Séville.", tip:"ZBE permanente sur le Casco Antiguo — vignette DGT nécessaire. Parkings Plaza de Armas ou Plaza de la Concordia, hors zone.", loc:"Hotel Alcázar, Sevilla"},
     {time:"17:00", title:"Croisière sur le Guadalquivir", desc:"Durée 1h — réservée sur GetYourGuide.", tip:null, loc:"Torre del Oro, Sevilla"},
     {time:"19:30", title:"Flamenco & Tapas", desc:"Soirée réservée sur GetYourGuide.", tip:null, loc:"Triana, Sevilla"},
@@ -100,7 +100,7 @@ const DAYS = [
     {time:"18:30", title:"Check-in — Hôtel Vento", desc:"Cadix.", tip:"Quasiment aucune place gratuite dans le Casco Antiguo — réserver un parking payant à l'avance plutôt que d'en chercher un sur place.", loc:"Hotel Boutique Vento, Cádiz"},
   ]},
   { id:8, date:"22 SEP", weekday:"MARDI", ville:"Cadix → Tarifa", color:LEG.tarifa, hotel:"Even Tarifa by Q Hotels, Tarifa", stops:[
-    {time:"11:00", title:"Route vers Tarifa", desc:"~100 km depuis Cadix.", tip:null, loc:"Tarifa, España"},
+    {time:"10:00", title:"Route vers Tarifa", desc:"~100 km depuis Cadix.", tip:null, loc:"Tarifa, España"},
     {time:"13:00", title:"Check-in — Even Tarifa", desc:"Tarifa.", tip:null, loc:"Even Tarifa by Q Hotels"},
     {time:"16:00", title:"Cours de surf", desc:"El Palmar — réservé sur GetYourGuide.", tip:null, loc:"Playa de El Palmar, Vejer de la Frontera"},
   ]},

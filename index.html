@@ -18,12 +18,13 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
   html, body { background:#0a0a0a; }
+  #app { background:#0a0a0a; min-height:100vh; }
   .no-scrollbar::-webkit-scrollbar { display:none; }
   .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
   * { -webkit-tap-highlight-color: transparent; }
 </style>
 </head>
-<body class="min-h-screen bg-neutral-950 text-zinc-100">
+<body class="min-h-screen text-zinc-100" style="background:#0a0a0a">
 
 <!-- ============================================================
      CONFIGURATION — colle ici l'URL de ton Web App Google Apps Script
@@ -35,7 +36,7 @@
 </script>
 
 <!-- Onglets de navigation entre voyages -->
-<div style="background:#000;border-bottom:1px solid #27272a">
+<div style="background:#000;border-bottom:1px solid #27272a;padding-top:env(safe-area-inset-top)">
   <div class="max-w-4xl mx-auto flex text-xs font-bold uppercase tracking-wide">
     <a href="index.html" class="flex-1 text-center py-2.5" style="color:#fff;border-bottom:2px solid #FCCC0A">🗽 New York</a>
     <a href="andalousie.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">☀️ Andalousie</a>
