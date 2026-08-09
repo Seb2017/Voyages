@@ -400,6 +400,9 @@ function render() {
         <a href="https://drive.google.com/drive/folders/1YITeji4bP_0G1GhkrXAVBUGzL3Vs7ZEm" target="_blank" rel="noopener" class="flex-1 flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2" style="background:#1B6B93;color:#F1E9DC">
           ${icon("folder",14)}Réservations (Drive)
         </a>
+        <button id="btn-share" class="flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2 px-3 border" style="border-color:#3A2E23;color:#F1E9DC">
+          ${icon("share-2",14)}
+        </button>
       </div>
     </div>
 
@@ -692,6 +695,16 @@ function attachEvents() {
 // ---------------------------------------------------------------
 // INIT
 // ---------------------------------------------------------------
+function jumpToToday() {
+  const tripStart = new Date("2026-09-15T00:00:00");
+  const diffDays = Math.floor((state.now - tripStart) / 86400000) + 1;
+  if (diffDays >= 1 && diffDays <= DAYS.length) {
+    state.activeDay = diffDays;
+    state.activeTab = "itineraire";
+  }
+}
+
+jumpToToday();
 setInterval(() => { state.now = new Date(); render(); }, 60000);
 render();
 loadState();
