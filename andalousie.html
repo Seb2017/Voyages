@@ -690,6 +690,28 @@ function attachEvents() {
   if (retryBtn) retryBtn.onclick = saveState;
   const resetBtn = document.getElementById("btn-reset");
   if (resetBtn) resetBtn.onclick = resetProgress;
+  const shareBtn = document.getElementById("btn-share");
+  if (shareBtn) shareBtn.onclick = shareApp;
+}
+
+async function shareApp() {
+  const shareData = {
+    title: "Andalousie — Carnet de voyage",
+    text: "Notre carnet de voyage en Andalousie",
+    url: window.location.href,
+  };
+  if (navigator.share) {
+    try { await navigator.share(shareData); } catch (err) { /* annulé par l'utilisateur */ }
+  } else if (navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(shareData.url);
+      window.alert("Lien copié dans le presse-papier !");
+    } catch (err) {
+      window.prompt("Copie ce lien :", shareData.url);
+    }
+  } else {
+    window.prompt("Copie ce lien :", shareData.url);
+  }
 }
 
 // ---------------------------------------------------------------
