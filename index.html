@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NYC Trip — Carnet de voyage</title>
+
+<!-- Ajout à l'écran d'accueil (iOS / Android) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NYC Trip">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FCCC0A' rx='18'/%3E%3Ctext x='50' y='63' font-size='40' font-weight='900' text-anchor='middle' font-family='Arial'%3ENY%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FCCC0A' rx='18'/%3E%3Ctext x='50' y='63' font-size='40' font-weight='900' text-anchor='middle' font-family='Arial'%3ENY%3C/text%3E%3C/svg%3E">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  html, body { background:#0a0a0a; }
+  .no-scrollbar::-webkit-scrollbar { display:none; }
+  .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+  * { -webkit-tap-highlight-color: transparent; }
+</style>
+</head>
+<body class="min-h-screen bg-neutral-950 text-zinc-100">
+
+<!-- ============================================================
+     CONFIGURATION — colle ici l'URL de ton Web App Google Apps Script
+     ============================================================ -->
+<script>
+  const CONFIG = {
+    API_URL: "https://script.google.com/macros/s/AKfycbyTzO4ZS-OETOHdBxlL1KFcX9idXobLJx79Y6dt1u_qipSR6Fc-r_mR4yKLr8brocWAWw/exec",
+  };
+</script>
+
+<div id="app"></div>
+
+<script>
+// ---------------------------------------------------------------
+// DATA
+// ---------------------------------------------------------------
+const LINE = {
+  yellow: "#FCCC0A", red: "#EE352E", brown: "#996633",
+  purple: "#B933AD", blue: "#0039A6", orange: "#FF6319", green: "#6CBE45",
+};
+const CATEGORY_COLORS = {
+  Visite: "#0039A6", Gastro: "#EE352E", "Street Food": "#6CBE45", Observatoire: "#B933AD",
+};
+
+const DAYS = [
+  { id:1, date:"1 MAI", weekday:"SAMEDI", quartier:"Midtown", color:LINE.yellow, stops:[
+    {time:"10:40", title:"Atterrissage JFK", desc:"Récupération des bagages, contrôle douanier.", tip:"Garde ton passeport et ta déclaration ESTA à portée de main."},
+    {time:"12:00", title:"Transfert vers l'hôtel", desc:"Taxi/VTC (~100$) ou AirTrain + Métro ligne E (11,40$/pers).", tip:null},
+    {time:"14:00", title:"Check-in — Hard Rock Hotel", desc:"159 W 48th St, Midtown.", tip:null},
+    {time:"15:30", title:"5th Avenue", desc:"Déambulation, vitrines, flagships.", tip:null},
+    {time:"16:30", title:"St. Patrick's Cathedral", desc:"Cathédrale néogothique en plein Midtown.", tip:"Lumière intérieure superbe en fin d'après-midi."},
+    {time:"17:15", title:"Grand Central Terminal", desc:"Hall principal, plafond voûté étoilé.", tip:"Photo grand-angle depuis la mezzanine ouest."},
+    {time:"18:00", title:"Bryant Park", desc:"Pause détente derrière la New York Public Library.", tip:null},
+    {time:"19:30", title:"Times Square de nuit", desc:"Néons, foule, énergie new-yorkaise.", tip:"La meilleure lumière arrive juste après le coucher du soleil."},
+    {time:"20:30", title:"Dîner", desc:"Brasserie new-yorkaise à Midtown.", tip:null},
+  ]},
+  { id:2, date:"2 MAI", weekday:"DIMANCHE", quartier:"Lower Manhattan", color:LINE.red, stops:[
+    {time:"08:30", title:"Ferry — Liberty Island", desc:"Départ vers la Statue de la Liberté, accès Couronne réservé.", tip:"Résa Couronne obligatoire des mois à l'avance."},
+    {time:"10:00", title:"Statue de la Liberté", desc:"Montée jusqu'à la Couronne.", tip:"Vue à 360° — prévoir sécurité renforcée à l'entrée."},
+    {time:"12:00", title:"Wall Street", desc:"Charging Bull, Federal Hall, NYSE.", tip:null},
+    {time:"13:00", title:"9/11 Memorial", desc:"Bassins mémoriaux, recueillement.", tip:null},
+    {time:"14:30", title:"Oculus", desc:"Structure spectaculaire de Santiago Calatrava.", tip:"Photo verticale depuis le centre du hall."},
+    {time:"16:00", title:"One World Observatory", desc:"Vue panoramique depuis le sommet du One WTC.", tip:"Viser la golden hour en fin d'après-midi."},
+    {time:"19:00", title:"Dîner", desc:"Stone Street — ruelle pavée, terrasses animées.", tip:null},
+  ]},
+  { id:3, date:"3 MAI", weekday:"LUNDI", quartier:"Brooklyn", color:LINE.brown, stops:[
+    {time:"08:00", title:"Pont de Brooklyn", desc:"Traversée à pied côté Manhattan → Brooklyn.", tip:"Partir tôt pour éviter la foule sur la passerelle."},
+    {time:"09:30", title:"DUMBO", desc:"Spot photo iconique Washington St / Water St.", tip:"Vue alignée sur le Manhattan Bridge — lumière du matin idéale."},
+    {time:"11:00", title:"Brooklyn Heights Promenade", desc:"Vue dégagée sur la skyline de Manhattan.", tip:null},
+    {time:"13:00", title:"Déjeuner", desc:"Juliana's Pizza — pizza napolitaine légendaire.", tip:null},
+    {time:"15:00", title:"Après-midi libre", desc:"Balade dans les rues de Brooklyn.", tip:null},
+    {time:"19:30", title:"Coucher de soleil", desc:"Skyline de Manhattan depuis les quais de Brooklyn.", tip:"Arriver 30 min avant l'heure du coucher pour s'installer."},
+  ]},
+  { id:4, date:"4 MAI", weekday:"MARDI", quartier:"Village & High Line", color:LINE.purple, stops:[
+    {time:"09:00", title:"Hudson Yards", desc:"Nouveau quartier, Vessel en toile de fond.", tip:null},
+    {time:"10:00", title:"The Edge Observatory", desc:"Plateforme d'observation avec sol vitré.", tip:"Le sol transparent est le meilleur spot photo vertigineux."},
+    {time:"11:30", title:"High Line", desc:"Promenade suspendue sur d'anciennes voies ferrées.", tip:null},
+    {time:"13:00", title:"Chelsea Market", desc:"Déjeuner dans le marché couvert.", tip:null},
+    {time:"15:00", title:"Washington Square Park", desc:"Arc emblématique, ambiance Greenwich Village.", tip:null},
+    {time:"19:30", title:"Dîner — Sushi Sho", desc:"Table d'exception à NoMad, menu omakase.", tip:"Réservation SevenRooms ouverte J-30, soit vers début avril."},
+  ]},
+  { id:5, date:"5 MAI", weekday:"MERCREDI", quartier:"Central Park & Broadway", color:LINE.blue, stops:[
+    {time:"09:00", title:"Central Park", desc:"Bethesda Terrace & Fountain.", tip:null},
+    {time:"10:30", title:"Bow Bridge", desc:"Pont photogénique au cœur du parc.", tip:"Meilleur point de vue du parc pour la photo."},
+    {time:"12:00", title:"MET Museum", desc:"Metropolitan Museum of Art.", tip:"Créneau d'entrée horodaté à réserver."},
+    {time:"17:30", title:"Dîner pré-show", desc:"Repas léger et rapide avant le spectacle.", tip:null},
+    {time:"20:00", title:"Broadway", desc:"Spectacle en soirée.", tip:null},
+  ]},
+  { id:6, date:"6 MAI", weekday:"JEUDI", quartier:"SoHo & Top of the Rock", color:LINE.orange, stops:[
+    {time:"09:30", title:"SoHo Cast-Iron District", desc:"Architecture en fonte, boutiques.", tip:null},
+    {time:"11:30", title:"Chinatown", desc:"Déambulation, marchés, échoppes.", tip:null},
+    {time:"13:30", title:"Déjeuner léger", desc:"Pause repas à Chinatown ou SoHo.", tip:null},
+    {time:"18:30", title:"Top of the Rock", desc:"Montée à l'observatoire du Rockefeller Center.", tip:null},
+    {time:"19:58", title:"Coucher de soleil", desc:"Vue imprenable sur Manhattan et l'Empire State.", tip:"Être en place au moins 15 min avant l'heure exacte."},
+    {time:"21:00", title:"Dîner — Corima", desc:"Restaurant mexicain 1 étoile Michelin.", tip:"Réservation Resy ouverte J-30, soit vers début mai — anticiper."},
+  ]},
+  { id:7, date:"7 MAI", weekday:"VENDREDI", quartier:"Street Food & Départ", color:LINE.green, stops:[
+    {time:"08:00", title:"Petit-déjeuner", desc:"Bagel new-yorkais classique.", tip:null},
+    {time:"09:30", title:"Harlem — Apollo Theater", desc:"Façade et histoire du théâtre mythique.", tip:null},
+    {time:"10:30", title:"Charles Pan-Fried Chicken", desc:"Institution du poulet frit à Harlem.", tip:null},
+    {time:"12:00", title:"Roosevelt Island Tramway", desc:"Aller-retour en téléphérique, vue aérienne sur l'East River.", tip:null},
+    {time:"13:30", title:"Street food", desc:"Halal Guys ou Los Tacos No. 1.", tip:null},
+    {time:"15:00", title:"Levain Bakery", desc:"Cookies emblématiques, à ne pas manquer.", tip:null},
+    {time:"16:30", title:"Empire State Building", desc:"Dernière vue panoramique du séjour.", tip:null},
+    {time:"18:30", title:"Retour à l'hôtel", desc:"Récupération des bagages au Hard Rock Hotel.", tip:null},
+    {time:"20:30", title:"Départ vers JFK", desc:"Transfert vers l'aéroport.", tip:null},
+    {time:"01:00", title:"Décollage (8 mai)", desc:"Vol retour.", tip:null},
+  ]},
+];
+
+const PLACES = [
+  {name:"Times Square", quartier:"Midtown", category:"Visite"},
+  {name:"Grand Central Terminal", quartier:"Midtown", category:"Visite"},
+  {name:"St. Patrick's Cathedral", quartier:"Midtown", category:"Visite"},
+  {name:"Bryant Park", quartier:"Midtown", category:"Visite"},
+  {name:"Top of the Rock", quartier:"Midtown", category:"Observatoire"},
+  {name:"Empire State Building", quartier:"Midtown", category:"Observatoire"},
+  {name:"Statue de la Liberté", quartier:"Lower Manhattan", category:"Visite"},
+  {name:"9/11 Memorial", quartier:"Lower Manhattan", category:"Visite"},
+  {name:"Oculus", quartier:"Lower Manhattan", category:"Visite"},
+  {name:"One World Observatory", quartier:"Lower Manhattan", category:"Observatoire"},
+  {name:"Stone Street", quartier:"Lower Manhattan", category:"Gastro"},
+  {name:"Pont de Brooklyn", quartier:"Brooklyn", category:"Visite"},
+  {name:"DUMBO", quartier:"Brooklyn", category:"Visite"},
+  {name:"Brooklyn Heights Promenade", quartier:"Brooklyn", category:"Visite"},
+  {name:"Juliana's Pizza", quartier:"Brooklyn", category:"Gastro"},
+  {name:"Hudson Yards / The Edge", quartier:"Village & High Line", category:"Observatoire"},
+  {name:"High Line", quartier:"Village & High Line", category:"Visite"},
+  {name:"Chelsea Market", quartier:"Village & High Line", category:"Gastro"},
+  {name:"Washington Square Park", quartier:"Village & High Line", category:"Visite"},
+  {name:"Sushi Sho", quartier:"NoMad", category:"Gastro"},
+  {name:"Central Park (Bethesda / Bow Bridge)", quartier:"Central Park", category:"Visite"},
+  {name:"MET Museum", quartier:"Upper East Side", category:"Visite"},
+  {name:"SoHo Cast-Iron District", quartier:"SoHo", category:"Visite"},
+  {name:"Chinatown", quartier:"Chinatown", category:"Street Food"},
+  {name:"Corima", quartier:"SoHo", category:"Gastro"},
+  {name:"Apollo Theater", quartier:"Harlem", category:"Visite"},
+  {name:"Charles Pan-Fried Chicken", quartier:"Harlem", category:"Street Food"},
+  {name:"Roosevelt Island Tramway", quartier:"Midtown East", category:"Visite"},
+  {name:"Halal Guys", quartier:"Midtown", category:"Street Food"},
+  {name:"Los Tacos No. 1", quartier:"Chelsea", category:"Street Food"},
+  {name:"Levain Bakery", quartier:"Upper West Side", category:"Street Food"},
+];
+
+const RESERVATIONS = [
+  {id:"r1", month:"Janvier 2027", label:"Vols aller-retour", note:"Dès disponibilité des tarifs"},
+  {id:"r2", month:"Janvier 2027", label:"Hard Rock Hotel", note:"Confirmer la réservation"},
+  {id:"r3", month:"Janvier 2027", label:"Statue de la Liberté — Couronne", note:"Accès limité, résa très en amont"},
+  {id:"r4", month:"Février 2027", label:"One World Observatory", note:"Billets horodatés"},
+  {id:"r5", month:"Février 2027", label:"Spectacle Broadway", note:"Choix du show + billets"},
+  {id:"r6", month:"Février 2027", label:"9/11 Memorial Museum", note:"Créneau d'entrée"},
+  {id:"r7", month:"Mars 2027", label:"Top of the Rock", note:"Créneau 18h30, coucher de soleil 19h58"},
+  {id:"r8", month:"Mars 2027", label:"The Edge — Hudson Yards", note:"Billets horodatés"},
+  {id:"r9", month:"Mars 2027", label:"MET Museum", note:"Pass horodaté"},
+  {id:"r10", month:"Avril 2027", label:"Sushi Sho — NoMad", note:"Résa SevenRooms, ouverture J-30 (~début avril)"},
+  {id:"r11", month:"Avril 2027", label:"Corima", note:"Résa Resy, ouverture J-30 (~début mai)"},
+  {id:"r12", month:"Avril 2027", label:"Empire State Building", note:"Billets coupe-file"},
+  {id:"r13", month:"Avril 2027", label:"Roosevelt Island Tramway", note:"Pas de résa — MetroCard / OMNY"},
+];
+const RES_MONTHS = ["Janvier 2027","Février 2027","Mars 2027","Avril 2027"];
+
+const GASTRO = [
+  {name:"Sushi Sho", when:"Mardi 4 mai, 19h30", quartier:"NoMad", tag:"Omakase d'exception", color:LINE.purple,
+   desc:"Table haut de gamme spécialisée dans le sushi omakase. Expérience à réserver impérativement à l'avance.",
+   booking:"SevenRooms — ouverture des résas J-30 (~début avril 2027)"},
+  {name:"Corima", when:"Jeudi 6 mai, 21h00", quartier:"SoHo", tag:"1 étoile Michelin — Mexicain", color:LINE.orange,
+   desc:"Cuisine mexicaine contemporaine étoilée. À enchaîner juste après le coucher de soleil au Top of the Rock.",
+   booking:"Resy — ouverture des résas J-30 (~début mai 2027)"},
+];
+const STREET_FOOD_DAY = [
+  {name:"Charles Pan-Fried Chicken", note:"Harlem — poulet frit culte"},
+  {name:"The Halal Guys", note:"Cart iconique de Midtown"},
+  {name:"Los Tacos No. 1", note:"Tacos mexicains parmi les meilleurs de NYC"},
+  {name:"Levain Bakery", note:"Cookies gigantesques, chocolat/noix"},
+];
+const TABS = [
+  {id:"itineraire", label:"Itinéraire", icon:"calendar"},
+  {id:"lieux", label:"Lieux clés", icon:"map"},
+  {id:"reservations", label:"Réservations", icon:"ticket"},
+  {id:"gastro", label:"Gastronomie", icon:"utensils"},
+];
+
+// ---------------------------------------------------------------
+// STATE
+// ---------------------------------------------------------------
+const state = {
+  activeTab: "itineraire",
+  activeDay: 1,
+  checkedStops: {},
+  checkedRes: {},
+  placeFilter: "Toutes",
+  isLoaded: false,
+  syncStatus: "idle", // idle | saving | saved | error
+  syncError: "",
+  now: new Date(),
+};
+
+let saveTimer = null;
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveState, 400);
+}
+
+async function loadState() {
+  if (!CONFIG.API_URL || CONFIG.API_URL.includes("COLLE_ICI")) {
+    state.isLoaded = true;
+    state.syncStatus = "error";
+    state.syncError = "Aucune URL Apps Script configurée (CONFIG.API_URL).";
+    render();
+    return;
+  }
+  try {
+    const res = await fetch(CONFIG.API_URL + "?action=get", { method: "GET" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    state.checkedStops = data.checkedStops || {};
+    state.checkedRes = data.checkedRes || {};
+    state.isLoaded = true;
+    state.syncStatus = "saved";
+  } catch (err) {
+    state.isLoaded = true;
+    state.syncStatus = "error";
+    state.syncError = err && err.message ? err.message : String(err);
+  }
+  render();
+}
+
+async function saveState() {
+  if (!CONFIG.API_URL || CONFIG.API_URL.includes("COLLE_ICI")) return;
+  state.syncStatus = "saving";
+  render();
+  try {
+    const res = await fetch(CONFIG.API_URL, {
+      method: "POST",
+      // text/plain évite le pre-flight CORS (OPTIONS) qu'Apps Script ne gère pas nativement
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ checkedStops: state.checkedStops, checkedRes: state.checkedRes }),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    state.syncStatus = data && data.ok ? "saved" : "error";
+    state.syncError = data && data.ok ? "" : "Réponse inattendue du serveur.";
+  } catch (err) {
+    state.syncStatus = "error";
+    state.syncError = err && err.message ? err.message : String(err);
+  }
+  render();
+}
+
+function resetProgress() {
+  state.checkedStops = {};
+  state.checkedRes = {};
+  saveState();
+}
+
+// ---------------------------------------------------------------
+// HELPERS
+// ---------------------------------------------------------------
+function icon(name, size, extraClass) {
+  return `<i data-lucide="${name}" style="width:${size}px;height:${size}px" class="${extraClass||''} shrink-0"></i>`;
+}
+
+function countdown() {
+  const target = new Date("2027-05-01T00:00:00");
+  const diffMs = target - state.now;
+  if (diffMs <= 0) return { live: true };
+  const days = Math.floor(diffMs / 86400000);
+  return { live: false, days };
+}
+
+function resProgress() {
+  const total = RESERVATIONS.length;
+  const done = Object.values(state.checkedRes).filter(Boolean).length;
+  return { total, done, pct: Math.round((done/total)*100) };
+}
+
+// ---------------------------------------------------------------
+// RENDER
+// ---------------------------------------------------------------
+function render() {
+  const cd = countdown();
+  const app = document.getElementById("app");
+
+  app.innerHTML = `
+    <header class="border-b-4 border-black bg-zinc-100 text-black">
+      <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-full flex items-center justify-center font-black text-lg shrink-0" style="background:${LINE.yellow};color:#000">NY</div>
+          <div>
+            <p class="uppercase tracking-widest text-[11px] font-bold text-zinc-500 leading-none">Carnet de voyage</p>
+            <h1 class="uppercase font-black text-xl sm:text-2xl tracking-tight leading-tight">New York City</h1>
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="uppercase text-[11px] font-bold text-zinc-500 leading-none">${cd.live ? "Bon séjour !" : "Départ dans"}</p>
+          <p class="font-mono font-black text-xl sm:text-2xl leading-tight">${cd.live ? "J-J" : "J-"+cd.days}</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="bg-zinc-900 border-b border-zinc-800">
+      <div class="max-w-4xl mx-auto px-4 py-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div class="flex items-center gap-2">${icon("calendar",16,"text-zinc-500")}<span>1 → 8 mai 2027</span></div>
+        <div class="flex items-center gap-2">${icon("hotel",16,"text-zinc-500")}<span>Hard Rock Hotel, W 48th St</span></div>
+        <div class="flex items-center gap-2">${icon("plane",16,"text-zinc-500")}<span>Arrivée JFK 10h40 (1/05)</span></div>
+        <div class="flex items-center gap-2">${icon("plane",16,"text-zinc-500 rotate-45")}<span>Retour JFK 20h30 (7/05) — vol 01h00</span></div>
+      </div>
+    </div>
+
+    <div class="bg-zinc-950 border-b border-zinc-900">
+      <div class="max-w-4xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+        <div class="flex items-center gap-1.5 text-zinc-500">${icon("users",13)}<span>Suivi partagé — visible par toute personne ayant ce lien</span></div>
+        <div class="flex items-center gap-3 shrink-0">
+          <span class="flex items-center gap-1.5">
+            ${!state.isLoaded ? icon("refresh-cw",12,"animate-spin text-zinc-500") + '<span class="text-zinc-500">Chargement…</span>' : ""}
+            ${state.isLoaded && state.syncStatus==="saving" ? icon("refresh-cw",12,"animate-spin text-yellow-400") + '<span class="text-yellow-400">Synchronisation…</span>' : ""}
+            ${state.isLoaded && state.syncStatus==="saved" ? icon("check-circle-2",12,"text-green-400") + '<span class="text-green-400">Synchronisé</span>' : ""}
+            ${state.isLoaded && state.syncStatus==="error" ? icon("cloud-off",12,"text-red-400") + '<span class="text-red-400">Échec de synchronisation</span>' : ""}
+          </span>
+          ${state.isLoaded && state.syncStatus==="error" ? `<button id="btn-retry" class="flex items-center gap-1 text-red-300 underline decoration-dotted">${icon("refresh-cw",12)}Réessayer</button>` : ""}
+          <button id="btn-reset" class="flex items-center gap-1 text-zinc-500">${icon("rotate-ccw",12)}Réinitialiser</button>
+        </div>
+        ${state.isLoaded && state.syncStatus==="error" && state.syncError ? `<p class="w-full text-red-400/80 font-mono text-[10px] break-all">Détail : ${state.syncError}</p>` : ""}
+      </div>
+    </div>
+
+    <nav class="sticky top-0 z-20 bg-neutral-950/95 backdrop-blur border-b border-zinc-800">
+      <div class="max-w-4xl mx-auto px-4 flex gap-1 overflow-x-auto no-scrollbar">
+        ${TABS.map(t => `
+          <button data-tab="${t.id}" class="tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${state.activeTab===t.id ? "border-yellow-400 text-white" : "border-transparent text-zinc-500"}">
+            ${icon(t.icon,16)}${t.label}
+          </button>
+        `).join("")}
+      </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-6">
+      ${state.activeTab==="itineraire" ? renderItineraire() : ""}
+      ${state.activeTab==="lieux" ? renderLieux() : ""}
+      ${state.activeTab==="reservations" ? renderReservations() : ""}
+      ${state.activeTab==="gastro" ? renderGastro() : ""}
+    </main>
+
+    <footer class="max-w-4xl mx-auto px-4 pt-4 pb-10 border-t border-zinc-900 text-center text-[11px] text-zinc-600">
+      Hard Rock Hotel New York · 159 W 48th St, Midtown · JFK ↔ Hôtel : Taxi/VTC ~100$ ou AirTrain + Métro E (11,40$/pers)
+    </footer>
+  `;
+
+  attachEvents();
+  if (window.lucide) lucide.createIcons();
+}
+
+function renderItineraire() {
+  const day = DAYS.find(d => d.id === state.activeDay);
+  return `
+    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 mb-6">
+      ${DAYS.map(d => {
+        const done = d.stops.filter((_,i) => state.checkedStops[`${d.id}-${i}`]).length;
+        const active = state.activeDay === d.id;
+        return `
+          <button data-day="${d.id}" class="day-btn shrink-0 w-20 rounded-lg border px-2 py-2 text-center transition-colors ${active ? "border-white bg-zinc-900" : "border-zinc-800 bg-zinc-900/40"}">
+            <div class="w-6 h-6 rounded-full mx-auto mb-1 flex items-center justify-center text-[10px] font-black text-black" style="background:${d.color}">${d.id}</div>
+            <p class="text-[10px] uppercase font-bold text-zinc-400">${d.weekday}</p>
+            <p class="text-xs font-mono text-zinc-500">${done}/${d.stops.length}</p>
+          </button>
+        `;
+      }).join("")}
+    </div>
+
+    <div class="flex items-center gap-3 mb-1">
+      <span class="w-3 h-3 rounded-full shrink-0" style="background:${day.color}"></span>
+      <h2 class="uppercase font-black text-2xl tracking-tight">${day.weekday} ${day.date}</h2>
+    </div>
+    <p class="text-zinc-500 text-sm mb-6 ml-6">${day.quartier}</p>
+
+    <div class="relative pl-8">
+      <div class="absolute left-[11px] top-2 bottom-2 w-[3px] rounded-full" style="background:${day.color};opacity:0.35"></div>
+      <div class="space-y-4">
+        ${day.stops.map((s, idx) => {
+          const key = `${day.id}-${idx}`;
+          const done = !!state.checkedStops[key];
+          return `
+            <div class="relative">
+              <button data-stop="${key}" class="stop-btn absolute -left-8 top-1 w-6 h-6 rounded-full border-2 flex items-center justify-center bg-neutral-950" style="border-color:${day.color}">
+                ${done ? icon("check-circle-2",16) : `<span style="width:8px;height:8px;border-radius:9999px;background:${day.color}"></span>`}
+              </button>
+              <div class="rounded-lg border px-4 py-3 ${done ? "border-zinc-800 bg-zinc-900/30 opacity-50" : "border-zinc-800 bg-zinc-900"}">
+                <span class="font-mono text-xs font-bold text-zinc-400 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
+                <p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>
+                <p class="text-zinc-400 text-xs mt-1">${s.desc}</p>
+                ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] text-yellow-400/90 mt-2">${icon("camera",12,"mt-0.5")}${s.tip}</p>` : ""}
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderLieux() {
+  const cats = ["Toutes","Visite","Gastro","Street Food","Observatoire"];
+  const filtered = state.placeFilter==="Toutes" ? PLACES : PLACES.filter(p => p.category===state.placeFilter);
+  return `
+    <div class="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar pb-1">
+      ${icon("filter",14,"text-zinc-500")}
+      ${cats.map(cat => {
+        const active = state.placeFilter===cat;
+        const color = CATEGORY_COLORS[cat];
+        return `
+          <button data-filter="${cat}" class="filter-btn shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border ${active ? "border-white bg-white text-black" : "border-zinc-700 text-zinc-300"}">
+            ${color ? `<span class="w-2 h-2 rounded-full" style="background:${active?'#000':color}"></span>` : ""}${cat}
+          </button>
+        `;
+      }).join("")}
+    </div>
+    <div class="grid sm:grid-cols-2 gap-3">
+      ${filtered.map(p => `
+        <div class="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3">
+          <span class="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style="background:${CATEGORY_COLORS[p.category]}"></span>
+          <div class="min-w-0">
+            <p class="font-semibold text-sm truncate">${p.name}</p>
+            <p class="text-zinc-500 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.quartier}</p>
+            <p class="text-[10px] uppercase tracking-wide font-bold mt-1" style="color:${CATEGORY_COLORS[p.category]}">${p.category}</p>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderReservations() {
+  const rp = resProgress();
+  return `
+    <div class="rounded-lg border border-zinc-800 bg-zinc-900 p-4 mb-6">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-semibold flex items-center gap-2">${icon("ticket",16)}Progression des réservations</p>
+        <p class="font-mono text-sm text-zinc-400">${rp.done}/${rp.total}</p>
+      </div>
+      <div class="h-2 rounded-full bg-zinc-800 overflow-hidden">
+        <div class="h-full rounded-full transition-all" style="width:${rp.pct}%;background:${LINE.yellow}"></div>
+      </div>
+    </div>
+    <div class="space-y-6">
+      ${RES_MONTHS.map(month => {
+        const items = RESERVATIONS.filter(r => r.month===month);
+        return `
+          <div>
+            <h3 class="uppercase text-xs font-black tracking-widest text-zinc-500 mb-2">${month}</h3>
+            <div class="space-y-2">
+              ${items.map(item => {
+                const done = !!state.checkedRes[item.id];
+                return `
+                  <button data-res="${item.id}" class="res-btn w-full flex items-start gap-3 text-left rounded-lg border px-4 py-3 ${done ? "border-zinc-800 bg-zinc-900/30" : "border-zinc-800 bg-zinc-900"}">
+                    <span class="mt-0.5 shrink-0">${done ? icon("check-circle-2",18,"text-yellow-400") : icon("circle",18,"text-zinc-600")}</span>
+                    <span class="min-w-0">
+                      <p class="text-sm font-semibold ${done ? "line-through text-zinc-500" : ""}">${item.label}</p>
+                      <p class="text-xs text-zinc-500 mt-0.5">${item.note}</p>
+                    </span>
+                  </button>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderGastro() {
+  return `
+    <div class="space-y-4">
+      ${GASTRO.map(r => `
+        <div class="rounded-lg border border-zinc-800 bg-zinc-900 overflow-hidden">
+          <div class="h-1.5" style="background:${r.color}"></div>
+          <div class="p-4">
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <h3 class="font-black text-lg">${r.name}</h3>
+              <span class="flex items-center gap-1 text-[11px] font-bold text-yellow-400 shrink-0">${icon("star",12)}${r.tag}</span>
+            </div>
+            <p class="text-xs text-zinc-500 flex items-center gap-3 mb-3">
+              <span class="flex items-center gap-1">${icon("clock",12)}${r.when}</span>
+              <span class="flex items-center gap-1">${icon("map-pin",12)}${r.quartier}</span>
+            </p>
+            <p class="text-sm text-zinc-300 mb-3">${r.desc}</p>
+            <div class="flex items-center gap-2 text-xs bg-zinc-800/60 rounded-md px-3 py-2">${icon("ticket",13,"text-zinc-400")}<span class="text-zinc-300">${r.booking}</span></div>
+          </div>
+        </div>
+      `).join("")}
+      <div class="rounded-lg border border-zinc-800 bg-zinc-900 overflow-hidden">
+        <div class="h-1.5" style="background:${LINE.green}"></div>
+        <div class="p-4">
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <h3 class="font-black text-lg">Journée Street Food</h3>
+            <span class="text-[11px] font-bold text-zinc-500">Vendredi 7 mai</span>
+          </div>
+          <p class="text-sm text-zinc-300 mb-3">Dernier jour à New York, sans réservation — enchaîner les meilleures adresses street food de Harlem à Chelsea avant le départ.</p>
+          <div class="grid sm:grid-cols-2 gap-2">
+            ${STREET_FOOD_DAY.map(item => `
+              <div class="flex items-start gap-2 rounded-md bg-zinc-800/60 px-3 py-2">
+                ${icon("utensils",13,"text-green-400 mt-0.5")}
+                <div><p class="text-sm font-semibold">${item.name}</p><p class="text-xs text-zinc-500">${item.note}</p></div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ---------------------------------------------------------------
+// EVENTS
+// ---------------------------------------------------------------
+function attachEvents() {
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.onclick = () => { state.activeTab = btn.dataset.tab; render(); };
+  });
+  document.querySelectorAll(".day-btn").forEach(btn => {
+    btn.onclick = () => { state.activeDay = Number(btn.dataset.day); render(); };
+  });
+  document.querySelectorAll(".stop-btn").forEach(btn => {
+    btn.onclick = () => {
+      const key = btn.dataset.stop;
+      state.checkedStops[key] = !state.checkedStops[key];
+      render();
+      scheduleSave();
+    };
+  });
+  document.querySelectorAll(".res-btn").forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.res;
+      state.checkedRes[id] = !state.checkedRes[id];
+      render();
+      scheduleSave();
+    };
+  });
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.onclick = () => { state.placeFilter = btn.dataset.filter; render(); };
+  });
+  const retryBtn = document.getElementById("btn-retry");
+  if (retryBtn) retryBtn.onclick = saveState;
+  const resetBtn = document.getElementById("btn-reset");
+  if (resetBtn) resetBtn.onclick = resetProgress;
+}
+
+// ---------------------------------------------------------------
+// INIT
+// ---------------------------------------------------------------
+setInterval(() => { state.now = new Date(); render(); }, 60000);
+render();
+loadState();
+</script>
+</body>
+</html>
