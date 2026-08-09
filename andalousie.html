@@ -74,19 +74,20 @@ const DAYS = [
   { id:2, date:"16 SEP", weekday:"MERCREDI", ville:"Málaga → Grenade", color:LEG.grenade, hotel:"Mercader de Sedas by Maxi Hoteles, Grenade", stops:[
     {time:"10:00", title:"Récupération voiture de location", desc:"Rentalcar — réservée du 16 au 26/09.", tip:"Vérifier le plein et l'état des lieux avant de partir."},
     {time:"11:00", title:"Route vers Grenade", desc:"~130 km depuis Málaga.", tip:null},
-    {time:"14:00", title:"Check-in — Mercader de Sedas", desc:"Grenade.", tip:null},
+    {time:"14:00", title:"Check-in — Mercader de Sedas", desc:"Grenade.", tip:"L'hôtel a un parking, mais non réservable (premier arrivé, premier servi) — arriver plutôt tôt dans l'après-midi. En dépannage : parking San Cristóbal, hors centre restreint."},
   ]},
   { id:3, date:"17 SEP", weekday:"JEUDI", ville:"Grenade → Cordoue", color:LEG.grenade, hotel:"Los Patios de la Judería, Cordoue", stops:[
     {time:"10:00", title:"Visite guidée de Grenade", desc:"Réservée sur GetYourGuide.", tip:null},
     {time:"16:00", title:"Route vers Cordoue", desc:"~165 km depuis Grenade.", tip:null},
-    {time:"18:30", title:"Check-in — Los Patios de la Judería", desc:"Cordoue.", tip:null},
+    {time:"18:30", title:"Check-in — Los Patios de la Judería", desc:"Cordoue.", tip:"Judería en grande partie piétonne : parking El Vial (près de la gare) ou gratuit au sud du pont romain."},
   ]},
   { id:4, date:"18 SEP", weekday:"VENDREDI", ville:"Cordoue", color:LEG.cordoue, hotel:"Los Patios de la Judería, Cordoue", stops:[
     {time:"10:15", title:"Visite guidée de Cordoue", desc:"Réservée sur GetYourGuide.", tip:"Prévoir de l'eau — les patios peuvent être bondés en fin de matinée."},
   ]},
   { id:5, date:"19 SEP", weekday:"SAMEDI", ville:"Cordoue → Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", stops:[
     {time:"11:00", title:"Route vers Séville", desc:"~140 km depuis Cordoue.", tip:null},
-    {time:"14:00", title:"Check-in — Hôtel Alcázar", desc:"Séville.", tip:null},
+    {time:"14:00", title:"Check-in — Hôtel Alcázar", desc:"Séville.", tip:"ZBE permanente sur le Casco Antiguo — vignette DGT nécessaire. Parkings Plaza de Armas ou Plaza de la Concordia, hors zone."},
+    {time:"17:00", title:"Le Guadalquivir", desc:"Balade le long du fleuve à Séville.", tip:null},
     {time:"19:30", title:"Flamenco & Tapas", desc:"Soirée réservée sur GetYourGuide.", tip:null},
   ]},
   { id:6, date:"20 SEP", weekday:"DIMANCHE", ville:"Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", stops:[
@@ -96,7 +97,7 @@ const DAYS = [
   { id:7, date:"21 SEP", weekday:"LUNDI", ville:"Séville → Cadix", color:LEG.cadix, hotel:"Hôtel Boutique Vento, Cadix", stops:[
     {time:"12:00", title:"Bodegas & dégustation de vin", desc:"Visite réservée sur GetYourGuide.", tip:null},
     {time:"17:00", title:"Route vers Cadix", desc:"Arrivée en fin d'après-midi.", tip:null},
-    {time:"18:30", title:"Check-in — Hôtel Vento", desc:"Cadix.", tip:null},
+    {time:"18:30", title:"Check-in — Hôtel Vento", desc:"Cadix.", tip:"Quasiment aucune place gratuite dans le Casco Antiguo — réserver un parking payant à l'avance plutôt que d'en chercher un sur place."},
   ]},
   { id:8, date:"22 SEP", weekday:"MARDI", ville:"Cadix → Tarifa", color:LEG.tarifa, hotel:"Even Tarifa by Q Hotels, Tarifa", stops:[
     {time:"11:00", title:"Route vers Tarifa", desc:"~100 km depuis Cadix.", tip:null},
@@ -105,8 +106,8 @@ const DAYS = [
   ]},
   { id:9, date:"23 SEP", weekday:"MERCREDI", ville:"Tarifa → Ronda", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", stops:[
     {time:"11:00", title:"Rocher de Gibraltar", desc:"Visite guidée, durée 2h30.", tip:"Prendre son passeport — passage de frontière."},
-    {time:"15:30", title:"Route vers Ronda", desc:"~170 km depuis Gibraltar/Tarifa.", tip:null},
-    {time:"18:00", title:"Check-in — Catalonia Reina Victoria", desc:"Ronda.", tip:null},
+    {time:"15:30", title:"Route vers Ronda", desc:"~100 km depuis Gibraltar.", tip:null},
+    {time:"18:00", title:"Check-in — Catalonia Reina Victoria", desc:"Ronda.", tip:"Le Puente Nuevo est désormais interdit à la circulation — privilégier un parking dédié plutôt que le centre historique."},
   ]},
   { id:10, date:"24 SEP", weekday:"JEUDI", ville:"Ronda — Villages blancs", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", stops:[
     {time:"09:30", title:"Route des villages blancs", desc:"Journée en voiture à la découverte des pueblos blancos autour de Ronda.", tip:"Prévoir des chaussures confortables — ruelles pavées et pentes dans la plupart des villages."},
@@ -216,7 +217,12 @@ const PLACES = [
 ];
 
 const INFOS_PRATIQUES = [
-  {icon:"car", titre:"Conduite & stationnement", texte:"Conduite à droite comme en France. Les centres historiques (Grenade, Cordoue, Séville) ont des zones à circulation restreinte (ZBE) souvent fermées aux véhicules non-résidents — préférer un parking en périphérie et terminer à pied plutôt que suivre le GPS jusqu'au centre."},
+  {icon:"car", titre:"Conduite & stationnement — vue d'ensemble", texte:"Conduite à droite comme en France. La plupart des vieux centres andalous sont restreints aux véhicules non-résidents (ZBE ou rues piétonnes) — le réflexe à prendre partout : se garer en périphérie ou dans un parking dédié, puis marcher ou prendre un taxi jusqu'à l'hôtel."},
+  {icon:"map-pin", titre:"Grenade — le plus contraignant", texte:"Centre historique (Albaicín, Gran Vía, Plaza Nueva, Elvira, Sacromonte) interdit à la circulation privée sauf résidents/hôtels autorisés, ZBE active. Le Mercader de Sedas a son propre parking mais non réservable — arriver tôt dans l'après-midi. En dépannage : parking San Cristóbal."},
+  {icon:"map-pin", titre:"Séville — ZBE permanente", texte:"La ZBE (lun-ven 7h-19h) couvre le Casco Antiguo et Triana, où se trouve l'hôtel. Vignette environnementale DGT nécessaire pour la voiture de location, sous peine d'amende. Parkings Plaza de Armas ou Plaza de la Concordia, hors zone."},
+  {icon:"map-pin", titre:"Cadix — quasiment aucune place", texte:"Une seule place gratuite subsiste dans la vieille ville (Punta San Felipe), très disputée. Casco Antiguo en grande partie piétonnier — mieux vaut réserver un parking payant à l'avance."},
+  {icon:"map-pin", titre:"Cordoue — Judería piétonne", texte:"Rues étroites, largement fermées à la circulation autour de la Mezquita. Parking El Vial (près de la gare) conseillé ; stationnement gratuit possible au sud du pont romain."},
+  {icon:"map-pin", titre:"Ronda — Puente Nuevo fermé aux voitures", texte:"Le pont emblématique est désormais interdit à la circulation. Stationnement limité en vieille ville — privilégier un parking dédié plutôt que chercher une place sur place."},
   {icon:"clock", titre:"Horaires & sieste", texte:"Beaucoup de commerces ferment entre 14h et 17h. Les Espagnols dînent tard (21h-22h). Les musées et monuments sont souvent fermés le lundi — à vérifier avant chaque visite."},
   {icon:"flag", titre:"Frontière de Gibraltar", texte:"Territoire britannique d'outre-mer : passeport obligatoire (pas seulement carte d'identité). Prévoir un peu d'attente au poste-frontière piéton/véhicule. La monnaie officielle est la livre de Gibraltar, mais l'euro est largement accepté."},
   {icon:"sun", titre:"Météo mi-septembre", texte:"Chaud à l'intérieur des terres (Séville, Cordoue : 28-32°C en journée), plus tempéré et venteux sur la côte (Cadix, Tarifa — capitale européenne du vent/kitesurf). Prévoir vêtements légers et une couche pour le soir."},
@@ -513,7 +519,7 @@ function renderReservations() {
                 <div class="min-w-0">
                   <p class="text-sm font-semibold">${item.label}</p>
                   <p class="text-xs text-[#F1E9DC]/70 mt-0.5">${item.note}</p>
-                  ${group.cat==="Hébergements" ? `<div class="mt-2">${linkChip(mapsLink(item.note + ", " + item.label), "Maps", "map-pin")}</div>` : ""}
+                  ${group.cat==="Hébergements" ? `<div class="mt-2">${linkChip(mapsLink(item.note.replace(/\s*\([^)]*\)\s*$/, "") + ", " + item.label), "Maps", "map-pin")}</div>` : ""}
                   ${group.cat==="Activités (GetYourGuide)" ? `<div class="mt-2">${linkChip(gygLink(item.label), "GetYourGuide", "external-link")}</div>` : ""}
                 </div>
                 <span class="flex items-center gap-1 text-[10px] font-bold shrink-0 mt-0.5" style="color:#8FA07C">${icon("check",11)}RÉSERVÉ</span>
