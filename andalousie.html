@@ -192,6 +192,7 @@ const PLACE_CATEGORY_COLORS = {
   Mirador: "#1B6B93",
   Plage: "#2A7F7E",
   Tapas: "#8C2F39",
+  Resto: "#E8833A",
 };
 
 const PLACES = [
@@ -260,6 +261,7 @@ const state = {
   checkedStops: {},
   checkedChecklist: {},
   customLinks: {},
+  customPlaces: [],
   placeFilter: "Toutes",
   isLoaded: false,
   syncStatus: "idle",
@@ -283,6 +285,7 @@ async function loadState() {
     state.checkedStops = data.checkedStops || {};
     state.checkedChecklist = data.checkedChecklist || {};
     state.customLinks = data.customLinks || {};
+    state.customPlaces = data.customPlaces || [];
     state.isLoaded = true;
     state.syncStatus = "saved";
   } catch (err) {
@@ -301,7 +304,7 @@ async function saveState() {
     const res = await fetch(apiUrl("set"), {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ checkedStops: state.checkedStops, checkedChecklist: state.checkedChecklist, customLinks: state.customLinks }),
+      body: JSON.stringify({ checkedStops: state.checkedStops, checkedChecklist: state.checkedChecklist, customLinks: state.customLinks, customPlaces: state.customPlaces }),
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
@@ -329,6 +332,22 @@ function addLink(key, prefill) {
   } else {
     state.customLinks[key] = url.trim();
   }
+  render();
+  scheduleSave();
+}
+
+function addPlace() {
+  const name = window.prompt("Nom du resto :");
+  if (!name || !name.trim()) return;
+  const ville = window.prompt("Ville :", "") || "";
+  const note = window.prompt("Note (optionnel) :", "") || "";
+  state.customPlaces.push({ id: "cp" + Date.now(), name: name.trim(), ville: ville.trim(), note: note.trim() });
+  render();
+  scheduleSave();
+}
+
+function deletePlace(id) {
+  state.customPlaces = state.customPlaces.filter(p => p.id !== id);
   render();
   scheduleSave();
 }
@@ -585,9 +604,13 @@ function renderReservations() {
 }
 
 function renderLieux() {
-  const cats = ["Toutes","Monument","Mirador","Plage","Tapas"];
-  const filtered = state.placeFilter==="Toutes" ? PLACES : PLACES.filter(p => p.category===state.placeFilter);
+  const cats = ["Toutes","Monument","Mirador","Plage","Tapas","Resto"];
+  const allPlaces = [...PLACES, ...state.customPlaces.map(p => ({ ...p, category: "Resto", custom: true }))];
+  const filtered = state.placeFilter==="Toutes" ? allPlaces : allPlaces.filter(p => p.category===state.placeFilter);
   return `
+    <button id="btn-addplace" class="w-full flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2 mb-4 border border-dashed" style="border-color:#3A2E23;color:#F1E9DC">
+      ${icon("plus",14)}Ajouter un resto
+    </button>
     <div class="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar pb-1">
       ${icon("filter",14,"text-[#F1E9DC]/60")}
       ${cats.map(cat => {
@@ -604,14 +627,16 @@ function renderLieux() {
       ${filtered.map(p => `
         <div class="flex items-start gap-3 rounded-lg border px-4 py-3" style="border-color:#2E241B;background:#241C15">
           <span class="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style="background:${PLACE_CATEGORY_COLORS[p.category]}"></span>
-          <div class="min-w-0">
+          <div class="min-w-0 flex-1">
             <p class="font-semibold text-sm">${p.name}</p>
             <p class="text-[#F1E9DC]/60 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.ville}</p>
+            ${p.custom && p.note ? `<p class="text-[#F1E9DC]/70 text-xs mt-1">${p.note}</p>` : ""}
             <div class="flex items-center gap-2 mt-2">
-              <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.category}</span>
+              <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.custom ? "Resto ajouté" : p.category}</span>
               ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
             </div>
           </div>
+          ${p.custom ? `<button data-delplace="${p.id}" class="delplace-btn shrink-0" style="color:#8A7A6A">${icon("x",14)}</button>` : ""}
         </div>
       `).join("")}
     </div>
@@ -686,6 +711,11 @@ function attachEvents() {
   document.querySelectorAll(".addlink-btn").forEach(btn => {
     btn.onclick = () => { addLink(btn.dataset.addlink, btn.dataset.prefill); };
   });
+  document.querySelectorAll(".delplace-btn").forEach(btn => {
+    btn.onclick = () => { deletePlace(btn.dataset.delplace); };
+  });
+  const addPlaceBtn = document.getElementById("btn-addplace");
+  if (addPlaceBtn) addPlaceBtn.onclick = addPlace;
   const retryBtn = document.getElementById("btn-retry");
   if (retryBtn) retryBtn.onclick = saveState;
   const resetBtn = document.getElementById("btn-reset");

@@ -203,6 +203,7 @@ const state = {
   activeDay: 1,
   checkedStops: {},
   checkedRes: {},
+  customPlaces: [],
   placeFilter: "Toutes",
   isLoaded: false,
   syncStatus: "idle", // idle | saving | saved | error
@@ -231,6 +232,7 @@ async function loadState() {
     const data = await res.json();
     state.checkedStops = data.checkedStops || {};
     state.checkedRes = data.checkedRes || {};
+    state.customPlaces = data.customPlaces || [];
     state.isLoaded = true;
     state.syncStatus = "saved";
   } catch (err) {
@@ -250,7 +252,7 @@ async function saveState() {
       method: "POST",
       // text/plain évite le pre-flight CORS (OPTIONS) qu'Apps Script ne gère pas nativement
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ checkedStops: state.checkedStops, checkedRes: state.checkedRes }),
+      body: JSON.stringify({ checkedStops: state.checkedStops, checkedRes: state.checkedRes, customPlaces: state.customPlaces }),
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
@@ -267,6 +269,22 @@ function resetProgress() {
   state.checkedStops = {};
   state.checkedRes = {};
   saveState();
+}
+
+function addPlace() {
+  const name = window.prompt("Nom du resto :");
+  if (!name || !name.trim()) return;
+  const quartier = window.prompt("Quartier :", "") || "";
+  const note = window.prompt("Note (optionnel) :", "") || "";
+  state.customPlaces.push({ id: "cp" + Date.now(), name: name.trim(), quartier: quartier.trim(), note: note.trim() });
+  render();
+  scheduleSave();
+}
+
+function deletePlace(id) {
+  state.customPlaces = state.customPlaces.filter(p => p.id !== id);
+  render();
+  scheduleSave();
 }
 
 // ---------------------------------------------------------------
@@ -340,17 +358,17 @@ function render() {
       </div>
     </div>
 
-    <nav class="sticky top-0 z-20 bg-neutral-950/95 backdrop-blur border-b border-zinc-800">
+    <nav class="sticky top-0 z-20 border-b border-zinc-800" style="background:#0a0a0a">
       <div class="max-w-4xl mx-auto px-4 flex gap-1 overflow-x-auto no-scrollbar">
         ${TABS.map(t => `
-          <button data-tab="${t.id}" class="tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${state.activeTab===t.id ? "border-yellow-400 text-white" : "border-transparent text-zinc-500"}">
+          <button data-tab="${t.id}" class="tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors ${state.activeTab===t.id ? "border-yellow-400 text-white" : "text-zinc-500"}" style="border-bottom-color:${state.activeTab===t.id ? '#facc15' : 'transparent'}">
             ${icon(t.icon,16)}${t.label}
           </button>
         `).join("")}
       </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-4 py-6">
+    <main class="max-w-4xl mx-auto px-4 py-6" style="background:#0a0a0a">
       ${state.activeTab==="itineraire" ? renderItineraire() : ""}
       ${state.activeTab==="lieux" ? renderLieux() : ""}
       ${state.activeTab==="reservations" ? renderReservations() : ""}
@@ -374,7 +392,7 @@ function renderItineraire() {
         const done = d.stops.filter((_,i) => state.checkedStops[`${d.id}-${i}`]).length;
         const active = state.activeDay === d.id;
         return `
-          <button data-day="${d.id}" class="day-btn shrink-0 w-20 rounded-lg border px-2 py-2 text-center transition-colors ${active ? "border-white bg-zinc-900" : "border-zinc-800 bg-zinc-900/40"}">
+          <button data-day="${d.id}" class="day-btn shrink-0 w-20 rounded-lg border px-2 py-2 text-center transition-colors ${active ? "border-white bg-zinc-900" : "border-zinc-800"}" style="background:${active ? '' : '#18181b'}">
             <div class="w-6 h-6 rounded-full mx-auto mb-1 flex items-center justify-center text-[10px] font-black text-black" style="background:${d.color}">${d.id}</div>
             <p class="text-[10px] uppercase font-bold text-zinc-400">${d.weekday}</p>
             <p class="text-xs font-mono text-zinc-500">${done}/${d.stops.length}</p>
@@ -400,7 +418,7 @@ function renderItineraire() {
               <button data-stop="${key}" class="stop-btn absolute -left-8 top-1 w-6 h-6 rounded-full border-2 flex items-center justify-center bg-neutral-950" style="border-color:${day.color}">
                 ${done ? icon("check-circle-2",16) : `<span style="width:8px;height:8px;border-radius:9999px;background:${day.color}"></span>`}
               </button>
-              <div class="rounded-lg border px-4 py-3 ${done ? "border-zinc-800 bg-zinc-900/30 opacity-50" : "border-zinc-800 bg-zinc-900"}">
+              <div class="rounded-lg border px-4 py-3 ${done ? "border-zinc-800 opacity-50" : "border-zinc-800 bg-zinc-900"}" style="background:${done ? '#0a0a0a' : ''}">
                 <span class="font-mono text-xs font-bold text-zinc-400 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
                 <p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>
                 <p class="text-zinc-400 text-xs mt-1">${s.desc}</p>
@@ -416,8 +434,12 @@ function renderItineraire() {
 
 function renderLieux() {
   const cats = ["Toutes","Visite","Gastro","Street Food","Observatoire"];
-  const filtered = state.placeFilter==="Toutes" ? PLACES : PLACES.filter(p => p.category===state.placeFilter);
+  const allPlaces = [...PLACES, ...state.customPlaces.map(p => ({ ...p, category: "Gastro", custom: true }))];
+  const filtered = state.placeFilter==="Toutes" ? allPlaces : allPlaces.filter(p => p.category===state.placeFilter);
   return `
+    <button id="btn-addplace" class="w-full flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2 mb-4 border border-dashed border-zinc-700 text-zinc-300">
+      ${icon("plus",14)}Ajouter un resto
+    </button>
     <div class="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar pb-1">
       ${icon("filter",14,"text-zinc-500")}
       ${cats.map(cat => {
@@ -434,11 +456,13 @@ function renderLieux() {
       ${filtered.map(p => `
         <div class="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3">
           <span class="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style="background:${CATEGORY_COLORS[p.category]}"></span>
-          <div class="min-w-0">
+          <div class="min-w-0 flex-1">
             <p class="font-semibold text-sm truncate">${p.name}</p>
             <p class="text-zinc-500 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.quartier}</p>
-            <p class="text-[10px] uppercase tracking-wide font-bold mt-1" style="color:${CATEGORY_COLORS[p.category]}">${p.category}</p>
+            ${p.custom && p.note ? `<p class="text-zinc-400 text-xs mt-1">${p.note}</p>` : ""}
+            <p class="text-[10px] uppercase tracking-wide font-bold mt-1" style="color:${CATEGORY_COLORS[p.category]}">${p.custom ? "Resto ajouté" : p.category}</p>
           </div>
+          ${p.custom ? `<button data-delplace="${p.id}" class="delplace-btn shrink-0 text-zinc-600">${icon("x",14)}</button>` : ""}
         </div>
       `).join("")}
     </div>
@@ -467,7 +491,7 @@ function renderReservations() {
               ${items.map(item => {
                 const done = !!state.checkedRes[item.id];
                 return `
-                  <button data-res="${item.id}" class="res-btn w-full flex items-start gap-3 text-left rounded-lg border px-4 py-3 ${done ? "border-zinc-800 bg-zinc-900/30" : "border-zinc-800 bg-zinc-900"}">
+                  <button data-res="${item.id}" class="res-btn w-full flex items-start gap-3 text-left rounded-lg border px-4 py-3 ${done ? "border-zinc-800" : "border-zinc-800 bg-zinc-900"}" style="background:${done ? '#0a0a0a' : ''}">
                     <span class="mt-0.5 shrink-0">${done ? icon("check-circle-2",18,"text-yellow-400") : icon("circle",18,"text-zinc-600")}</span>
                     <span class="min-w-0">
                       <p class="text-sm font-semibold ${done ? "line-through text-zinc-500" : ""}">${item.label}</p>
@@ -500,7 +524,7 @@ function renderGastro() {
               <span class="flex items-center gap-1">${icon("map-pin",12)}${r.quartier}</span>
             </p>
             <p class="text-sm text-zinc-300 mb-3">${r.desc}</p>
-            <div class="flex items-center gap-2 text-xs bg-zinc-800/60 rounded-md px-3 py-2">${icon("ticket",13,"text-zinc-400")}<span class="text-zinc-300">${r.booking}</span></div>
+            <div class="flex items-center gap-2 text-xs rounded-md px-3 py-2" style="background:#27272a">${icon("ticket",13,"text-zinc-400")}<span class="text-zinc-300">${r.booking}</span></div>
           </div>
         </div>
       `).join("")}
@@ -514,7 +538,7 @@ function renderGastro() {
           <p class="text-sm text-zinc-300 mb-3">Dernier jour à New York, sans réservation — enchaîner les meilleures adresses street food de Harlem à Chelsea avant le départ.</p>
           <div class="grid sm:grid-cols-2 gap-2">
             ${STREET_FOOD_DAY.map(item => `
-              <div class="flex items-start gap-2 rounded-md bg-zinc-800/60 px-3 py-2">
+              <div class="flex items-start gap-2 rounded-md px-3 py-2" style="background:#27272a">
                 ${icon("utensils",13,"text-green-400 mt-0.5")}
                 <div><p class="text-sm font-semibold">${item.name}</p><p class="text-xs text-zinc-500">${item.note}</p></div>
               </div>
@@ -555,6 +579,11 @@ function attachEvents() {
   document.querySelectorAll(".filter-btn").forEach(btn => {
     btn.onclick = () => { state.placeFilter = btn.dataset.filter; render(); };
   });
+  document.querySelectorAll(".delplace-btn").forEach(btn => {
+    btn.onclick = () => { deletePlace(btn.dataset.delplace); };
+  });
+  const addPlaceBtn = document.getElementById("btn-addplace");
+  if (addPlaceBtn) addPlaceBtn.onclick = addPlace;
   const retryBtn = document.getElementById("btn-retry");
   if (retryBtn) retryBtn.onclick = saveState;
   const resetBtn = document.getElementById("btn-reset");
