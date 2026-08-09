@@ -120,9 +120,11 @@ const DAYS = [
     {time:"15:00", title:"Route vers Málaga", desc:"~100 km depuis Ronda/Caminito.", tip:null},
     {time:"17:00", title:"Check-in — Hôtel Catalonia Málaga", desc:"Málaga.", tip:null},
   ]},
-  { id:12, date:"26 SEP", weekday:"SAMEDI", ville:"Málaga → Retour", color:LEG.malaga, hotel:"—", stops:[
-    {time:"11:30", title:"Croisière à Puerto Banús", desc:"Durée 2h30 — réservée sur GetYourGuide.", tip:null},
-    {time:"15:30", title:"Restitution voiture de location", desc:"Vérifier plein d'essence et état des lieux.", tip:null},
+  { id:12, date:"26 SEP", weekday:"SAMEDI", ville:"Málaga → Puerto Banús (Marbella) → Retour", color:LEG.malaga, hotel:"—", stops:[
+    {time:"10:00", title:"Route vers Puerto Banús", desc:"~60 km depuis Málaga (Marbella), compter 45-60 min selon trafic.", tip:null},
+    {time:"11:30", title:"Croisière à Puerto Banús", desc:"Marbella — durée 2h30, réservée sur GetYourGuide.", tip:null},
+    {time:"14:30", title:"Route retour vers Málaga", desc:"~60 km, compter 45-60 min.", tip:null},
+    {time:"16:00", title:"Restitution voiture de location", desc:"Vérifier plein d'essence et état des lieux.", tip:null},
     {time:"19:05", title:"Vol Málaga → Lyon", desc:"Décollage.", tip:null},
     {time:"21:20", title:"Atterrissage à Lyon", desc:"Fin du séjour.", tip:null},
   ]},
@@ -158,7 +160,7 @@ const RESERVATIONS_RECAP = [
     {label:"Cours de surf, El Palmar", note:"22/09, 16h00"},
     {label:"Rocher de Gibraltar", note:"23/09, 11h00 (2h30)"},
     {label:"Caminito del Rey", note:"25/09, 10h30"},
-    {label:"Croisière Puerto Banús", note:"26/09, 11h30 (2h30)"},
+    {label:"Croisière Puerto Banús (Marbella)", note:"26/09, 11h30 (2h30)"},
   ]},
 ];
 
@@ -177,7 +179,7 @@ const EXPERIENCES = [
   {name:"Cours de surf", when:"Mardi 22 sept., 16h00", ville:"El Palmar", color:LEG.tarifa, desc:"Initiation surf sur la côte atlantique.", booking:"Réservé — GetYourGuide"},
   {name:"Rocher de Gibraltar", when:"Mercredi 23 sept., 11h00 (2h30)", ville:"Gibraltar", color:LEG.ronda, desc:"Visite guidée du Rocher — passage de frontière.", booking:"Réservé — GetYourGuide"},
   {name:"Caminito del Rey", when:"Vendredi 25 sept., 10h30", ville:"Ronda / El Chorro", color:LEG.malaga, desc:"Randonnée sur les passerelles suspendues.", booking:"Réservé — GetYourGuide"},
-  {name:"Croisière Puerto Banús", when:"Samedi 26 sept., 11h30 (2h30)", ville:"Málaga", color:LEG.malaga, desc:"Croisière côtière le jour du départ.", booking:"Réservé — GetYourGuide"},
+  {name:"Croisière Puerto Banús", when:"Samedi 26 sept., 11h30 (2h30)", ville:"Puerto Banús, Marbella", color:LEG.malaga, desc:"Croisière côtière au départ de Puerto Banús, le jour du départ.", booking:"Réservé — GetYourGuide"},
 ];
 
 const PLACE_CATEGORY_COLORS = {
