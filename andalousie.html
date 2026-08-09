@@ -41,6 +41,14 @@
   };
 </script>
 
+<!-- Onglets de navigation entre voyages -->
+<div style="background:#000;border-bottom:1px solid #2E241B">
+  <div class="max-w-4xl mx-auto flex text-xs font-bold uppercase tracking-wide">
+    <a href="index.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🗽 New York</a>
+    <a href="andalousie.html" class="flex-1 text-center py-2.5" style="color:#fff;border-bottom:2px solid #C1502E">☀️ Andalousie</a>
+  </div>
+</div>
+
 <div id="app"></div>
 
 <script>
@@ -101,7 +109,10 @@ const DAYS = [
     {time:"18:00", title:"Check-in — Catalonia Reina Victoria", desc:"Ronda.", tip:null},
   ]},
   { id:10, date:"24 SEP", weekday:"JEUDI", ville:"Ronda", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", stops:[
-    {time:"—", title:"Journée libre", desc:"Aucune activité programmée — à définir sur place.", tip:null},
+    {time:"09:30", title:"Suggestion — Puente Nuevo", desc:"Pont emblématique au-dessus du Tajo de Ronda, à pied depuis l'hôtel.", tip:"Descendre par le sentier Camino de los Molinos pour la vue du pont depuis le fond du canyon — meilleure lumière en matinée."},
+    {time:"11:00", title:"Suggestion — Vieille ville & Mirador de Ronda", desc:"Balade dans la ville, jardins de la Casa del Rey Moro, Alameda del Tajo.", tip:null},
+    {time:"13:30", title:"Suggestion — Déjeuner tapas", desc:"Autour de la Plaza del Socorro.", tip:null},
+    {time:"—", title:"Après-midi libre", desc:"Aucune activité réservée — journée volontairement laissée ouverte.", tip:null},
   ]},
   { id:11, date:"25 SEP", weekday:"VENDREDI", ville:"Ronda → Málaga", color:LEG.malaga, hotel:"Hôtel Catalonia Málaga", stops:[
     {time:"10:30", title:"Caminito del Rey", desc:"Réservé sur GetYourGuide.", tip:"Chaussures fermées indispensables."},
@@ -168,11 +179,59 @@ const EXPERIENCES = [
   {name:"Croisière Puerto Banús", when:"Samedi 26 sept., 11h30 (2h30)", ville:"Málaga", color:LEG.malaga, desc:"Croisière côtière le jour du départ.", booking:"Réservé — GetYourGuide"},
 ];
 
+const PLACE_CATEGORY_COLORS = {
+  Monument: "#C9972C",
+  Mirador: "#1B6B93",
+  Plage: "#2A7F7E",
+  Tapas: "#8C2F39",
+};
+
+const PLACES = [
+  {name:"Alcazaba de Málaga", ville:"Málaga", category:"Monument"},
+  {name:"Cathédrale de Málaga", ville:"Málaga", category:"Monument"},
+  {name:"Playa La Malagueta", ville:"Málaga", category:"Plage"},
+  {name:"Mercado Atarazanas", ville:"Málaga", category:"Tapas"},
+  {name:"Alhambra & Generalife", ville:"Grenade", category:"Monument"},
+  {name:"Mirador de San Nicolás", ville:"Grenade", category:"Mirador"},
+  {name:"Barrio de l'Albaicín", ville:"Grenade", category:"Monument"},
+  {name:"Calle Navas (rue à tapas)", ville:"Grenade", category:"Tapas"},
+  {name:"Mezquita-Catedral", ville:"Cordoue", category:"Monument"},
+  {name:"Alcázar de los Reyes Cristianos", ville:"Cordoue", category:"Monument"},
+  {name:"Puente Romano", ville:"Cordoue", category:"Monument"},
+  {name:"Plaza de la Corredera", ville:"Cordoue", category:"Tapas"},
+  {name:"Plaza de España", ville:"Séville", category:"Monument"},
+  {name:"Barrio Santa Cruz", ville:"Séville", category:"Monument"},
+  {name:"Torre del Oro", ville:"Séville", category:"Mirador"},
+  {name:"Triana / Calle Betis", ville:"Séville", category:"Tapas"},
+  {name:"Catedral de Cádiz", ville:"Cadix", category:"Monument"},
+  {name:"Torre Tavira", ville:"Cadix", category:"Mirador"},
+  {name:"Playa de La Caleta", ville:"Cadix", category:"Plage"},
+  {name:"Mercado Central de Cádiz", ville:"Cadix", category:"Tapas"},
+  {name:"Castillo de Guzmán el Bueno", ville:"Tarifa", category:"Monument"},
+  {name:"Playa de Bolonia (ruines de Baelo Claudia)", ville:"Tarifa", category:"Plage"},
+  {name:"Playa de los Lances", ville:"Tarifa", category:"Plage"},
+  {name:"Mirador del Estrecho", ville:"Tarifa", category:"Mirador"},
+  {name:"Puente Nuevo", ville:"Ronda", category:"Monument"},
+  {name:"Mirador de Ronda / Alameda del Tajo", ville:"Ronda", category:"Mirador"},
+  {name:"Plaza de Toros de Ronda", ville:"Ronda", category:"Monument"},
+  {name:"Plaza del Socorro (tapas)", ville:"Ronda", category:"Tapas"},
+];
+
+const INFOS_PRATIQUES = [
+  {icon:"car", titre:"Conduite & stationnement", texte:"Conduite à droite comme en France. Les centres historiques (Grenade, Cordoue, Séville) ont des zones à circulation restreinte (ZBE) souvent fermées aux véhicules non-résidents — préférer un parking en périphérie et terminer à pied plutôt que suivre le GPS jusqu'au centre."},
+  {icon:"clock", titre:"Horaires & sieste", texte:"Beaucoup de commerces ferment entre 14h et 17h. Les Espagnols dînent tard (21h-22h). Les musées et monuments sont souvent fermés le lundi — à vérifier avant chaque visite."},
+  {icon:"flag", titre:"Frontière de Gibraltar", texte:"Territoire britannique d'outre-mer : passeport obligatoire (pas seulement carte d'identité). Prévoir un peu d'attente au poste-frontière piéton/véhicule. La monnaie officielle est la livre de Gibraltar, mais l'euro est largement accepté."},
+  {icon:"sun", titre:"Météo mi-septembre", texte:"Chaud à l'intérieur des terres (Séville, Cordoue : 28-32°C en journée), plus tempéré et venteux sur la côte (Cadix, Tarifa — capitale européenne du vent/kitesurf). Prévoir vêtements légers et une couche pour le soir."},
+  {icon:"plug", titre:"Électricité", texte:"Prises de type C/F, standard européen identique à la France — aucun adaptateur nécessaire."},
+];
+
 const TABS = [
   {id:"itineraire", label:"Itinéraire", icon:"calendar"},
   {id:"etapes", label:"Étapes & hôtels", icon:"map"},
+  {id:"lieux", label:"Lieux clés", icon:"landmark"},
   {id:"reservations", label:"Réservations", icon:"ticket"},
   {id:"experiences", label:"Expériences", icon:"sparkles"},
+  {id:"infos", label:"Infos pratiques", icon:"info"},
 ];
 
 // ---------------------------------------------------------------
@@ -183,6 +242,7 @@ const state = {
   activeDay: 1,
   checkedStops: {},
   checkedChecklist: {},
+  placeFilter: "Toutes",
   isLoaded: false,
   syncStatus: "idle",
   syncError: "",
@@ -290,16 +350,16 @@ function render() {
 
     <div class="border-b" style="background:#1C1712;border-color:#2E241B">
       <div class="max-w-4xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-        <div class="flex items-center gap-1.5 text-[#F1E9DC]/50">${icon("users",13)}<span>Suivi partagé — visible par toute personne ayant ce lien</span></div>
+        <div class="flex items-center gap-1.5 text-[#F1E9DC]/70">${icon("users",13)}<span>Suivi partagé — visible par toute personne ayant ce lien</span></div>
         <div class="flex items-center gap-3 shrink-0">
           <span class="flex items-center gap-1.5">
-            ${!state.isLoaded ? icon("refresh-cw",12,"animate-spin text-[#F1E9DC]/50") + '<span class="text-[#F1E9DC]/50">Chargement…</span>' : ""}
+            ${!state.isLoaded ? icon("refresh-cw",12,"animate-spin text-[#F1E9DC]/70") + '<span class="text-[#F1E9DC]/70">Chargement…</span>' : ""}
             ${state.isLoaded && state.syncStatus==="saving" ? icon("refresh-cw",12,"animate-spin text-[#C9972C]") + '<span style="color:#C9972C">Synchronisation…</span>' : ""}
             ${state.isLoaded && state.syncStatus==="saved" ? icon("check-circle-2",12,"text-[#6B7A5E]") + '<span style="color:#8FA07C">Synchronisé</span>' : ""}
             ${state.isLoaded && state.syncStatus==="error" ? icon("cloud-off",12,"text-[#8C2F39]") + '<span style="color:#C15060">Échec de synchronisation</span>' : ""}
           </span>
           ${state.isLoaded && state.syncStatus==="error" ? `<button id="btn-retry" class="flex items-center gap-1 underline decoration-dotted" style="color:#C15060">${icon("refresh-cw",12)}Réessayer</button>` : ""}
-          <button id="btn-reset" class="flex items-center gap-1 text-[#F1E9DC]/50">${icon("rotate-ccw",12)}Réinitialiser</button>
+          <button id="btn-reset" class="flex items-center gap-1 text-[#F1E9DC]/70">${icon("rotate-ccw",12)}Réinitialiser</button>
         </div>
         ${state.isLoaded && state.syncStatus==="error" && state.syncError ? `<p class="w-full font-mono text-[10px] break-all" style="color:#C15060">Détail : ${state.syncError}</p>` : ""}
       </div>
@@ -318,11 +378,13 @@ function render() {
     <main class="max-w-4xl mx-auto px-4 py-6" style="background:#1C1712">
       ${state.activeTab==="itineraire" ? renderItineraire() : ""}
       ${state.activeTab==="etapes" ? renderEtapes() : ""}
+      ${state.activeTab==="lieux" ? renderLieux() : ""}
       ${state.activeTab==="reservations" ? renderReservations() : ""}
       ${state.activeTab==="experiences" ? renderExperiences() : ""}
+      ${state.activeTab==="infos" ? renderInfos() : ""}
     </main>
 
-    <footer class="max-w-4xl mx-auto px-4 pt-4 pb-10 border-t text-center text-[11px] text-[#F1E9DC]/40" style="border-color:#2E241B">
+    <footer class="max-w-4xl mx-auto px-4 pt-4 pb-10 border-t text-center text-[11px] text-[#F1E9DC]/65" style="border-color:#2E241B">
       Road trip Málaga → Grenade → Cordoue → Séville → Cadix → Tarifa → Ronda → Málaga
     </footer>
   `;
@@ -338,7 +400,7 @@ function renderRoute() {
         <div class="flex items-center shrink-0">
           <div class="flex flex-col items-center gap-1">
             <div class="w-8 h-8 arch flex items-center justify-center text-[10px] font-bold" style="background:${s.color};color:#1C1712">${i+1}</div>
-            <p class="text-[9px] uppercase font-semibold text-[#F1E9DC]/60 whitespace-nowrap">${s.ville}</p>
+            <p class="text-[9px] uppercase font-semibold text-[#F1E9DC]/75 whitespace-nowrap">${s.ville}</p>
           </div>
           ${i < STAGES.length-1 ? `<div class="w-6 sm:w-10 h-[2px] mx-1" style="background:#3A2E23"></div>` : ""}
         </div>
@@ -358,8 +420,8 @@ function renderItineraire() {
         return `
           <button data-day="${d.id}" class="day-btn shrink-0 w-20 rounded-lg border px-2 py-2 text-center transition-colors" style="border-color:${active?'#F1E9DC':'#2E241B'};background:${active?'#241C15':'#1C1712'}">
             <div class="w-6 h-6 arch mx-auto mb-1 flex items-center justify-center text-[10px] font-black" style="background:${d.color};color:#1C1712">${d.id}</div>
-            <p class="text-[10px] uppercase font-bold text-[#F1E9DC]/60">${d.weekday.slice(0,3)}</p>
-            <p class="text-xs font-mono text-[#F1E9DC]/40">${done}/${d.stops.length}</p>
+            <p class="text-[10px] uppercase font-bold text-[#F1E9DC]/75">${d.weekday.slice(0,3)}</p>
+            <p class="text-xs font-mono text-[#F1E9DC]/65">${done}/${d.stops.length}</p>
           </button>
         `;
       }).join("")}
@@ -369,8 +431,8 @@ function renderItineraire() {
       <span class="w-3 h-3 arch shrink-0" style="background:${day.color}"></span>
       <h2 class="font-display font-black text-2xl tracking-tight">${day.weekday} ${day.date}</h2>
     </div>
-    <p class="text-[#F1E9DC]/50 text-sm mb-1 ml-6">${day.ville}</p>
-    ${day.hotel !== "—" ? `<p class="text-[#F1E9DC]/40 text-xs mb-6 ml-6 flex items-center gap-1">${icon("bed",11)}${day.hotel}</p>` : `<div class="mb-6"></div>`}
+    <p class="text-[#F1E9DC]/70 text-sm mb-1 ml-6">${day.ville}</p>
+    ${day.hotel !== "—" ? `<p class="text-[#F1E9DC]/65 text-xs mb-6 ml-6 flex items-center gap-1">${icon("bed",11)}${day.hotel}</p>` : `<div class="mb-6"></div>`}
 
     <div class="relative pl-8">
       <div class="absolute left-[11px] top-2 bottom-2 w-[3px] rounded-full" style="background:${day.color};opacity:0.3"></div>
@@ -384,9 +446,9 @@ function renderItineraire() {
                 ${done ? icon("check-circle-2",16) : `<span style="width:8px;height:8px;border-radius:9999px;background:${day.color}"></span>`}
               </button>
               <div class="rounded-lg border px-4 py-3" style="border-color:#2E241B;background:${done ? '#1C1712' : '#241C15'};opacity:${done?0.5:1}">
-                <span class="font-mono text-xs font-bold text-[#F1E9DC]/50 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
+                <span class="font-mono text-xs font-bold text-[#F1E9DC]/70 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
                 <p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>
-                <p class="text-[#F1E9DC]/50 text-xs mt-1">${s.desc}</p>
+                <p class="text-[#F1E9DC]/70 text-xs mt-1">${s.desc}</p>
                 ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] mt-2" style="color:#C9972C">${icon("info",12,"mt-0.5")}${s.tip}</p>` : ""}
               </div>
             </div>
@@ -405,7 +467,7 @@ function renderEtapes() {
           <div class="w-8 h-8 arch flex items-center justify-center text-xs font-bold shrink-0" style="background:${s.color};color:#1C1712">${i+1}</div>
           <div class="min-w-0">
             <p class="font-display font-bold text-base">${s.ville}</p>
-            <p class="text-[#F1E9DC]/50 text-xs flex items-center gap-1 mt-0.5">${icon("calendar",11)}${s.dates}</p>
+            <p class="text-[#F1E9DC]/70 text-xs flex items-center gap-1 mt-0.5">${icon("calendar",11)}${s.dates}</p>
             <p class="text-[#F1E9DC]/70 text-xs mt-1 flex items-center gap-1">${icon("bed",11)}${s.logement}</p>
           </div>
         </div>
@@ -419,14 +481,14 @@ function renderReservations() {
   return `
     <div class="rounded-lg border px-4 py-4 mb-6" style="border-color:#2E241B;background:#241C15">
       <p class="text-sm font-semibold flex items-center gap-2 mb-1">${icon("check-square",16)}Checklist pratique avant le départ</p>
-      <p class="text-xs text-[#F1E9DC]/40 mb-3">${doneCount}/${CHECKLIST_PRATIQUE.length} — tout est déjà réservé, ceci concerne les derniers préparatifs.</p>
+      <p class="text-xs text-[#F1E9DC]/65 mb-3">${doneCount}/${CHECKLIST_PRATIQUE.length} — tout est déjà réservé, ceci concerne les derniers préparatifs.</p>
       <div class="space-y-2">
         ${CHECKLIST_PRATIQUE.map(item => {
           const done = !!state.checkedChecklist[item.id];
           return `
             <button data-check="${item.id}" class="check-btn w-full flex items-center gap-3 text-left rounded-md border px-3 py-2" style="border-color:#2E241B;background:${done?'#241C15':'#1C1712'}">
-              <span class="shrink-0">${done ? icon("check-circle-2",16,"") : icon("circle",16,"text-[#F1E9DC]/30")}</span>
-              <span class="text-sm ${done ? "line-through text-[#F1E9DC]/40" : ""}">${item.label}</span>
+              <span class="shrink-0">${done ? icon("check-circle-2",16,"") : icon("circle",16,"text-[#F1E9DC]/50")}</span>
+              <span class="text-sm ${done ? "line-through text-[#F1E9DC]/65" : ""}">${item.label}</span>
             </button>
           `;
         }).join("")}
@@ -436,13 +498,13 @@ function renderReservations() {
     <div class="space-y-6">
       ${RESERVATIONS_RECAP.map(group => `
         <div>
-          <h3 class="uppercase text-xs font-black tracking-widest text-[#F1E9DC]/40 mb-2">${group.cat}</h3>
+          <h3 class="uppercase text-xs font-black tracking-widest text-[#F1E9DC]/65 mb-2">${group.cat}</h3>
           <div class="space-y-2">
             ${group.items.map(item => `
               <div class="flex items-start justify-between gap-3 rounded-lg border px-4 py-3" style="border-color:#2E241B;background:#241C15">
                 <div class="min-w-0">
                   <p class="text-sm font-semibold">${item.label}</p>
-                  <p class="text-xs text-[#F1E9DC]/50 mt-0.5">${item.note}</p>
+                  <p class="text-xs text-[#F1E9DC]/70 mt-0.5">${item.note}</p>
                 </div>
                 <span class="flex items-center gap-1 text-[10px] font-bold shrink-0 mt-0.5" style="color:#8FA07C">${icon("check",11)}RÉSERVÉ</span>
               </div>
@@ -464,12 +526,12 @@ function renderExperiences() {
             <div class="flex items-center justify-between gap-2 mb-1">
               <h3 class="font-display font-black text-lg">${r.name}</h3>
             </div>
-            <p class="text-xs text-[#F1E9DC]/50 flex items-center gap-3 mb-3">
+            <p class="text-xs text-[#F1E9DC]/70 flex items-center gap-3 mb-3">
               <span class="flex items-center gap-1">${icon("clock",12)}${r.when}</span>
               <span class="flex items-center gap-1">${icon("map-pin",12)}${r.ville}</span>
             </p>
             <p class="text-sm text-[#F1E9DC]/80 mb-3">${r.desc}</p>
-            <div class="flex items-center gap-2 text-xs rounded-md px-3 py-2" style="background:#1C1712">${icon("ticket",13,"text-[#F1E9DC]/40")}<span style="color:#8FA07C">${r.booking}</span></div>
+            <div class="flex items-center gap-2 text-xs rounded-md px-3 py-2" style="background:#1C1712">${icon("ticket",13,"text-[#F1E9DC]/65")}<span style="color:#8FA07C">${r.booking}</span></div>
           </div>
         </div>
       `).join("")}
