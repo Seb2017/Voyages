@@ -77,7 +77,7 @@ const DAYS = [
     {time:"14:00", title:"Check-in — Mercader de Sedas", desc:"Grenade.", tip:"L'hôtel a un parking, mais non réservable (premier arrivé, premier servi) — arriver plutôt tôt dans l'après-midi. En dépannage : parking San Cristóbal, hors centre restreint."},
   ]},
   { id:3, date:"17 SEP", weekday:"JEUDI", ville:"Grenade → Cordoue", color:LEG.grenade, hotel:"Los Patios de la Judería, Cordoue", stops:[
-    {time:"10:00", title:"Visite guidée de Grenade", desc:"Réservée sur GetYourGuide.", tip:null},
+    {time:"10:00", title:"Alhambra & Generalife", desc:"Visite guidée — réservée sur GetYourGuide.", tip:null},
     {time:"16:00", title:"Route vers Cordoue", desc:"~165 km depuis Grenade.", tip:null},
     {time:"18:30", title:"Check-in — Los Patios de la Judería", desc:"Cordoue.", tip:"Judería en grande partie piétonne : parking El Vial (près de la gare) ou gratuit au sud du pont romain."},
   ]},
@@ -87,7 +87,7 @@ const DAYS = [
   { id:5, date:"19 SEP", weekday:"SAMEDI", ville:"Cordoue → Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", stops:[
     {time:"11:00", title:"Route vers Séville", desc:"~140 km depuis Cordoue.", tip:null},
     {time:"14:00", title:"Check-in — Hôtel Alcázar", desc:"Séville.", tip:"ZBE permanente sur le Casco Antiguo — vignette DGT nécessaire. Parkings Plaza de Armas ou Plaza de la Concordia, hors zone."},
-    {time:"17:00", title:"Le Guadalquivir", desc:"Balade le long du fleuve à Séville.", tip:null},
+    {time:"17:00", title:"Croisière sur le Guadalquivir", desc:"Durée 1h — réservée sur GetYourGuide.", tip:null},
     {time:"19:30", title:"Flamenco & Tapas", desc:"Soirée réservée sur GetYourGuide.", tip:null},
   ]},
   { id:6, date:"20 SEP", weekday:"DIMANCHE", ville:"Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", stops:[
@@ -112,8 +112,9 @@ const DAYS = [
   { id:10, date:"24 SEP", weekday:"JEUDI", ville:"Ronda — Villages blancs", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", stops:[
     {time:"09:00", title:"Setenil de las Bodegas", desc:"Village troglodyte, maisons construites sous la roche — le plus proche de Ronda (~20 min).", tip:"Calle Cuevas del Sol et Calle Cuevas de la Sombra pour les maisons encastrées dans la roche."},
     {time:"11:00", title:"Grazalema", desc:"Village blanc au cœur du Parc naturel de la Sierra de Grazalema (~35 min depuis Setenil).", tip:null},
-    {time:"14:00", title:"Zahara de la Sierra", desc:"Village perché avec vue sur son réservoir turquoise (~20 min depuis Grazalema).", tip:"Monter jusqu'au château (Castillo) pour la vue sur le lac."},
-    {time:"17:00", title:"Retour à Ronda", desc:"~45 min depuis Zahara de la Sierra.", tip:null},
+    {time:"13:30", title:"Zahara de la Sierra", desc:"Village perché avec vue sur son réservoir turquoise (~20 min depuis Grazalema).", tip:"Monter jusqu'au château (Castillo) pour la vue sur le lac."},
+    {time:"15:30", title:"Arcos de la Frontera", desc:"Village blanc perché sur une falaise au-dessus du Guadalete (~40 min depuis Zahara).", tip:"Plaza del Cabildo — mirador vertigineux au bord de la falaise, juste derrière l'église Santa María."},
+    {time:"18:00", title:"Retour à Ronda", desc:"~1h depuis Arcos de la Frontera.", tip:null},
   ]},
   { id:11, date:"25 SEP", weekday:"VENDREDI", ville:"Ronda → Málaga", color:LEG.malaga, hotel:"Hôtel Catalonia Málaga", stops:[
     {time:"10:30", title:"Caminito del Rey", desc:"Réservé sur GetYourGuide.", tip:"Chaussures fermées indispensables."},
@@ -151,16 +152,17 @@ const RESERVATIONS_RECAP = [
   ]},
   {cat:"Hébergements", items: STAGES.map(s => ({label: s.ville, note: `${s.logement} (${s.dates})`}))},
   {cat:"Activités (GetYourGuide)", items:[
-    {label:"Visite guidée Grenade", note:"17/09, 10h00"},
+    {label:"Alhambra & Generalife", note:"17/09, 10h00"},
     {label:"Visite guidée Cordoue", note:"18/09, 10h15"},
+    {label:"Croisière sur le Guadalquivir", note:"19/09, 17h00 (1h)"},
     {label:"Flamenco & Tapas", note:"19/09, 19h30"},
     {label:"Cathédrale & Giralda", note:"20/09, 13h30 (1h30)"},
     {label:"Alcázar de Séville", note:"20/09, 15h30"},
-    {label:"Bodegas & dégustation", note:"21/09, 12h00"},
-    {label:"Cours de surf, El Palmar", note:"22/09, 16h00"},
+    {label:"Bodegas & dégustation de vin", note:"21/09, 12h00"},
+    {label:"Cours de surf", note:"22/09, 16h00"},
     {label:"Rocher de Gibraltar", note:"23/09, 11h00 (2h30)"},
     {label:"Caminito del Rey", note:"25/09, 10h30"},
-    {label:"Croisière Puerto Banús (Marbella)", note:"26/09, 11h30 (2h30)"},
+    {label:"Croisière Puerto Banús", note:"26/09, 11h30 (2h30)"},
   ]},
 ];
 
@@ -175,6 +177,8 @@ const CHECKLIST_PRATIQUE = [
 ];
 
 const EXPERIENCES = [
+  {name:"Croisière sur le Guadalquivir", when:"Samedi 19 sept., 17h00 (1h)", ville:"Séville", color:LEG.seville, desc:"Croisière fluviale sur le Guadalquivir.", booking:"Réservé — GetYourGuide"},
+  {name:"Alhambra & Generalife", when:"Jeudi 17 sept., 10h00", ville:"Grenade", color:LEG.grenade, desc:"Visite guidée du palais nasride et de ses jardins.", booking:"Réservé — GetYourGuide", gygUrl:"https://gyg.me/WnEZrv2C"},
   {name:"Flamenco & Tapas", when:"Vendredi 19 sept., 19h30", ville:"Séville", color:LEG.seville, desc:"Soirée spectacle flamenco accompagnée de tapas.", booking:"Réservé — GetYourGuide"},
   {name:"Bodegas & dégustation de vin", when:"Lundi 21 sept., 12h00", ville:"Route Séville → Cadix", color:LEG.cadix, desc:"Visite de bodegas avec dégustation.", booking:"Réservé — GetYourGuide"},
   {name:"Cours de surf", when:"Mardi 22 sept., 16h00", ville:"El Palmar", color:LEG.tarifa, desc:"Initiation surf sur la côte atlantique.", booking:"Réservé — GetYourGuide"},
@@ -222,6 +226,7 @@ const PLACES = [
   {name:"Setenil de las Bodegas", ville:"Ronda (villages blancs)", category:"Monument"},
   {name:"Grazalema", ville:"Ronda (villages blancs)", category:"Monument"},
   {name:"Zahara de la Sierra", ville:"Ronda (villages blancs)", category:"Mirador"},
+  {name:"Arcos de la Frontera", ville:"Ronda (villages blancs)", category:"Mirador"},
 ];
 
 const INFOS_PRATIQUES = [
@@ -254,6 +259,7 @@ const state = {
   activeDay: 1,
   checkedStops: {},
   checkedChecklist: {},
+  customLinks: {},
   placeFilter: "Toutes",
   isLoaded: false,
   syncStatus: "idle",
@@ -276,6 +282,7 @@ async function loadState() {
     const data = await res.json();
     state.checkedStops = data.checkedStops || {};
     state.checkedChecklist = data.checkedChecklist || {};
+    state.customLinks = data.customLinks || {};
     state.isLoaded = true;
     state.syncStatus = "saved";
   } catch (err) {
@@ -294,7 +301,7 @@ async function saveState() {
     const res = await fetch(apiUrl("set"), {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ checkedStops: state.checkedStops, checkedChecklist: state.checkedChecklist }),
+      body: JSON.stringify({ checkedStops: state.checkedStops, checkedChecklist: state.checkedChecklist, customLinks: state.customLinks }),
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
@@ -311,6 +318,19 @@ function resetProgress() {
   state.checkedStops = {};
   state.checkedChecklist = {};
   saveState();
+}
+
+function addLink(key) {
+  const existing = state.customLinks[key] || "";
+  const url = window.prompt("Colle le lien de réservation (GetYourGuide, etc.) :", existing);
+  if (url === null) return; // annulé
+  if (url.trim() === "") {
+    delete state.customLinks[key];
+  } else {
+    state.customLinks[key] = url.trim();
+  }
+  render();
+  scheduleSave();
 }
 
 // ---------------------------------------------------------------
@@ -539,7 +559,12 @@ function renderReservations() {
                   <p class="text-sm font-semibold">${item.label}</p>
                   <p class="text-xs text-[#F1E9DC]/70 mt-0.5">${item.note}</p>
                   ${group.cat==="Hébergements" ? `<div class="mt-2">${linkChip(mapsLink(item.note.replace(/\s*\([^)]*\)\s*$/, "") + ", " + item.label), "Maps", "map-pin")}</div>` : ""}
-                  ${group.cat==="Activités (GetYourGuide)" ? `<div class="mt-2">${linkChip(gygLink(item.label), "GetYourGuide", "external-link")}</div>` : ""}
+                  ${group.cat==="Activités (GetYourGuide)" ? `<div class="mt-2 flex items-center gap-2 flex-wrap">
+                    ${state.customLinks[item.label] ? linkChip(state.customLinks[item.label], "GetYourGuide", "external-link") : linkChip(gygLink(item.label), "Recherche GYG", "external-link")}
+                    <button data-addlink="${item.label}" class="addlink-btn inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A2E23;color:#F1E9DC">
+                      ${icon(state.customLinks[item.label] ? "pencil" : "plus",10)}${state.customLinks[item.label] ? "Modifier" : "Ajouter le lien"}
+                    </button>
+                  </div>` : ""}
                 </div>
                 <span class="flex items-center gap-1 text-[10px] font-bold shrink-0 mt-0.5" style="color:#8FA07C">${icon("check",11)}RÉSERVÉ</span>
               </div>
@@ -604,7 +629,10 @@ function renderInfos() {
 function renderExperiences() {
   return `
     <div class="space-y-4">
-      ${EXPERIENCES.map(r => `
+      ${EXPERIENCES.map(r => {
+        const savedLink = state.customLinks[r.name];
+        const realLink = savedLink || r.gygUrl;
+        return `
         <div class="rounded-lg border overflow-hidden" style="border-color:#2E241B;background:#241C15">
           <div class="h-1.5" style="background:${r.color}"></div>
           <div class="p-4">
@@ -617,13 +645,17 @@ function renderExperiences() {
             </p>
             <p class="text-sm text-[#F1E9DC]/80 mb-3">${r.desc}</p>
             <div class="flex items-center gap-2 text-xs rounded-md px-3 py-2 mb-3" style="background:#1C1712">${icon("ticket",13,"text-[#F1E9DC]/65")}<span style="color:#8FA07C">${r.booking}</span></div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               ${linkChip(mapsLink(r.name + ", " + r.ville), "Maps", "map-pin")}
-              ${linkChip(gygLink(r.name + " " + r.ville), "GetYourGuide", "external-link")}
+              ${realLink ? linkChip(realLink, "GetYourGuide", "external-link") : ""}
+              <button data-addlink="${r.name}" class="addlink-btn inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A2E23;color:#F1E9DC">
+                ${icon(savedLink ? "pencil" : "plus",10)}${savedLink ? "Modifier le lien" : "Ajouter le lien"}
+              </button>
             </div>
           </div>
         </div>
-      `).join("")}
+      `;
+      }).join("")}
     </div>
   `;
 }
@@ -642,6 +674,9 @@ function attachEvents() {
   });
   document.querySelectorAll(".placefilter-btn").forEach(btn => {
     btn.onclick = () => { state.placeFilter = btn.dataset.placefilter; render(); };
+  });
+  document.querySelectorAll(".addlink-btn").forEach(btn => {
+    btn.onclick = () => { addLink(btn.dataset.addlink); };
   });
   const retryBtn = document.getElementById("btn-retry");
   if (retryBtn) retryBtn.onclick = saveState;
