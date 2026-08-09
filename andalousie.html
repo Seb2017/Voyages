@@ -171,6 +171,7 @@ const CHECKLIST_PRATIQUE = [
   {id:"c4", label:"Chaussures fermées pour le Caminito del Rey"},
   {id:"c5", label:"Maillot de bain / affaires de surf pour El Palmar"},
   {id:"c6", label:"Faire le plein avant restitution de la voiture le 26/09"},
+  {id:"c7", label:"Porte-documents (passeports, vouchers, réservations hôtels, permis, carte grise location)"},
 ];
 
 const EXPERIENCES = [
@@ -369,9 +370,12 @@ function render() {
     </div>
 
     <div class="border-b" style="background:#1C1712;border-color:#2E241B">
-      <div class="max-w-4xl mx-auto px-4 py-2.5">
-        <a href="https://www.polarsteps.com/S%C3%A9bastienTOULET/27419620-andalusia?s=2292f494-4a67-4ed7-a694-c16be59d6b6f&referral=true" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2" style="background:#C1502E;color:#F1E9DC">
-          ${icon("camera",14)}Voir les photos du voyage sur Polarsteps
+      <div class="max-w-4xl mx-auto px-4 py-2.5 flex gap-2">
+        <a href="https://www.polarsteps.com/S%C3%A9bastienTOULET/27419620-andalusia?s=2292f494-4a67-4ed7-a694-c16be59d6b6f&referral=true" target="_blank" rel="noopener" class="flex-1 flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2" style="background:#C1502E;color:#F1E9DC">
+          ${icon("camera",14)}Polarsteps
+        </a>
+        <a href="https://drive.google.com/drive/folders/1YITeji4bP_0G1GhkrXAVBUGzL3Vs7ZEm" target="_blank" rel="noopener" class="flex-1 flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2" style="background:#1B6B93;color:#F1E9DC">
+          ${icon("folder",14)}Réservations (Drive)
         </a>
       </div>
     </div>
