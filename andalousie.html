@@ -108,11 +108,9 @@ const DAYS = [
     {time:"15:30", title:"Route vers Ronda", desc:"~170 km depuis Gibraltar/Tarifa.", tip:null},
     {time:"18:00", title:"Check-in — Catalonia Reina Victoria", desc:"Ronda.", tip:null},
   ]},
-  { id:10, date:"24 SEP", weekday:"JEUDI", ville:"Ronda", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", stops:[
-    {time:"09:30", title:"Suggestion — Puente Nuevo", desc:"Pont emblématique au-dessus du Tajo de Ronda, à pied depuis l'hôtel.", tip:"Descendre par le sentier Camino de los Molinos pour la vue du pont depuis le fond du canyon — meilleure lumière en matinée."},
-    {time:"11:00", title:"Suggestion — Vieille ville & Mirador de Ronda", desc:"Balade dans la ville, jardins de la Casa del Rey Moro, Alameda del Tajo.", tip:null},
-    {time:"13:30", title:"Suggestion — Déjeuner tapas", desc:"Autour de la Plaza del Socorro.", tip:null},
-    {time:"—", title:"Après-midi libre", desc:"Aucune activité réservée — journée volontairement laissée ouverte.", tip:null},
+  { id:10, date:"24 SEP", weekday:"JEUDI", ville:"Ronda — Villages blancs", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", stops:[
+    {time:"09:30", title:"Route des villages blancs", desc:"Journée en voiture à la découverte des pueblos blancos autour de Ronda.", tip:"Prévoir des chaussures confortables — ruelles pavées et pentes dans la plupart des villages."},
+    {time:"—", title:"Journée libre — villages blancs", desc:"Itinéraire et villages précis à définir sur place.", tip:null},
   ]},
   { id:11, date:"25 SEP", weekday:"VENDREDI", ville:"Ronda → Málaga", color:LEG.malaga, hotel:"Hôtel Catalonia Málaga", stops:[
     {time:"10:30", title:"Caminito del Rey", desc:"Réservé sur GetYourGuide.", tip:"Chaussures fermées indispensables."},
@@ -307,6 +305,15 @@ function resetProgress() {
 function icon(name, size, extraClass) {
   return `<i data-lucide="${name}" style="width:${size}px;height:${size}px" class="${extraClass||''} shrink-0"></i>`;
 }
+function mapsLink(query) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+function gygLink(query) {
+  return `https://www.getyourguide.com/s/?q=${encodeURIComponent(query)}`;
+}
+function linkChip(href, label, iconName) {
+  return `<a href="${href}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full" style="background:#1C1712;color:#F1E9DC" onclick="event.stopPropagation()">${icon(iconName,10)}${label}</a>`;
+}
 function countdown() {
   const target = new Date("2026-09-15T21:55:00");
   const diffMs = target - state.now;
@@ -469,6 +476,7 @@ function renderEtapes() {
             <p class="font-display font-bold text-base">${s.ville}</p>
             <p class="text-[#F1E9DC]/70 text-xs flex items-center gap-1 mt-0.5">${icon("calendar",11)}${s.dates}</p>
             <p class="text-[#F1E9DC]/70 text-xs mt-1 flex items-center gap-1">${icon("bed",11)}${s.logement}</p>
+            <div class="mt-2">${linkChip(mapsLink(s.logement + ", " + s.ville), "Maps", "map-pin")}</div>
           </div>
         </div>
       `).join("")}
@@ -505,6 +513,8 @@ function renderReservations() {
                 <div class="min-w-0">
                   <p class="text-sm font-semibold">${item.label}</p>
                   <p class="text-xs text-[#F1E9DC]/70 mt-0.5">${item.note}</p>
+                  ${group.cat==="Hébergements" ? `<div class="mt-2">${linkChip(mapsLink(item.note + ", " + item.label), "Maps", "map-pin")}</div>` : ""}
+                  ${group.cat==="Activités (GetYourGuide)" ? `<div class="mt-2">${linkChip(gygLink(item.label), "GetYourGuide", "external-link")}</div>` : ""}
                 </div>
                 <span class="flex items-center gap-1 text-[10px] font-bold shrink-0 mt-0.5" style="color:#8FA07C">${icon("check",11)}RÉSERVÉ</span>
               </div>
@@ -539,7 +549,10 @@ function renderLieux() {
           <div class="min-w-0">
             <p class="font-semibold text-sm">${p.name}</p>
             <p class="text-[#F1E9DC]/60 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.ville}</p>
-            <p class="text-[10px] uppercase tracking-wide font-bold mt-1" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.category}</p>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.category}</span>
+              ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
+            </div>
           </div>
         </div>
       `).join("")}
@@ -578,7 +591,11 @@ function renderExperiences() {
               <span class="flex items-center gap-1">${icon("map-pin",12)}${r.ville}</span>
             </p>
             <p class="text-sm text-[#F1E9DC]/80 mb-3">${r.desc}</p>
-            <div class="flex items-center gap-2 text-xs rounded-md px-3 py-2" style="background:#1C1712">${icon("ticket",13,"text-[#F1E9DC]/65")}<span style="color:#8FA07C">${r.booking}</span></div>
+            <div class="flex items-center gap-2 text-xs rounded-md px-3 py-2 mb-3" style="background:#1C1712">${icon("ticket",13,"text-[#F1E9DC]/65")}<span style="color:#8FA07C">${r.booking}</span></div>
+            <div class="flex items-center gap-2">
+              ${linkChip(mapsLink(r.name + ", " + r.ville), "Maps", "map-pin")}
+              ${linkChip(gygLink(r.name + " " + r.ville), "GetYourGuide", "external-link")}
+            </div>
           </div>
         </div>
       `).join("")}
