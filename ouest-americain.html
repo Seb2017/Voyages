@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ouest Américain — Carnet de voyage</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ouest US">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#161311">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23C1440E' rx='18'/%3E%3Ctext x='50' y='63' font-size='30' font-weight='900' text-anchor='middle' font-family='Georgia' fill='%23F2ECE1'%3EUS-W%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23C1440E' rx='18'/%3E%3Ctext x='50' y='63' font-size='30' font-weight='900' text-anchor='middle' font-family='Georgia' fill='%23F2ECE1'%3EUS-W%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400;600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  html, body { background:#161311; }
+  body { font-family:'Inter', ui-sans-serif, system-ui; }
+  #app { background:#161311; min-height:100vh; }
+  .font-display { font-family:'Bitter', serif; }
+  .no-scrollbar::-webkit-scrollbar { display:none; }
+  .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+  * { -webkit-tap-highlight-color: transparent; }
+  .shield { clip-path: polygon(50% 0%, 100% 22%, 100% 72%, 50% 100%, 0% 72%, 0% 22%); }
+</style>
+</head>
+<body class="min-h-screen text-[#F2ECE1]" style="background:#161311">
+
+<!-- ============================================================
+     CONFIGURATION — même backend Apps Script que NYC/Andalousie,
+     paramètre "trip" dédié pour ce voyage
+     ============================================================ -->
+<script>
+  const CONFIG = {
+    API_URL: "https://script.google.com/macros/s/AKfycbyTzO4ZS-OETOHdBxlL1KFcX9idXobLJx79Y6dt1u_qipSR6Fc-r_mR4yKLr8brocWAWw/exec",
+    TRIP_ID: "ouest-americain",
+  };
+</script>
+
+<!-- Onglets de navigation entre voyages -->
+<div style="background:#000;border-bottom:1px solid #2E241B;padding-top:env(safe-area-inset-top)">
+  <div class="max-w-4xl mx-auto flex text-xs font-bold uppercase tracking-wide">
+    <a href="index.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🗽 New York</a>
+    <a href="andalousie.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">☀️ Andalousie</a>
+    <a href="ouest-americain.html" class="flex-1 text-center py-2.5" style="color:#fff;border-bottom:2px solid #C1440E">🏜️ Ouest US</a>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<script>
+// ---------------------------------------------------------------
+// DATA
+// ---------------------------------------------------------------
+const LEG = {
+  sf: "#2E6E8E",       // bleu baie de San Francisco
+  yosemite: "#4A6B3A", // vert forêt / granit
+  mammoth: "#5C6B73",  // gris montagne
+  deathvalley: "#B7472A", // rouge désert
+  vegas: "#D4A24C",    // or / néon désert
+  bryce: "#C1440E",    // rouge canyon
+  page: "#3E8E8E",     // turquoise Lake Powell
+  monumentvalley: "#A6402A", // rouge rouille
+  grandcanyon: "#CC6B2C", // orange canyon
+  route66: "#A98456",  // tan poussière
+  la: "#C1618E",       // rose coucher de soleil
+};
+
+const CATEGORY_COLORS = {
+  Visite: "#3E8E8E",
+  Nature: "#4A6B3A",
+  Vue: "#CC6B2C",
+  Resto: "#D4A24C",
+};
+
+const DAYS = [
+  { id:1, label:"JOUR 1", stage:"San Francisco", color:LEG.sf, hotel:"Hôtel, San Francisco", stops:[
+    {time:"—", title:"Arrivée & transfert privé", desc:"Transfert vers l'hôtel, vue sur le Golden Gate Bridge.", tip:null, loc:"San Francisco International Airport"},
+    {time:"11:00", title:"Fisherman's Wharf & Pier 39", desc:"Clam chowder traditionnelle, observation des otaries.", tip:null, loc:"Pier 39, San Francisco"},
+    {time:"12:30", title:"Vélo → Golden Gate Bridge", desc:"12 km le long de la côte jusqu'au pont, via Sausalito.", tip:null, loc:"Golden Gate Bridge, San Francisco"},
+    {time:"16:00", title:"Retour en ferry", desc:"Vue sur la baie de San Francisco sous un nouvel angle.", tip:null, loc:"Sausalito Ferry Terminal"},
+    {time:"19:00", title:"Dîner fruits de mer", desc:"Sur les quais illuminés.", tip:"Vue sur le pont au soleil couchant depuis l'hôtel."},
+  ]},
+  { id:2, label:"JOUR 2", stage:"San Francisco", color:LEG.sf, hotel:"Hôtel, San Francisco", stops:[
+    {time:"09:00", title:"Ferry vers Alcatraz", desc:"Départ Pier 33, audioguide en français.", tip:null, loc:"Alcatraz Landing, Pier 33, San Francisco"},
+    {time:"11:00", title:"Alcatraz", desc:"Visite de l'ancienne prison — cellules, couloirs, histoire.", tip:null, loc:"Alcatraz Island"},
+    {time:"13:00", title:"Lombard Street", desc:"La rue la plus sinueuse du monde, 8 virages en épingle.", tip:null, loc:"Lombard Street, San Francisco"},
+    {time:"14:30", title:"Alamo Square — Painted Ladies", desc:"Maisons victoriennes colorées, contraste avec la skyline.", tip:null, loc:"Alamo Square, San Francisco"},
+    {time:"17:00", title:"Union Square", desc:"Shopping et dîner dans l'un des nombreux restaurants du quartier.", tip:null, loc:"Union Square, San Francisco"},
+  ]},
+  { id:3, label:"JOUR 3", stage:"San Francisco", color:LEG.sf, hotel:"Hôtel, San Francisco", stops:[
+    {time:"09:00", title:"Chinatown", desc:"L'un des plus anciens et vastes quartiers chinois des États-Unis.", tip:null, loc:"Chinatown, San Francisco"},
+    {time:"12:00", title:"North Beach", desc:"Quartier italien emblématique de San Francisco.", tip:null, loc:"North Beach, San Francisco"},
+    {time:"13:30", title:"Telegraph Hill — Coit Tower", desc:"Vue panoramique depuis la tour, perchée à 64 m.", tip:null, loc:"Coit Tower, San Francisco"},
+    {time:"15:30", title:"Cable car", desc:"Balade historique depuis Union Square à travers les collines.", tip:null, loc:"Powell-Hyde Cable Car, San Francisco"},
+    {time:"19:00", title:"Dîner fruits de mer", desc:"Dernière soirée à San Francisco.", tip:null},
+  ]},
+  { id:4, label:"JOUR 4", stage:"San Francisco → Yosemite", color:LEG.yosemite, hotel:"Hôtel, Yosemite", stops:[
+    {time:"09:00", title:"Récupération voiture de location", desc:"Départ du road trip.", tip:null, loc:"San Francisco"},
+    {time:"10:00", title:"Route vers Yosemite", desc:"330 km / 3h via le Golden Gate Bridge et la Sierra Nevada.", tip:null, loc:"Yosemite National Park"},
+    {time:"14:00", title:"Installation — 3 nuits", desc:"Base à Yosemite pour explorer le parc.", tip:null, loc:"Yosemite Valley"},
+  ]},
+  { id:5, label:"JOUR 5", stage:"Yosemite", color:LEG.yosemite, hotel:"Hôtel, Yosemite", stops:[
+    {time:"—", title:"Journée libre à Yosemite", desc:"Balade tranquille, découverte de la vallée à votre rythme avant la grande journée du lendemain.", tip:null},
+  ]},
+  { id:6, label:"JOUR 6", stage:"Yosemite", color:LEG.yosemite, hotel:"Hôtel, Yosemite", stops:[
+    {time:"07:00", title:"Mist Trail", desc:"Départ à l'aube pour éviter la foule — Vernal Fall et Nevada Fall.", tip:"Routes secondaires vers Yosemite Valley pour arriver avant l'affluence.", loc:"Mist Trail, Yosemite"},
+    {time:"10:00", title:"Yosemite Valley", desc:"Yosemite Falls, Bridalveil Fall, El Capitan, Half Dome.", tip:null, loc:"Yosemite Valley Visitor Center"},
+    {time:"12:00", title:"Glacier Point & Taft Point", desc:"Panoramas spectaculaires sur la vallée.", tip:null, loc:"Glacier Point, Yosemite"},
+    {time:"13:00", title:"Pique-nique", desc:"Au bord de la rivière Merced.", tip:null, loc:"Merced River, Yosemite"},
+    {time:"15:00", title:"Mariposa Grove", desc:"Séquoias géants.", tip:null, loc:"Mariposa Grove, Yosemite"},
+    {time:"18:00", title:"Tuolumne Meadows", desc:"Balade tranquille au crépuscule.", tip:"Sous les étoiles, loin de toute pollution lumineuse.", loc:"Tuolumne Meadows, Yosemite"},
+  ]},
+  { id:7, label:"JOUR 7", stage:"Yosemite → Mammoth Lakes", color:LEG.mammoth, hotel:"Hôtel, Mammoth Lakes", stops:[
+    {time:"09:00", title:"Route vers Mammoth Lakes", desc:"65 km / 1h via Tioga Pass, plus de 3 000 m d'altitude.", tip:null, loc:"Tioga Pass, Yosemite"},
+    {time:"11:00", title:"Mono Lake", desc:"Arrêt sur les paysages lunaires de la région.", tip:null, loc:"Mono Lake, California"},
+    {time:"14:00", title:"Mammoth Lakes village", desc:"Exploration du village.", tip:null, loc:"Mammoth Lakes, California"},
+    {time:"16:00", title:"Randonnée courte", desc:"Autour d'un des lacs de la région.", tip:null, loc:"Twin Lakes, Mammoth Lakes"},
+  ]},
+  { id:8, label:"JOUR 8", stage:"Mammoth Lakes → Death Valley", color:LEG.deathvalley, hotel:"Hôtel, Death Valley", stops:[
+    {time:"09:00", title:"Route vers Death Valley", desc:"320 km / 3h30 via la Highway 395.", tip:null, loc:"Death Valley National Park"},
+    {time:"10:30", title:"Red Rock Canyon State Park", desc:"Formations rocheuses rouges contre un ciel azur.", tip:null, loc:"Red Rock Canyon State Park, California"},
+    {time:"12:30", title:"Lone Pine — Alabama Hills", desc:"Formations rocheuses uniques, vues sur le Mont Whitney.", tip:null, loc:"Alabama Hills, Lone Pine"},
+    {time:"16:00", title:"Arrivée à Death Valley", desc:"L'une des régions les plus chaudes et sèches de la planète.", tip:null, loc:"Death Valley National Park"},
+    {time:"18:00", title:"Badwater Basin", desc:"Le point le plus bas d'Amérique du Nord.", tip:"Ciel étoilé exceptionnel la nuit, loin des lumières artificielles.", loc:"Badwater Basin, Death Valley"},
+  ]},
+  { id:9, label:"JOUR 9", stage:"Death Valley → Las Vegas", color:LEG.vegas, hotel:"Hôtel, Las Vegas", stops:[
+    {time:"06:30", title:"Lever de soleil à Zabriskie Point", desc:"Formations géologiques dignes d'un western.", tip:null, loc:"Zabriskie Point, Death Valley"},
+    {time:"08:00", title:"Artist Drive", desc:"Route panoramique sinueuse à travers des falaises pourpres.", tip:null, loc:"Artist Drive, Death Valley"},
+    {time:"10:00", title:"Route vers Las Vegas", desc:"230 km / 2h20 à travers le désert de Mojave.", tip:null, loc:"Las Vegas"},
+    {time:"14:00", title:"Installation — 2 nuits", desc:"Base à Las Vegas.", tip:null, loc:"The Strip, Las Vegas"},
+    {time:"19:00", title:"Le Strip", desc:"Excalibur (dîner médiéval), New York-New York, Venetian (gondoles), Caesars Palace.", tip:null, loc:"Las Vegas Strip"},
+  ]},
+  { id:10, label:"JOUR 10", stage:"Las Vegas / Excursion Zion", color:LEG.vegas, hotel:"Hôtel, Las Vegas", stops:[
+    {time:"08:00", title:"Excursion optionnelle à Zion", desc:"~2h de route depuis Vegas. Pause ravitaillement à Hurricane.", tip:"Alternative : rester profiter du Strip et des casinos de Las Vegas.", loc:"Zion National Park"},
+    {time:"10:30", title:"Zion Canyon Scenic Drive", desc:"Court of the Patriarchs, Weeping Rock.", tip:null, loc:"Zion Canyon Scenic Drive"},
+    {time:"13:00", title:"Emerald Pools ou Angels Landing", desc:"Randonnée vers les cascades, ou pour les plus aventureux : Angels Landing (permis requis).", tip:"Angels Landing nécessite un permis obtenu par loterie — à anticiper.", loc:"Emerald Pools Trail, Zion"},
+    {time:"18:00", title:"Retour à Las Vegas", desc:"Dernière soirée dans la ville.", tip:null, loc:"Las Vegas"},
+  ]},
+  { id:11, label:"JOUR 11", stage:"Las Vegas → Bryce Canyon", color:LEG.bryce, hotel:"Hôtel, Bryce Canyon", stops:[
+    {time:"09:00", title:"Route vers Bryce Canyon", desc:"135 km / 2h via l'US-89 et la Route 12.", tip:null, loc:"Bryce Canyon National Park"},
+    {time:"11:00", title:"Red Canyon", desc:"Première pause sur la route.", tip:null, loc:"Red Canyon, Utah"},
+    {time:"14:00", title:"Bryce Canyon Scenic Drive", desc:"Bryce Point, Inspiration Point — centaines de hoodoos sculptés par l'érosion.", tip:null, loc:"Bryce Point, Bryce Canyon"},
+  ]},
+  { id:12, label:"JOUR 12", stage:"Bryce Canyon → Lake Powell", color:LEG.page, hotel:"Hôtel, Page / Lake Powell", stops:[
+    {time:"08:00", title:"Navajo Loop Trail", desc:"Immersion au cœur des hoodoos, arches et canyon.", tip:null, loc:"Navajo Loop Trail, Bryce Canyon"},
+    {time:"11:00", title:"Route vers Page", desc:"240 km / 2h30, déjeuner à Page.", tip:null, loc:"Page, Arizona"},
+    {time:"14:30", title:"Horseshoe Bend", desc:"Détour pour admirer ce méandre spectaculaire du fleuve Colorado.", tip:null, loc:"Horseshoe Bend, Page"},
+    {time:"17:00", title:"Installation à Lake Powell", desc:"Paysages nocturnes au cœur des terres Navajos.", tip:null, loc:"Lake Powell, Page"},
+  ]},
+  { id:13, label:"JOUR 13", stage:"Lake Powell", color:LEG.page, hotel:"Hôtel, Page / Lake Powell", stops:[
+    {time:"09:00", title:"Upper Antelope Canyon", desc:"Visite guidée par un guide Navajo — jeux de lumière dans les couloirs étroits.", tip:"Réservation à faire 3 à 6 mois à l'avance.", loc:"Upper Antelope Canyon, Page"},
+    {time:"13:00", title:"Bateau sur Lake Powell", desc:"Location d'un bateau à moteur, baies cachées, Lone Rock Beach.", tip:null, loc:"Lone Rock Beach, Lake Powell"},
+  ]},
+  { id:14, label:"JOUR 14", stage:"Lake Powell → Monument Valley", color:LEG.monumentvalley, hotel:"Hôtel, Monument Valley", stops:[
+    {time:"09:00", title:"Route vers Monument Valley", desc:"200 km / 2h via Kayenta.", tip:null, loc:"Monument Valley Navajo Tribal Park"},
+    {time:"12:00", title:"Visitor Center", desc:"Expositions culturelles sur les populations Navajo.", tip:null, loc:"Monument Valley Visitor Center"},
+    {time:"13:30", title:"Visite guidée en jeep", desc:"Avec un guide Navajo — Mitten Buttes, Elephant Butte.", tip:"Réservation recommandée à l'avance.", loc:"Monument Valley"},
+    {time:"16:00", title:"Valley Drive", desc:"Circuit de 27 km, John Ford's Point.", tip:null, loc:"John Ford's Point, Monument Valley"},
+    {time:"18:30", title:"Coucher de soleil", desc:"Sur les formations rocheuses dorées.", tip:null, loc:"Monument Valley"},
+  ]},
+  { id:15, label:"JOUR 15", stage:"Grand Canyon (South Rim)", color:LEG.grandcanyon, hotel:"Hôtel, Grand Canyon South Rim", stops:[
+    {time:"09:00", title:"Route vers le Grand Canyon", desc:"~230 km / 2h30 via Cameron, Arizona.", tip:null, loc:"Grand Canyon South Rim"},
+    {time:"12:00", title:"Mather Point", desc:"Premier point de vue sur cette faille de 450 km façonnée par le Colorado.", tip:null, loc:"Mather Point, Grand Canyon"},
+    {time:"14:00", title:"Bright Angel Trail ou Rim Trail", desc:"Randonnée dans le canyon ou balade le long du bord.", tip:null, loc:"Bright Angel Trailhead, Grand Canyon"},
+    {time:"16:00", title:"The Abyss & Pima Point", desc:"Ligne rouge du shuttle gratuit — points de vue moins fréquentés.", tip:null, loc:"Pima Point, Grand Canyon"},
+    {time:"18:30", title:"Coucher de soleil à Hopi Point", desc:"Un moment de pur émerveillement.", tip:null, loc:"Hopi Point, Grand Canyon"},
+  ]},
+  { id:16, label:"JOUR 16", stage:"Grand Canyon → Kingman", color:LEG.route66, hotel:"Hôtel, Kingman", stops:[
+    {time:"09:00", title:"Route vers Kingman", desc:"280 km / 2h40 via Flagstaff, Williams et Seligman.", tip:null, loc:"Kingman, Arizona"},
+    {time:"12:00", title:"Route 66 historique", desc:"Tronçon emblématique — machine à remonter le temps dans les années 1950.", tip:null, loc:"Historic Route 66, Seligman"},
+  ]},
+  { id:17, label:"JOUR 17", stage:"Kingman → Los Angeles", color:LEG.la, hotel:"Hôtel, Los Angeles", stops:[
+    {time:"08:00", title:"Oatman", desc:"Ville de western, ânes sauvages en liberté dans les rues.", tip:null, loc:"Oatman, Arizona"},
+    {time:"11:00", title:"Désert de Mojave", desc:"Paysages parsemés de Joshua Trees.", tip:null, loc:"Mojave Desert"},
+    {time:"13:00", title:"Calico Ghost Town", desc:"Ancienne ville minière transformée en boutiques de souvenirs.", tip:null, loc:"Calico Ghost Town, California"},
+    {time:"17:00", title:"Arrivée à Los Angeles", desc:"500 km / 5h30 au total — dernière étape du road trip.", tip:null, loc:"Los Angeles"},
+  ]},
+  { id:18, label:"JOUR 18", stage:"Los Angeles", color:LEG.la, hotel:"Hôtel, Los Angeles", stops:[
+    {time:"09:00", title:"Universal Studios Hollywood", desc:"The Wizarding World of Harry Potter, Jurassic World, WaterWorld.", tip:null, loc:"Universal Studios Hollywood"},
+    {time:"14:00", title:"Studio Tour", desc:"Coulisses, décors de films célèbres.", tip:null, loc:"Universal Studios Hollywood"},
+  ]},
+  { id:19, label:"JOUR 19", stage:"Fin du voyage", color:LEG.la, hotel:"—", stops:[
+    {time:"—", title:"Restitution voiture de location", desc:"À l'aéroport de Los Angeles.", tip:null, loc:"Los Angeles International Airport"},
+    {time:"—", title:"Vol retour", desc:"Nuit en vol, arrivée en France le lendemain.", tip:null, loc:"Los Angeles International Airport"},
+  ]},
+];
+
+const STAGES = [
+  {ville:"San Francisco", dates:"Jours 1-3", logement:"Hôtel San Francisco", color:LEG.sf},
+  {ville:"Yosemite", dates:"Jours 4-6", logement:"Hôtel Yosemite", color:LEG.yosemite},
+  {ville:"Mammoth Lakes", dates:"Jour 7", logement:"Hôtel Mammoth Lakes", color:LEG.mammoth},
+  {ville:"Death Valley", dates:"Jour 8", logement:"Hôtel Death Valley", color:LEG.deathvalley},
+  {ville:"Las Vegas", dates:"Jours 9-10", logement:"Hôtel Las Vegas Strip", color:LEG.vegas},
+  {ville:"Bryce Canyon", dates:"Jour 11", logement:"Hôtel Bryce Canyon", color:LEG.bryce},
+  {ville:"Lake Powell / Page", dates:"Jours 12-13", logement:"Hôtel Page / Lake Powell", color:LEG.page},
+  {ville:"Monument Valley", dates:"Jour 14", logement:"Hôtel Monument Valley", color:LEG.monumentvalley},
+  {ville:"Grand Canyon South Rim", dates:"Jour 15", logement:"Hôtel Grand Canyon South Rim", color:LEG.grandcanyon},
+  {ville:"Kingman", dates:"Jour 16", logement:"Hôtel Kingman", color:LEG.route66},
+  {ville:"Los Angeles", dates:"Jours 17-19", logement:"Hôtel Los Angeles", color:LEG.la},
+];
+
+const PLACES = [
+  {name:"Golden Gate Bridge", ville:"San Francisco", category:"Vue"},
+  {name:"Alcatraz Island", ville:"San Francisco", category:"Visite"},
+  {name:"Painted Ladies, Alamo Square", ville:"San Francisco", category:"Visite"},
+  {name:"Coit Tower", ville:"San Francisco", category:"Vue"},
+  {name:"Yosemite Valley", ville:"Yosemite", category:"Nature"},
+  {name:"Glacier Point", ville:"Yosemite", category:"Vue"},
+  {name:"Mariposa Grove", ville:"Yosemite", category:"Nature"},
+  {name:"Mono Lake", ville:"Mammoth Lakes", category:"Nature"},
+  {name:"Badwater Basin", ville:"Death Valley", category:"Nature"},
+  {name:"Zabriskie Point", ville:"Death Valley", category:"Vue"},
+  {name:"Las Vegas Strip", ville:"Las Vegas", category:"Visite"},
+  {name:"Zion Canyon Scenic Drive", ville:"Zion (excursion)", category:"Nature"},
+  {name:"Bryce Point", ville:"Bryce Canyon", category:"Vue"},
+  {name:"Horseshoe Bend", ville:"Page", category:"Vue"},
+  {name:"Upper Antelope Canyon", ville:"Page", category:"Nature"},
+  {name:"Mitten Buttes", ville:"Monument Valley", category:"Vue"},
+  {name:"Mather Point", ville:"Grand Canyon", category:"Vue"},
+  {name:"Hopi Point", ville:"Grand Canyon", category:"Vue"},
+  {name:"Route 66 (Seligman)", ville:"Kingman", category:"Visite"},
+  {name:"Oatman", ville:"Route 66", category:"Visite"},
+  {name:"Calico Ghost Town", ville:"Mojave", category:"Visite"},
+  {name:"Universal Studios Hollywood", ville:"Los Angeles", category:"Visite"},
+];
+
+const RESERVATIONS_RECAP = [
+  {cat:"À réserver en priorité", items:[
+    {label:"Hébergements Grand Canyon South Rim", note:"Ouverture à 13 mois avant la date — le goulot d'étranglement n°1 du voyage"},
+    {label:"Upper Antelope Canyon (Page)", note:"Réserver 3 à 6 mois à l'avance"},
+    {label:"Alcatraz (ferry + visite)", note:"Se vend souvent plusieurs semaines/mois à l'avance"},
+    {label:"Angels Landing (Zion, si choisi le jour 10)", note:"Permis obligatoire par loterie — lottery saisonnière ou loterie la veille"},
+  ]},
+  {cat:"À réserver dans un second temps", items:[
+    {label:"Visite jeep Monument Valley", note:"Avec guide Navajo — réservation recommandée"},
+    {label:"Billets Universal Studios Hollywood", note:"Réservation en ligne à l'avance conseillée"},
+    {label:"Voiture de location", note:"SUV type Ford Edge/Hyundai Santa Fe — kilométrage illimité"},
+  ]},
+];
+
+const CHECKLIST_PRATIQUE = [
+  {id:"c1", label:"ESTA (40$/pers, valable 2 ans) — nom identique au billet d'avion"},
+  {id:"c2", label:"America the Beautiful annual pass (~80$) — rentabilisé dès 3-4 parcs"},
+  {id:"c3", label:"Vérifier règles de réservation d'entrée Yosemite (changent chaque année)"},
+  {id:"c4", label:"Prévoir eau en quantité pour les randonnées (Death Valley, Grand Canyon)"},
+  {id:"c5", label:"Carte SIM / eSIM données US"},
+  {id:"c6", label:"Vêtements chauds pour le soir (nuits fraîches en altitude et dans le désert)"},
+];
+
+const TABS = [
+  {id:"itineraire", label:"Itinéraire", icon:"map"},
+  {id:"etapes", label:"Étapes & hôtels", icon:"route"},
+  {id:"lieux", label:"Lieux clés", icon:"landmark"},
+  {id:"reservations", label:"Réservations", icon:"ticket"},
+  {id:"infos", label:"Infos pratiques", icon:"info"},
+];
+
+// ---------------------------------------------------------------
+// STATE
+// ---------------------------------------------------------------
+const state = {
+  activeTab: "itineraire",
+  activeDay: 1,
+  checkedStops: {},
+  checkedChecklist: {},
+  customLinks: {},
+  customPlaces: [],
+  placeFilter: "Toutes",
+  isLoaded: false,
+  syncStatus: "idle",
+  syncError: "",
+  now: new Date(),
+};
+
+let saveTimer = null;
+function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveState, 400); }
+
+function apiUrl(action) {
+  return `${CONFIG.API_URL}?action=${action}&trip=${encodeURIComponent(CONFIG.TRIP_ID)}`;
+}
+
+async function loadState() {
+  if (!CONFIG.API_URL) { state.isLoaded = true; state.syncStatus = "error"; state.syncError = "Aucune URL Apps Script configurée."; render(); return; }
+  try {
+    const res = await fetch(apiUrl("get"), { method: "GET" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    state.checkedStops = data.checkedStops || {};
+    state.checkedChecklist = data.checkedChecklist || {};
+    state.customLinks = data.customLinks || {};
+    state.customPlaces = data.customPlaces || [];
+    state.isLoaded = true;
+    state.syncStatus = "saved";
+  } catch (err) {
+    state.isLoaded = true;
+    state.syncStatus = "error";
+    state.syncError = err && err.message ? err.message : String(err);
+  }
+  render();
+}
+
+async function saveState() {
+  if (!CONFIG.API_URL) return;
+  state.syncStatus = "saving";
+  render();
+  try {
+    const res = await fetch(apiUrl("set"), {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ checkedStops: state.checkedStops, checkedChecklist: state.checkedChecklist, customLinks: state.customLinks, customPlaces: state.customPlaces }),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    state.syncStatus = data && data.ok ? "saved" : "error";
+    state.syncError = data && data.ok ? "" : "Réponse inattendue du serveur.";
+  } catch (err) {
+    state.syncStatus = "error";
+    state.syncError = err && err.message ? err.message : String(err);
+  }
+  render();
+}
+
+function resetProgress() {
+  state.checkedStops = {};
+  state.checkedChecklist = {};
+  saveState();
+}
+
+function addLink(key, prefill) {
+  const existing = state.customLinks[key] || prefill || "";
+  const url = window.prompt("Colle le lien de réservation :", existing);
+  if (url === null) return;
+  if (url.trim() === "") { delete state.customLinks[key]; } else { state.customLinks[key] = url.trim(); }
+  render();
+  scheduleSave();
+}
+
+function addPlace() {
+  const name = window.prompt("Nom du lieu / resto :");
+  if (!name || !name.trim()) return;
+  const ville = window.prompt("Ville / étape :", "") || "";
+  const note = window.prompt("Note (optionnel) :", "") || "";
+  const link = window.prompt("Lien (optionnel) :", "") || "";
+  state.customPlaces.push({ id:"cp"+Date.now(), name:name.trim(), ville:ville.trim(), note:note.trim(), link:link.trim() });
+  render();
+  scheduleSave();
+}
+
+function editPlace(id) {
+  const p = state.customPlaces.find(x => x.id === id);
+  if (!p) return;
+  const name = window.prompt("Nom du lieu / resto :", p.name);
+  if (name === null || !name.trim()) return;
+  const ville = window.prompt("Ville / étape :", p.ville || "");
+  if (ville === null) return;
+  const note = window.prompt("Note (optionnel) :", p.note || "");
+  if (note === null) return;
+  const link = window.prompt("Lien (optionnel) :", p.link || "");
+  if (link === null) return;
+  p.name = name.trim(); p.ville = ville.trim(); p.note = note.trim(); p.link = link.trim();
+  render();
+  scheduleSave();
+}
+
+function deletePlace(id) {
+  state.customPlaces = state.customPlaces.filter(p => p.id !== id);
+  render();
+  scheduleSave();
+}
+
+// ---------------------------------------------------------------
+// HELPERS
+// ---------------------------------------------------------------
+function icon(name, size, extraClass) {
+  return `<i data-lucide="${name}" style="width:${size}px;height:${size}px" class="${extraClass||''} shrink-0"></i>`;
+}
+function mapsLink(query) { return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`; }
+function wazeLink(query) { return `https://www.waze.com/ul?q=${encodeURIComponent(query)}&navigate=yes`; }
+function linkChip(href, label, iconName) {
+  return `<a href="${href}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full" style="background:#211C17;color:#F2ECE1" onclick="event.stopPropagation()">${icon(iconName,10)}${label}</a>`;
+}
+
+// ---------------------------------------------------------------
+// RENDER
+// ---------------------------------------------------------------
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = `
+    <header class="border-b-4" style="background:#F2ECE1;color:#161311;border-color:#161311">
+      <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 shield flex items-center justify-center font-display font-black text-[10px] shrink-0" style="background:${LEG.grandcanyon};color:#F2ECE1">US-W</div>
+          <div>
+            <p class="uppercase tracking-widest text-[11px] font-semibold text-[#161311]/50 leading-none">Carnet de voyage</p>
+            <h1 class="font-display font-black text-xl sm:text-2xl tracking-tight leading-tight">Ouest Américain</h1>
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="uppercase text-[11px] font-semibold text-[#161311]/50 leading-none">Durée</p>
+          <p class="font-display font-black text-xl sm:text-2xl leading-tight">19 j.</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="border-b" style="background:#211C17;border-color:#3A2E23">
+      <div class="max-w-4xl mx-auto px-4 py-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div class="flex items-center gap-2">${icon("calendar",16,"text-[#CC6B2C]")}<span>Automne — dates à fixer</span></div>
+        <div class="flex items-center gap-2">${icon("car",16,"text-[#CC6B2C]")}<span>SUV, kilométrage illimité</span></div>
+        <div class="flex items-center gap-2">${icon("plane",16,"text-[#CC6B2C]")}<span>Arrivée San Francisco</span></div>
+        <div class="flex items-center gap-2">${icon("plane",16,"text-[#CC6B2C] rotate-45")}<span>Retour Los Angeles</span></div>
+      </div>
+    </div>
+
+    <div class="border-b" style="background:#1C1712;border-color:#2E241B">
+      <div class="max-w-4xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+        <div class="flex items-center gap-1.5 text-[#F2ECE1]/50">${icon("users",13)}<span>Suivi partagé — visible par toute personne ayant ce lien</span></div>
+        <div class="flex items-center gap-3 shrink-0">
+          <span class="flex items-center gap-1.5">
+            ${!state.isLoaded ? icon("refresh-cw",12,"animate-spin text-[#F2ECE1]/50") + '<span class="text-[#F2ECE1]/50">Chargement…</span>' : ""}
+            ${state.isLoaded && state.syncStatus==="saving" ? icon("refresh-cw",12,"animate-spin") + '<span style="color:#D4A24C">Synchronisation…</span>' : ""}
+            ${state.isLoaded && state.syncStatus==="saved" ? icon("check-circle-2",12) + '<span style="color:#8FA07C">Synchronisé</span>' : ""}
+            ${state.isLoaded && state.syncStatus==="error" ? icon("cloud-off",12) + '<span style="color:#C15060">Échec de synchronisation</span>' : ""}
+          </span>
+          ${state.isLoaded && state.syncStatus==="error" ? `<button id="btn-retry" class="flex items-center gap-1 underline decoration-dotted" style="color:#C15060">${icon("refresh-cw",12)}Réessayer</button>` : ""}
+          <button id="btn-reset" class="flex items-center gap-1 text-[#F2ECE1]/50">${icon("rotate-ccw",12)}Réinitialiser</button>
+        </div>
+        ${state.isLoaded && state.syncStatus==="error" && state.syncError ? `<p class="w-full font-mono text-[10px] break-all" style="color:#C15060">Détail : ${state.syncError}</p>` : ""}
+      </div>
+    </div>
+
+    <nav class="sticky top-0 z-20 border-b" style="background:#161311;border-color:#2E241B">
+      <div class="max-w-4xl mx-auto px-4 flex gap-1 overflow-x-auto no-scrollbar">
+        ${TABS.map(t => `
+          <button data-tab="${t.id}" class="tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors" style="color:${state.activeTab===t.id ? '#F2ECE1' : 'rgba(242,236,225,0.5)'};border-color:${state.activeTab===t.id ? '#C1440E' : 'transparent'}">
+            ${icon(t.icon,16)}${t.label}
+          </button>
+        `).join("")}
+      </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-6" style="background:#161311">
+      ${state.activeTab==="itineraire" ? renderItineraire() : ""}
+      ${state.activeTab==="etapes" ? renderEtapes() : ""}
+      ${state.activeTab==="lieux" ? renderLieux() : ""}
+      ${state.activeTab==="reservations" ? renderReservations() : ""}
+      ${state.activeTab==="infos" ? renderInfos() : ""}
+    </main>
+
+    <footer class="max-w-4xl mx-auto px-4 pt-4 pb-10 border-t text-center text-[11px] text-[#F2ECE1]/40" style="border-color:#2E241B">
+      San Francisco → Yosemite → Mammoth Lakes → Death Valley → Las Vegas → Bryce → Lake Powell → Monument Valley → Grand Canyon → Route 66 → Los Angeles
+    </footer>
+  `;
+  attachEvents();
+  if (window.lucide) lucide.createIcons();
+}
+
+function renderRoute() {
+  return `
+    <div class="flex items-center gap-1 overflow-x-auto no-scrollbar pb-3 mb-4">
+      ${STAGES.map((s, i) => `
+        <div class="flex items-center shrink-0">
+          <div class="flex flex-col items-center gap-1">
+            <div class="w-8 h-8 shield flex items-center justify-center text-[10px] font-bold" style="background:${s.color};color:#161311">${i+1}</div>
+            <p class="text-[9px] uppercase font-semibold text-[#F2ECE1]/60 whitespace-nowrap">${s.ville}</p>
+          </div>
+          ${i < STAGES.length-1 ? `<div class="w-4 sm:w-8 h-[2px] mx-1" style="background:#3A2E23"></div>` : ""}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderItineraire() {
+  const day = DAYS.find(d => d.id === state.activeDay);
+  return `
+    ${renderRoute()}
+    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 mb-6">
+      ${DAYS.map(d => {
+        const done = d.stops.filter((_,i) => state.checkedStops[`${d.id}-${i}`]).length;
+        const active = state.activeDay === d.id;
+        return `
+          <button data-day="${d.id}" class="day-btn shrink-0 w-16 rounded-lg border px-1.5 py-2 text-center transition-colors" style="border-color:${active?'#F2ECE1':'#2E241B'};background:${active?'#211C17':'#161311'}">
+            <div class="w-6 h-6 shield mx-auto mb-1 flex items-center justify-center text-[10px] font-black" style="background:${d.color};color:#161311">${d.id}</div>
+            <p class="text-[9px] font-mono text-[#F2ECE1]/50">${done}/${d.stops.length}</p>
+          </button>
+        `;
+      }).join("")}
+    </div>
+
+    <div class="flex items-center gap-3 mb-1">
+      <span class="w-3 h-3 shield shrink-0" style="background:${day.color}"></span>
+      <h2 class="font-display font-black text-2xl tracking-tight">${day.label}</h2>
+    </div>
+    <p class="text-[#F2ECE1]/60 text-sm mb-1 ml-6">${day.stage}</p>
+    ${day.hotel !== "—" ? `<p class="text-[#F2ECE1]/40 text-xs mb-6 ml-6 flex items-center gap-1">${icon("bed",11)}${day.hotel}</p>` : `<div class="mb-6"></div>`}
+
+    <div class="relative pl-8">
+      <div class="absolute left-[11px] top-2 bottom-2 w-[3px] rounded-full" style="background:${day.color};opacity:0.3"></div>
+      <div class="space-y-4">
+        ${day.stops.map((s, idx) => {
+          const key = `${day.id}-${idx}`;
+          const done = !!state.checkedStops[key];
+          return `
+            <div class="relative">
+              <button data-stop="${key}" class="stop-btn absolute -left-8 top-1 w-6 h-6 rounded-full border-2 flex items-center justify-center" style="border-color:${day.color};background:#161311">
+                ${done ? icon("check-circle-2",16) : `<span style="width:8px;height:8px;border-radius:9999px;background:${day.color}"></span>`}
+              </button>
+              <div class="rounded-lg border px-4 py-3" style="border-color:#2E241B;background:${done ? '#161311' : '#211C17'};opacity:${done?0.5:1}">
+                <span class="font-mono text-xs font-bold text-[#F2ECE1]/50 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
+                ${s.loc
+                  ? `<a href="${wazeLink(s.loc)}" target="_blank" rel="noopener" class="font-semibold text-sm inline-flex items-center gap-1.5" style="color:#F2ECE1">${s.title}${icon("navigation",12,"text-[#D4A24C]")}</a>`
+                  : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
+                <p class="text-[#F2ECE1]/60 text-xs mt-1">${s.desc}</p>
+                ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] mt-2" style="color:#D4A24C">${icon("info",12,"mt-0.5")}${s.tip}</p>` : ""}
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderEtapes() {
+  return `
+    <div class="space-y-3">
+      ${STAGES.map((s, i) => `
+        <div class="flex items-start gap-3 rounded-lg border px-4 py-3" style="border-color:#2E241B;background:#211C17">
+          <div class="w-8 h-8 shield flex items-center justify-center text-xs font-bold shrink-0" style="background:${s.color};color:#161311">${i+1}</div>
+          <div class="min-w-0">
+            <p class="font-display font-bold text-base">${s.ville}</p>
+            <p class="text-[#F2ECE1]/60 text-xs flex items-center gap-1 mt-0.5">${icon("calendar",11)}${s.dates}</p>
+            <p class="text-[#F2ECE1]/70 text-xs mt-1 flex items-center gap-1">${icon("bed",11)}${s.logement}</p>
+            <div class="mt-2">${linkChip(mapsLink(s.ville), "Maps", "map-pin")}</div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderLieux() {
+  const cats = ["Toutes","Visite","Nature","Vue","Resto"];
+  const allPlaces = [...PLACES, ...state.customPlaces.map(p => ({ ...p, category:"Resto", custom:true }))];
+  const filtered = state.placeFilter==="Toutes" ? allPlaces : allPlaces.filter(p => p.category===state.placeFilter);
+  return `
+    <button id="btn-addplace" class="w-full flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2 mb-4 border border-dashed" style="border-color:#3A2E23;color:#F2ECE1">
+      ${icon("plus",14)}Ajouter un lieu / resto
+    </button>
+    <div class="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar pb-1">
+      ${icon("filter",14,"text-[#F2ECE1]/60")}
+      ${cats.map(cat => {
+        const active = state.placeFilter===cat;
+        const color = CATEGORY_COLORS[cat];
+        return `
+          <button data-placefilter="${cat}" class="placefilter-btn shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border" style="border-color:${active?'#F2ECE1':'#3A2E23'};background:${active?'#F2ECE1':'transparent'};color:${active?'#161311':'#F2ECE1'}">
+            ${color ? `<span class="w-2 h-2 rounded-full" style="background:${active?'#161311':color}"></span>` : ""}${cat}
+          </button>
+        `;
+      }).join("")}
+    </div>
+    <div class="grid sm:grid-cols-2 gap-3">
+      ${filtered.map(p => `
+        <div class="flex items-start gap-3 rounded-lg border px-4 py-3" style="border-color:#2E241B;background:#211C17">
+          <span class="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style="background:${CATEGORY_COLORS[p.category]}"></span>
+          <div class="min-w-0 flex-1">
+            <p class="font-semibold text-sm">${p.name}</p>
+            <p class="text-[#F2ECE1]/60 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.ville}</p>
+            ${p.note ? `<p class="text-[#F2ECE1]/70 text-xs mt-1">${p.note}</p>` : ""}
+            <div class="flex items-center gap-2 mt-2 flex-wrap">
+              <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${CATEGORY_COLORS[p.category]}">${p.category}</span>
+              ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
+              ${p.custom && p.link ? linkChip(p.link, "Lien", "external-link") : ""}
+            </div>
+          </div>
+          ${p.custom ? `
+            <div class="flex flex-col gap-1 shrink-0">
+              <button data-editplace="${p.id}" style="color:#8A7A6A" class="editplace-btn">${icon("pencil",13)}</button>
+              <button data-delplace="${p.id}" style="color:#8A7A6A" class="delplace-btn">${icon("x",14)}</button>
+            </div>
+          ` : ""}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderReservations() {
+  const doneCount = Object.values(state.checkedChecklist).filter(Boolean).length;
+  return `
+    <div class="rounded-lg border px-4 py-4 mb-6" style="border-color:#2E241B;background:#211C17">
+      <p class="text-sm font-semibold flex items-center gap-2 mb-1">${icon("check-square",16)}Checklist pratique</p>
+      <p class="text-xs text-[#F2ECE1]/60 mb-3">${doneCount}/${CHECKLIST_PRATIQUE.length}</p>
+      <div class="space-y-2">
+        ${CHECKLIST_PRATIQUE.map(item => {
+          const done = !!state.checkedChecklist[item.id];
+          return `
+            <button data-check="${item.id}" class="check-btn w-full flex items-center gap-3 text-left rounded-md border px-3 py-2" style="border-color:#2E241B;background:${done?'#211C17':'#161311'}">
+              <span class="shrink-0">${done ? icon("check-circle-2",16,"") : icon("circle",16,"text-[#F2ECE1]/40")}</span>
+              <span class="text-sm ${done ? "line-through text-[#F2ECE1]/50" : ""}">${item.label}</span>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      ${RESERVATIONS_RECAP.map(group => `
+        <div>
+          <h3 class="uppercase text-xs font-black tracking-widest text-[#F2ECE1]/50 mb-2">${group.cat}</h3>
+          <div class="space-y-2">
+            ${group.items.map(item => {
+              const savedLink = state.customLinks[item.label];
+              return `
+              <div class="rounded-lg border px-4 py-3" style="border-color:#2E241B;background:#211C17">
+                <p class="text-sm font-semibold">${item.label}</p>
+                <p class="text-xs text-[#F2ECE1]/60 mt-0.5">${item.note}</p>
+                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                  ${savedLink ? linkChip(savedLink, "Lien réservation", "external-link") : ""}
+                  <button data-addlink="${item.label}" class="addlink-btn inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A2E23;color:#F2ECE1">
+                    ${icon(savedLink ? "pencil" : "plus",10)}${savedLink ? "Modifier" : "Ajouter le lien"}
+                  </button>
+                </div>
+              </div>
+            `;
+            }).join("")}
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderInfos() {
+  const infos = [
+    {icon:"stamp", titre:"ESTA & documents", texte:"Formulaire ESTA obligatoire (40$/pers, valable 2 ans) — le nom doit correspondre exactement au billet d'avion. À faire sur le site officiel esta.cbp.dhs.gov."},
+    {icon:"ticket", titre:"America the Beautiful Pass", texte:"~80$, donne accès à tous les parcs nationaux fédéraux pendant un an — rentabilisé dès 3-4 parcs visités sur cet itinéraire."},
+    {icon:"bus", titre:"Navette Zion", texte:"Si vous faites l'excursion du jour 10 : véhicules privés interdits sur la route panoramique de mars à fin novembre, navette gratuite obligatoire."},
+    {icon:"mountain-snow", titre:"Yosemite", texte:"Aucune réservation d'entrée requise en 2026, mais la règle change chaque année selon la fréquentation — à revérifier une fois les dates fixées."},
+    {icon:"bed", titre:"Grand Canyon — anticiper", texte:"Les hébergements du South Rim (El Tovar, Bright Angel...) s'ouvrent à la réservation 13 mois avant la date et se remplissent vite. C'est le point le plus urgent à réserver une fois les dates connues."},
+    {icon:"camera", titre:"Antelope Canyon", texte:"Visite guidée obligatoire (Navajo Nation) — réserver 3 à 6 mois à l'avance, plus tôt encore en haute saison."},
+    {icon:"sun", titre:"Climat automne", texte:"Chaud le jour à Death Valley et dans le désert, nuits fraîches en altitude (Yosemite, Bryce Canyon ~2 400 m). Prévoir des couches."},
+  ];
+  return `
+    <div class="space-y-3">
+      ${infos.map(info => `
+        <div class="flex items-start gap-3 rounded-lg border px-4 py-3" style="border-color:#2E241B;background:#211C17">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:#161311">${icon(info.icon,15,"text-[#D4A24C]")}</div>
+          <div class="min-w-0">
+            <p class="font-display font-bold text-base mb-1">${info.titre}</p>
+            <p class="text-[#F2ECE1]/70 text-sm">${info.texte}</p>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+// ---------------------------------------------------------------
+// EVENTS
+// ---------------------------------------------------------------
+function attachEvents() {
+  document.querySelectorAll(".tab-btn").forEach(btn => { btn.onclick = () => { state.activeTab = btn.dataset.tab; render(); }; });
+  document.querySelectorAll(".day-btn").forEach(btn => { btn.onclick = () => { state.activeDay = Number(btn.dataset.day); render(); }; });
+  document.querySelectorAll(".stop-btn").forEach(btn => {
+    btn.onclick = () => { const key = btn.dataset.stop; state.checkedStops[key] = !state.checkedStops[key]; render(); scheduleSave(); };
+  });
+  document.querySelectorAll(".check-btn").forEach(btn => {
+    btn.onclick = () => { const id = btn.dataset.check; state.checkedChecklist[id] = !state.checkedChecklist[id]; render(); scheduleSave(); };
+  });
+  document.querySelectorAll(".placefilter-btn").forEach(btn => {
+    btn.onclick = () => { state.placeFilter = btn.dataset.placefilter; render(); };
+  });
+  document.querySelectorAll(".addlink-btn").forEach(btn => {
+    btn.onclick = () => { addLink(btn.dataset.addlink, btn.dataset.prefill); };
+  });
+  document.querySelectorAll(".delplace-btn").forEach(btn => {
+    btn.onclick = () => { deletePlace(btn.dataset.delplace); };
+  });
+  document.querySelectorAll(".editplace-btn").forEach(btn => {
+    btn.onclick = () => { editPlace(btn.dataset.editplace); };
+  });
+  const addPlaceBtn = document.getElementById("btn-addplace");
+  if (addPlaceBtn) addPlaceBtn.onclick = addPlace;
+  const retryBtn = document.getElementById("btn-retry");
+  if (retryBtn) retryBtn.onclick = saveState;
+  const resetBtn = document.getElementById("btn-reset");
+  if (resetBtn) resetBtn.onclick = resetProgress;
+}
+
+// ---------------------------------------------------------------
+// INIT
+// ---------------------------------------------------------------
+render();
+loadState();
+</script>
+</body>
+</html>
