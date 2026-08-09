@@ -502,7 +502,9 @@ function renderItineraire() {
               </button>
               <div class="rounded-lg border px-4 py-3" style="border-color:#2E241B;background:${done ? '#1C1712' : '#241C15'};opacity:${done?0.5:1}">
                 <span class="font-mono text-xs font-bold text-[#F1E9DC]/70 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
-                <p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>
+                ${s.loc
+                  ? `<a href="${wazeLink(s.loc)}" target="_blank" rel="noopener" class="font-semibold text-sm inline-flex items-center gap-1.5 ${done ? "line-through" : ""}" style="color:#F1E9DC">${s.title}${icon("navigation",12,"text-[#C9972C]")}</a>`
+                  : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
                 <p class="text-[#F1E9DC]/70 text-xs mt-1">${s.desc}</p>
                 ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] mt-2" style="color:#C9972C">${icon("info",12,"mt-0.5")}${s.tip}</p>` : ""}
               </div>
