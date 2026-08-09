@@ -516,6 +516,53 @@ function renderReservations() {
   `;
 }
 
+function renderLieux() {
+  const cats = ["Toutes","Monument","Mirador","Plage","Tapas"];
+  const filtered = state.placeFilter==="Toutes" ? PLACES : PLACES.filter(p => p.category===state.placeFilter);
+  return `
+    <div class="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar pb-1">
+      ${icon("filter",14,"text-[#F1E9DC]/60")}
+      ${cats.map(cat => {
+        const active = state.placeFilter===cat;
+        const color = PLACE_CATEGORY_COLORS[cat];
+        return `
+          <button data-placefilter="${cat}" class="placefilter-btn shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border" style="border-color:${active?'#F1E9DC':'#3A2E23'};background:${active?'#F1E9DC':'transparent'};color:${active?'#1C1712':'#F1E9DC'}">
+            ${color ? `<span class="w-2 h-2 rounded-full" style="background:${active?'#1C1712':color}"></span>` : ""}${cat}
+          </button>
+        `;
+      }).join("")}
+    </div>
+    <div class="grid sm:grid-cols-2 gap-3">
+      ${filtered.map(p => `
+        <div class="flex items-start gap-3 rounded-lg border px-4 py-3" style="border-color:#2E241B;background:#241C15">
+          <span class="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style="background:${PLACE_CATEGORY_COLORS[p.category]}"></span>
+          <div class="min-w-0">
+            <p class="font-semibold text-sm">${p.name}</p>
+            <p class="text-[#F1E9DC]/60 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.ville}</p>
+            <p class="text-[10px] uppercase tracking-wide font-bold mt-1" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.category}</p>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderInfos() {
+  return `
+    <div class="space-y-3">
+      ${INFOS_PRATIQUES.map(info => `
+        <div class="flex items-start gap-3 rounded-lg border px-4 py-3" style="border-color:#2E241B;background:#241C15">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:#1C1712">${icon(info.icon,15,"text-[#C9972C]")}</div>
+          <div class="min-w-0">
+            <p class="font-display font-bold text-base mb-1">${info.titre}</p>
+            <p class="text-[#F1E9DC]/70 text-sm">${info.texte}</p>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 function renderExperiences() {
   return `
     <div class="space-y-4">
@@ -550,6 +597,9 @@ function attachEvents() {
   });
   document.querySelectorAll(".check-btn").forEach(btn => {
     btn.onclick = () => { const id = btn.dataset.check; state.checkedChecklist[id] = !state.checkedChecklist[id]; render(); scheduleSave(); };
+  });
+  document.querySelectorAll(".placefilter-btn").forEach(btn => {
+    btn.onclick = () => { state.placeFilter = btn.dataset.placefilter; render(); };
   });
   const retryBtn = document.getElementById("btn-retry");
   if (retryBtn) retryBtn.onclick = saveState;
