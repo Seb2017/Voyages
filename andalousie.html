@@ -341,7 +341,28 @@ function addPlace() {
   if (!name || !name.trim()) return;
   const ville = window.prompt("Ville :", "") || "";
   const note = window.prompt("Note (optionnel) :", "") || "";
-  state.customPlaces.push({ id: "cp" + Date.now(), name: name.trim(), ville: ville.trim(), note: note.trim() });
+  const link = window.prompt("Lien (site, réservation... optionnel) :", "") || "";
+  state.customPlaces.push({ id: "cp" + Date.now(), name: name.trim(), ville: ville.trim(), note: note.trim(), link: link.trim() });
+  render();
+  scheduleSave();
+}
+
+function editPlace(id) {
+  const p = state.customPlaces.find(x => x.id === id);
+  if (!p) return;
+  const name = window.prompt("Nom du resto :", p.name);
+  if (name === null) return; // annulé
+  if (!name.trim()) return;
+  const ville = window.prompt("Ville :", p.ville || "");
+  if (ville === null) return;
+  const note = window.prompt("Note (optionnel) :", p.note || "");
+  if (note === null) return;
+  const link = window.prompt("Lien (site, réservation... optionnel) :", p.link || "");
+  if (link === null) return;
+  p.name = name.trim();
+  p.ville = ville.trim();
+  p.note = note.trim();
+  p.link = link.trim();
   render();
   scheduleSave();
 }
@@ -631,12 +652,18 @@ function renderLieux() {
             <p class="font-semibold text-sm">${p.name}</p>
             <p class="text-[#F1E9DC]/60 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.ville}</p>
             ${p.custom && p.note ? `<p class="text-[#F1E9DC]/70 text-xs mt-1">${p.note}</p>` : ""}
-            <div class="flex items-center gap-2 mt-2">
+            <div class="flex items-center gap-2 mt-2 flex-wrap">
               <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.custom ? "Resto ajouté" : p.category}</span>
               ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
+              ${p.custom && p.link ? linkChip(p.link, "Lien", "external-link") : ""}
             </div>
           </div>
-          ${p.custom ? `<button data-delplace="${p.id}" class="delplace-btn shrink-0" style="color:#8A7A6A">${icon("x",14)}</button>` : ""}
+          ${p.custom ? `
+            <div class="flex flex-col gap-1 shrink-0">
+              <button data-editplace="${p.id}" style="color:#8A7A6A" class="editplace-btn">${icon("pencil",13)}</button>
+              <button data-delplace="${p.id}" style="color:#8A7A6A" class="delplace-btn">${icon("x",14)}</button>
+            </div>
+          ` : ""}
         </div>
       `).join("")}
     </div>
@@ -713,6 +740,9 @@ function attachEvents() {
   });
   document.querySelectorAll(".delplace-btn").forEach(btn => {
     btn.onclick = () => { deletePlace(btn.dataset.delplace); };
+  });
+  document.querySelectorAll(".editplace-btn").forEach(btn => {
+    btn.onclick = () => { editPlace(btn.dataset.editplace); };
   });
   const addPlaceBtn = document.getElementById("btn-addplace");
   if (addPlaceBtn) addPlaceBtn.onclick = addPlace;

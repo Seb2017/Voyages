@@ -276,7 +276,28 @@ function addPlace() {
   if (!name || !name.trim()) return;
   const quartier = window.prompt("Quartier :", "") || "";
   const note = window.prompt("Note (optionnel) :", "") || "";
-  state.customPlaces.push({ id: "cp" + Date.now(), name: name.trim(), quartier: quartier.trim(), note: note.trim() });
+  const link = window.prompt("Lien (site, réservation... optionnel) :", "") || "";
+  state.customPlaces.push({ id: "cp" + Date.now(), name: name.trim(), quartier: quartier.trim(), note: note.trim(), link: link.trim() });
+  render();
+  scheduleSave();
+}
+
+function editPlace(id) {
+  const p = state.customPlaces.find(x => x.id === id);
+  if (!p) return;
+  const name = window.prompt("Nom du resto :", p.name);
+  if (name === null) return; // annulé
+  if (!name.trim()) return;
+  const quartier = window.prompt("Quartier :", p.quartier || "");
+  if (quartier === null) return;
+  const note = window.prompt("Note (optionnel) :", p.note || "");
+  if (note === null) return;
+  const link = window.prompt("Lien (site, réservation... optionnel) :", p.link || "");
+  if (link === null) return;
+  p.name = name.trim();
+  p.quartier = quartier.trim();
+  p.note = note.trim();
+  p.link = link.trim();
   render();
   scheduleSave();
 }
@@ -460,9 +481,17 @@ function renderLieux() {
             <p class="font-semibold text-sm truncate">${p.name}</p>
             <p class="text-zinc-500 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.quartier}</p>
             ${p.custom && p.note ? `<p class="text-zinc-400 text-xs mt-1">${p.note}</p>` : ""}
-            <p class="text-[10px] uppercase tracking-wide font-bold mt-1" style="color:${CATEGORY_COLORS[p.category]}">${p.custom ? "Resto ajouté" : p.category}</p>
+            <div class="flex items-center gap-2 mt-1 flex-wrap">
+              <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${CATEGORY_COLORS[p.category]}">${p.custom ? "Resto ajouté" : p.category}</span>
+              ${p.custom && p.link ? `<a href="${p.link}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-200">${icon("external-link",10)}Lien</a>` : ""}
+            </div>
           </div>
-          ${p.custom ? `<button data-delplace="${p.id}" class="delplace-btn shrink-0 text-zinc-600">${icon("x",14)}</button>` : ""}
+          ${p.custom ? `
+            <div class="flex flex-col gap-1 shrink-0">
+              <button data-editplace="${p.id}" class="editplace-btn text-zinc-500">${icon("pencil",13)}</button>
+              <button data-delplace="${p.id}" class="delplace-btn text-zinc-600">${icon("x",14)}</button>
+            </div>
+          ` : ""}
         </div>
       `).join("")}
     </div>
@@ -581,6 +610,9 @@ function attachEvents() {
   });
   document.querySelectorAll(".delplace-btn").forEach(btn => {
     btn.onclick = () => { deletePlace(btn.dataset.delplace); };
+  });
+  document.querySelectorAll(".editplace-btn").forEach(btn => {
+    btn.onclick = () => { editPlace(btn.dataset.editplace); };
   });
   const addPlaceBtn = document.getElementById("btn-addplace");
   if (addPlaceBtn) addPlaceBtn.onclick = addPlace;
