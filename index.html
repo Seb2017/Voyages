@@ -60,7 +60,7 @@ const CATEGORY_COLORS = {
 
 const DAYS = [
   { id:1, date:"1 MAI", weekday:"SAMEDI", quartier:"Midtown", color:LINE.yellow, stops:[
-    {time:"—", title:"Correspondance Lyon → Paris CDG", desc:"Vol de rapprochement — horaire à préciser dès réservation.", tip:null, loc:"Aéroport de Lyon-Saint Exupéry"},
+    {time:"—", title:"Trajet vers Paris CDG", desc:"Voiture ou vol de rapprochement Lyon → Paris — mode de transport pas encore décidé.", tip:null},
     {time:"08:30", title:"Décollage Paris CDG — AF002", desc:"Air France, Boeing 777-300, Terminal 2E. Cabine Premium, sièges 23K/23L. Durée 8h10, repas + en-cas à bord.", tip:null, loc:"Aéroport Paris-Charles de Gaulle Terminal 2E"},
     {time:"10:40", title:"Atterrissage JFK", desc:"Terminal 1. Récupération des bagages, contrôle douanier.", tip:"Garde ton passeport et ta déclaration ESTA à portée de main.", loc:"John F. Kennedy International Airport Terminal 1"},
     {time:"12:00", title:"Transfert vers l'hôtel", desc:"Taxi/VTC (~100$) ou AirTrain + Métro ligne E (11,40$/pers).", tip:null},
@@ -123,7 +123,7 @@ const DAYS = [
     {time:"18:30", title:"Retour à l'hôtel", desc:"Récupération des bagages au Hard Rock Hotel.", tip:null, loc:"Hard Rock Hotel New York, 159 W 48th St"},
     {time:"20:30", title:"Départ vers JFK", desc:"Transfert vers l'aéroport.", tip:null, loc:"John F. Kennedy International Airport"},
     {time:"01:00", title:"Décollage JFK — AF011 (8 mai)", desc:"Air France, Airbus A350-900, Terminal 1. Cabine Premium, sièges 16L/16K. Durée 7h10 — arrivée à Paris CDG vers 14h10 (heure de Paris).", tip:null, loc:"John F. Kennedy International Airport Terminal 1"},
-    {time:"—", title:"Correspondance Paris CDG → Lyon", desc:"Vol de rapprochement — horaire à préciser dès réservation.", tip:null, loc:"Aéroport Paris-Charles de Gaulle"},
+    {time:"—", title:"Trajet retour vers Lyon", desc:"Voiture ou vol de rapprochement Paris → Lyon — mode de transport pas encore décidé.", tip:null},
   ]},
 ];
 
@@ -210,6 +210,7 @@ const state = {
   checkedRes: {},
   customPlaces: [],
   customLinks: {},
+  stopNotes: {},
   placeFilter: "Toutes",
   isLoaded: false,
   syncStatus: "idle", // idle | saving | saved | error
@@ -240,6 +241,7 @@ async function loadState() {
     state.checkedRes = data.checkedRes || {};
     state.customPlaces = data.customPlaces || [];
     state.customLinks = data.customLinks || {};
+    state.stopNotes = data.stopNotes || {};
     state.isLoaded = true;
     state.syncStatus = "saved";
   } catch (err) {
@@ -259,7 +261,7 @@ async function saveState() {
       method: "POST",
       // text/plain évite le pre-flight CORS (OPTIONS) qu'Apps Script ne gère pas nativement
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ checkedStops: state.checkedStops, checkedRes: state.checkedRes, customPlaces: state.customPlaces, customLinks: state.customLinks }),
+      body: JSON.stringify({ checkedStops: state.checkedStops, checkedRes: state.checkedRes, customPlaces: state.customPlaces, customLinks: state.customLinks, stopNotes: state.stopNotes }),
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
@@ -286,6 +288,19 @@ function addLink(key, prefill) {
     delete state.customLinks[key];
   } else {
     state.customLinks[key] = url.trim();
+  }
+  render();
+  scheduleSave();
+}
+
+function addNote(key) {
+  const existing = state.stopNotes[key] || "";
+  const note = window.prompt("Ta note personnelle :", existing);
+  if (note === null) return; // annulé
+  if (note.trim() === "") {
+    delete state.stopNotes[key];
+  } else {
+    state.stopNotes[key] = note.trim();
   }
   render();
   scheduleSave();
@@ -490,6 +505,10 @@ function renderItineraire() {
                   : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
                 <p class="text-zinc-400 text-xs mt-1">${s.desc}</p>
                 ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] text-yellow-400/90 mt-2">${icon("camera",12,"mt-0.5")}${s.tip}</p>` : ""}
+                ${state.stopNotes[key] ? `<p class="flex items-start gap-1.5 text-[11px] text-zinc-300 mt-2 italic">${icon("pencil",12,"mt-0.5 text-zinc-500")}${state.stopNotes[key]}</p>` : ""}
+                <button data-addnote="${key}" class="addnote-btn mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border border-zinc-700 text-zinc-400">
+                  ${icon(state.stopNotes[key] ? "pencil" : "plus",10)}${state.stopNotes[key] ? "Modifier ma note" : "Ajouter une note"}
+                </button>
               </div>
             </div>
           `;
@@ -651,7 +670,7 @@ function renderInfos() {
     {icon:"wifi-off", titre:"Rappel — carnet hors-ligne", texte:"Ce carnet reste consultable sans réseau une fois mis en cache, mais Safari iOS purge ce cache s'il n'est pas rouvert depuis ~7 jours. Réflexe : ouvrir le carnet en wifi et recharger 2-3 fois la veille du départ."},
     {icon:"hand-coins", titre:"Pourboires (tipping)", texte:"18 à 20 % au restaurant (souvent des lignes 18/20/22 % déjà calculées en bas de l'addition), 1-2$ par bagage porté à l'hôtel, 2-5$/nuit pour le ménage, 15-20 % pour un chauffeur taxi/Uber, 1-2$ par verre au bar. Le pourboire n'est pas optionnel aux USA — il complète un salaire de base souvent très bas."},
     {icon:"receipt", titre:"Taxes non incluses", texte:"Les prix affichés en vitrine ou sur les menus sont hors taxe (sales tax NYC ~8,875 %) — elle s'ajoute au moment de payer, en plus du pourboire."},
-    {icon:"plane", titre:"Correspondance Lyon → Paris", texte:"Vol de rapprochement Lyon-Paris (aller) et Paris-Lyon (retour) à ajouter — horaires à préciser dès que réservés."},
+    {icon:"plane", titre:"Trajet Lyon ↔ Paris", texte:"Mode de transport pas encore décidé (voiture ou vol de rapprochement) — à trancher avant de réserver le reste."},
   ];
   return `
     <div class="space-y-3">
@@ -705,6 +724,9 @@ function attachEvents() {
   });
   document.querySelectorAll(".addlink-btn").forEach(btn => {
     btn.onclick = () => { addLink(btn.dataset.addlink, btn.dataset.prefill); };
+  });
+  document.querySelectorAll(".addnote-btn").forEach(btn => {
+    btn.onclick = () => { addNote(btn.dataset.addnote); };
   });
   const addPlaceBtn = document.getElementById("btn-addplace");
   if (addPlaceBtn) addPlaceBtn.onclick = addPlace;

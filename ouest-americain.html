@@ -273,6 +273,7 @@ const state = {
   checkedStops: {},
   checkedChecklist: {},
   customLinks: {},
+  stopNotes: {},
   customPlaces: [],
   placeFilter: "Toutes",
   isLoaded: false,
@@ -297,6 +298,7 @@ async function loadState() {
     state.checkedStops = data.checkedStops || {};
     state.checkedChecklist = data.checkedChecklist || {};
     state.customLinks = data.customLinks || {};
+    state.stopNotes = data.stopNotes || {};
     state.customPlaces = data.customPlaces || [];
     state.isLoaded = true;
     state.syncStatus = "saved";
@@ -316,7 +318,7 @@ async function saveState() {
     const res = await fetch(apiUrl("set"), {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ checkedStops: state.checkedStops, checkedChecklist: state.checkedChecklist, customLinks: state.customLinks, customPlaces: state.customPlaces }),
+      body: JSON.stringify({ checkedStops: state.checkedStops, checkedChecklist: state.checkedChecklist, customLinks: state.customLinks, customPlaces: state.customPlaces, stopNotes: state.stopNotes }),
     });
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
@@ -340,6 +342,15 @@ function addLink(key, prefill) {
   const url = window.prompt("Colle le lien de réservation :", existing);
   if (url === null) return;
   if (url.trim() === "") { delete state.customLinks[key]; } else { state.customLinks[key] = url.trim(); }
+  render();
+  scheduleSave();
+}
+
+function addNote(key) {
+  const existing = state.stopNotes[key] || "";
+  const note = window.prompt("Ta note personnelle :", existing);
+  if (note === null) return;
+  if (note.trim() === "") { delete state.stopNotes[key]; } else { state.stopNotes[key] = note.trim(); }
   render();
   scheduleSave();
 }
@@ -521,6 +532,10 @@ function renderItineraire() {
                   : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
                 <p class="text-[#F2ECE1]/60 text-xs mt-1">${s.desc}</p>
                 ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] mt-2" style="color:#D4A24C">${icon("info",12,"mt-0.5")}${s.tip}</p>` : ""}
+                ${state.stopNotes[key] ? `<p class="flex items-start gap-1.5 text-[11px] mt-2 italic" style="color:#F2ECE1">${icon("pencil",12,"mt-0.5 text-[#8A7A6A]")}${state.stopNotes[key]}</p>` : ""}
+                <button data-addnote="${key}" class="addnote-btn mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A2E23;color:#F2ECE1">
+                  ${icon(state.stopNotes[key] ? "pencil" : "plus",10)}${state.stopNotes[key] ? "Modifier ma note" : "Ajouter une note"}
+                </button>
               </div>
             </div>
           `;
@@ -688,6 +703,9 @@ function attachEvents() {
   });
   document.querySelectorAll(".addlink-btn").forEach(btn => {
     btn.onclick = () => { addLink(btn.dataset.addlink, btn.dataset.prefill); };
+  });
+  document.querySelectorAll(".addnote-btn").forEach(btn => {
+    btn.onclick = () => { addNote(btn.dataset.addnote); };
   });
   document.querySelectorAll(".delplace-btn").forEach(btn => {
     btn.onclick = () => { deletePlace(btn.dataset.delplace); };
