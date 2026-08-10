@@ -239,6 +239,7 @@ const PLACES = [
 ];
 
 const INFOS_PRATIQUES = [
+  {icon:"route", titre:"Distance totale estimée", texte:"~1 150 km de route sur l'ensemble du circuit, répartis sur 9 trajets principaux — l'étape la plus longue est Grenade → Cordoue (~165 km). Prévoir le plein d'essence avant chaque grande étape."},
   {icon:"car", titre:"Conduite & stationnement — vue d'ensemble", texte:"Conduite à droite comme en France. La plupart des vieux centres andalous sont restreints aux véhicules non-résidents (ZBE ou rues piétonnes) — le réflexe à prendre partout : se garer en périphérie ou dans un parking dédié, puis marcher ou prendre un taxi jusqu'à l'hôtel."},
   {icon:"map-pin", titre:"Grenade — le plus contraignant", texte:"Centre historique (Albaicín, Gran Vía, Plaza Nueva, Elvira, Sacromonte) interdit à la circulation privée sauf résidents/hôtels autorisés, ZBE active. Le Mercader de Sedas a son propre parking mais non réservable — arriver tôt dans l'après-midi. En dépannage : parking San Cristóbal."},
   {icon:"map-pin", titre:"Séville — ZBE permanente", texte:"La ZBE (lun-ven 7h-19h) couvre le Casco Antiguo et Triana, où se trouve l'hôtel. Vignette environnementale DGT nécessaire pour la voiture de location, sous peine d'amende. Parkings Plaza de Armas ou Plaza de la Concordia, hors zone."},
@@ -249,6 +250,7 @@ const INFOS_PRATIQUES = [
   {icon:"flag", titre:"Frontière de Gibraltar", texte:"Territoire britannique d'outre-mer : passeport obligatoire (pas seulement carte d'identité). Prévoir un peu d'attente au poste-frontière piéton/véhicule. La monnaie officielle est la livre de Gibraltar, mais l'euro est largement accepté."},
   {icon:"sun", titre:"Météo mi-septembre", texte:"Chaud à l'intérieur des terres (Séville, Cordoue : 28-32°C en journée), plus tempéré et venteux sur la côte (Cadix, Tarifa — capitale européenne du vent/kitesurf). Prévoir vêtements légers et une couche pour le soir."},
   {icon:"plug", titre:"Électricité", texte:"Prises de type C/F, standard européen identique à la France — aucun adaptateur nécessaire."},
+  {icon:"siren", titre:"Urgences", texte:"112 — numéro d'urgence unique dans toute l'Union européenne (police, pompiers, ambulance), fonctionne aussi en Espagne. Consulat de France le plus proche selon l'étape : Séville (Plaza de Santa Cruz) ou Málaga."},
 ];
 
 const TABS = [
@@ -798,6 +800,13 @@ function jumpToToday() {
 
 jumpToToday();
 setInterval(() => { state.now = new Date(); render(); }, 60000);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+
 render();
 loadState();
 </script>

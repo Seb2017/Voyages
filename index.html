@@ -60,6 +60,7 @@ const CATEGORY_COLORS = {
 
 const DAYS = [
   { id:1, date:"1 MAI", weekday:"SAMEDI", quartier:"Midtown", color:LINE.yellow, stops:[
+    {time:"—", title:"Correspondance Lyon → Paris CDG", desc:"Vol de rapprochement — horaire à préciser dès réservation.", tip:null, loc:"Aéroport de Lyon-Saint Exupéry"},
     {time:"08:30", title:"Décollage Paris CDG — AF002", desc:"Air France, Boeing 777-300, Terminal 2E. Cabine Premium, sièges 23K/23L. Durée 8h10, repas + en-cas à bord.", tip:null, loc:"Aéroport Paris-Charles de Gaulle Terminal 2E"},
     {time:"10:40", title:"Atterrissage JFK", desc:"Terminal 1. Récupération des bagages, contrôle douanier.", tip:"Garde ton passeport et ta déclaration ESTA à portée de main.", loc:"John F. Kennedy International Airport Terminal 1"},
     {time:"12:00", title:"Transfert vers l'hôtel", desc:"Taxi/VTC (~100$) ou AirTrain + Métro ligne E (11,40$/pers).", tip:null},
@@ -122,6 +123,7 @@ const DAYS = [
     {time:"18:30", title:"Retour à l'hôtel", desc:"Récupération des bagages au Hard Rock Hotel.", tip:null, loc:"Hard Rock Hotel New York, 159 W 48th St"},
     {time:"20:30", title:"Départ vers JFK", desc:"Transfert vers l'aéroport.", tip:null, loc:"John F. Kennedy International Airport"},
     {time:"01:00", title:"Décollage JFK — AF011 (8 mai)", desc:"Air France, Airbus A350-900, Terminal 1. Cabine Premium, sièges 16L/16K. Durée 7h10 — arrivée à Paris CDG vers 14h10 (heure de Paris).", tip:null, loc:"John F. Kennedy International Airport Terminal 1"},
+    {time:"—", title:"Correspondance Paris CDG → Lyon", desc:"Vol de rapprochement — horaire à préciser dès réservation.", tip:null, loc:"Aéroport Paris-Charles de Gaulle"},
   ]},
 ];
 
@@ -195,6 +197,7 @@ const TABS = [
   {id:"lieux", label:"Lieux clés", icon:"map"},
   {id:"reservations", label:"Réservations", icon:"ticket"},
   {id:"gastro", label:"Gastronomie", icon:"utensils"},
+  {id:"infos", label:"Infos pratiques", icon:"info"},
 ];
 
 // ---------------------------------------------------------------
@@ -434,6 +437,7 @@ function render() {
       ${state.activeTab==="lieux" ? renderLieux() : ""}
       ${state.activeTab==="reservations" ? renderReservations() : ""}
       ${state.activeTab==="gastro" ? renderGastro() : ""}
+      ${state.activeTab==="infos" ? renderInfos() : ""}
     </main>
 
     <footer class="max-w-4xl mx-auto px-4 pt-4 pb-10 border-t border-zinc-900 text-center text-[11px] text-zinc-600">
@@ -641,6 +645,28 @@ function renderGastro() {
   `;
 }
 
+function renderInfos() {
+  const infos = [
+    {icon:"siren", titre:"Urgences", texte:"911 — police, pompiers, ambulance (numéro unique aux États-Unis). Consulat général de France à New York : 934 Fifth Avenue — à contacter en cas de perte de papiers ou de problème grave."},
+    {icon:"hand-coins", titre:"Pourboires (tipping)", texte:"18 à 20 % au restaurant (souvent des lignes 18/20/22 % déjà calculées en bas de l'addition), 1-2$ par bagage porté à l'hôtel, 2-5$/nuit pour le ménage, 15-20 % pour un chauffeur taxi/Uber, 1-2$ par verre au bar. Le pourboire n'est pas optionnel aux USA — il complète un salaire de base souvent très bas."},
+    {icon:"receipt", titre:"Taxes non incluses", texte:"Les prix affichés en vitrine ou sur les menus sont hors taxe (sales tax NYC ~8,875 %) — elle s'ajoute au moment de payer, en plus du pourboire."},
+    {icon:"plane", titre:"Correspondance Lyon → Paris", texte:"Vol de rapprochement Lyon-Paris (aller) et Paris-Lyon (retour) à ajouter — horaires à préciser dès que réservés."},
+  ];
+  return `
+    <div class="space-y-3">
+      ${infos.map(info => `
+        <div class="flex items-start gap-3 rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:#18181b">${icon(info.icon,15,"text-yellow-400")}</div>
+          <div class="min-w-0">
+            <p class="font-bold text-base mb-1">${info.titre}</p>
+            <p class="text-zinc-400 text-sm">${info.texte}</p>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 // ---------------------------------------------------------------
 // EVENTS
 // ---------------------------------------------------------------
@@ -713,6 +739,13 @@ async function shareApp() {
 // INIT
 // ---------------------------------------------------------------
 setInterval(() => { state.now = new Date(); render(); }, 60000);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+
 render();
 loadState();
 </script>

@@ -650,6 +650,10 @@ function renderInfos() {
     {icon:"camera", titre:"Antelope Canyon", texte:"Visite guidée obligatoire (Navajo Nation) — réserver 3 à 6 mois à l'avance, plus tôt encore en haute saison."},
     {icon:"sun", titre:"Climat automne", texte:"Chaud le jour à Death Valley et dans le désert, nuits fraîches en altitude (Sequoia, Yosemite, Bryce Canyon ~2 000-2 700 m). Prévoir des couches."},
     {icon:"plane", titre:"Vol en \"open jaw\"", texte:"Arrivée San Francisco / départ Las Vegas — vérifier que la compagnie propose ce type de billet aller-retour asymétrique."},
+    {icon:"siren", titre:"Urgences", texte:"911 — police, pompiers, ambulance (numéro unique aux États-Unis). Dans les parcs nationaux, le réseau mobile est souvent absent : repérer les postes de rangers en cas de besoin. Consulat de France le plus proche selon l'étape : San Francisco (début du séjour) ou Los Angeles (secteur Nevada/Arizona)."},
+    {icon:"hand-coins", titre:"Pourboires (tipping)", texte:"18 à 20 % au restaurant, 1-2$ par bagage à l'hôtel, 2-5$/nuit pour le ménage, 15-20 % pour un chauffeur ou une visite guidée (jeep Monument Valley, guide Antelope Canyon). Le pourboire n'est pas optionnel aux USA."},
+    {icon:"receipt", titre:"Taxes non incluses", texte:"Les prix affichés sont hors taxe — elle varie selon l'État : Californie ~7,25-10,75 %, Nevada ~8,25 %, Arizona ~5,6-11,2 %, Utah ~4,85-8,7 %. S'ajoute au moment de payer, en plus du pourboire."},
+    {icon:"route", titre:"Distance totale estimée", texte:"~2 400 km de route sur l'ensemble du circuit (hors excursion Zion), répartis sur 11 trajets — prévoir une marge dans le budget essence et la fatigue de conduite, surtout sur les étapes Death Valley (320 km) et Grand Canyon → Kingman (280 km)."},
   ];
   return `
     <div class="space-y-3">
@@ -701,6 +705,13 @@ function attachEvents() {
 // ---------------------------------------------------------------
 // INIT
 // ---------------------------------------------------------------
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+
 render();
 loadState();
 </script>
