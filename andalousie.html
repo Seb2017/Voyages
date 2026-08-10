@@ -78,7 +78,7 @@ const DAYS = [
     {time:"14:00", title:"Check-in — Mercader de Sedas", desc:"Grenade.", tip:"L'hôtel a un parking, mais non réservable (premier arrivé, premier servi) — arriver plutôt tôt dans l'après-midi. En dépannage : parking San Cristóbal, hors centre restreint.", loc:"Mercader de Sedas by Maxi Hoteles, Granada"},
   ]},
   { id:3, date:"17 SEP", weekday:"JEUDI", ville:"Grenade → Cordoue", color:LEG.grenade, hotel:"Los Patios de la Judería, Cordoue", stops:[
-    {time:"10:00", title:"Alhambra & Generalife", desc:"Visite guidée — réservée sur GetYourGuide.", tip:null, loc:"Alhambra, Granada"},
+    {time:"10:00", title:"Alhambra & Generalife", desc:"Visite guidée — réservée sur GetYourGuide.", tip:"Le Patio de los Arrayanes offre le reflet miroir le plus célèbre du palais — lumière la plus douce en tout début de matinée, avant la foule.", loc:"Alhambra, Granada"},
     {time:"16:00", title:"Route vers Cordoue", desc:"~165 km depuis Grenade.", tip:null, loc:"Córdoba, España"},
     {time:"18:30", title:"Check-in — Los Patios de la Judería", desc:"Cordoue.", tip:"Judería en grande partie piétonne : parking El Vial (près de la gare) ou gratuit au sud du pont romain.", loc:"Los Patios de la Judería, Córdoba"},
   ]},
@@ -88,12 +88,12 @@ const DAYS = [
   { id:5, date:"19 SEP", weekday:"SAMEDI", ville:"Cordoue → Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", stops:[
     {time:"10:00", title:"Route vers Séville", desc:"~140 km depuis Cordoue.", tip:null, loc:"Sevilla, España"},
     {time:"14:00", title:"Check-in — Hôtel Alcázar", desc:"Séville.", tip:"ZBE permanente sur le Casco Antiguo — vignette DGT nécessaire. Parkings Plaza de Armas ou Plaza de la Concordia, hors zone.", loc:"Hotel Alcázar, Sevilla"},
-    {time:"17:00", title:"Croisière sur le Guadalquivir", desc:"Durée 1h — réservée sur GetYourGuide.", tip:null, loc:"Torre del Oro, Sevilla"},
+    {time:"17:00", title:"Croisière sur le Guadalquivir", desc:"Durée 1h — réservée sur GetYourGuide.", tip:"Depuis le bateau, viser la Torre del Oro et la Giralda en fond — la lumière dorée de fin d'après-midi sublime les façades.", loc:"Torre del Oro, Sevilla"},
     {time:"19:30", title:"Flamenco & Tapas", desc:"Soirée réservée sur GetYourGuide.", tip:null, loc:"Triana, Sevilla"},
   ]},
   { id:6, date:"20 SEP", weekday:"DIMANCHE", ville:"Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", stops:[
     {time:"13:30", title:"Cathédrale & Giralda", desc:"Visite guidée, durée 1h30.", tip:"Monter à la Giralda pour la vue sur la ville.", loc:"Catedral de Sevilla"},
-    {time:"15:30", title:"Alcázar de Séville", desc:"Visite guidée.", tip:null, loc:"Real Alcázar de Sevilla"},
+    {time:"15:30", title:"Alcázar de Séville", desc:"Visite guidée.", tip:"Les patios et jardins mudéjars sont superbes en lumière filtrée — le Patio de las Doncellas offre un beau jeu de reflets dans le bassin central.", loc:"Real Alcázar de Sevilla"},
   ]},
   { id:7, date:"21 SEP", weekday:"LUNDI", ville:"Séville → Cadix", color:LEG.cadix, hotel:"Hôtel Boutique Vento, Cadix", stops:[
     {time:"12:00", title:"Bodegas & dégustation de vin", desc:"Visite réservée sur GetYourGuide.", tip:null, loc:"Bodegas Jerez de la Frontera"},
@@ -112,7 +112,7 @@ const DAYS = [
   ]},
   { id:10, date:"24 SEP", weekday:"JEUDI", ville:"Ronda — Villages blancs", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", stops:[
     {time:"09:00", title:"Setenil de las Bodegas", desc:"Village troglodyte, maisons construites sous la roche — le plus proche de Ronda (~20 min).", tip:"Calle Cuevas del Sol et Calle Cuevas de la Sombra pour les maisons encastrées dans la roche.", loc:"Setenil de las Bodegas"},
-    {time:"11:00", title:"Grazalema", desc:"Village blanc au cœur du Parc naturel de la Sierra de Grazalema (~35 min depuis Setenil).", tip:null, loc:"Grazalema"},
+    {time:"11:00", title:"Grazalema", desc:"Village blanc au cœur du Parc naturel de la Sierra de Grazalema (~35 min depuis Setenil).", tip:"Le meilleur point de vue est en arrivant par la route depuis Ronda — s'arrêter avant l'entrée du village pour le cadrer en contre-plongée, maisons blanches contre la roche.", loc:"Grazalema"},
     {time:"13:30", title:"Zahara de la Sierra", desc:"Village perché avec vue sur son réservoir turquoise (~20 min depuis Grazalema).", tip:"Monter jusqu'au château (Castillo) pour la vue sur le lac.", loc:"Zahara de la Sierra"},
     {time:"15:30", title:"Arcos de la Frontera", desc:"Village blanc perché sur une falaise au-dessus du Guadalete (~40 min depuis Zahara).", tip:"Plaza del Cabildo — mirador vertigineux au bord de la falaise, juste derrière l'église Santa María.", loc:"Arcos de la Frontera"},
     {time:"18:00", title:"Retour à Ronda", desc:"~1h depuis Arcos de la Frontera.", tip:null, loc:"Ronda, España"},
@@ -124,7 +124,7 @@ const DAYS = [
   ]},
   { id:12, date:"26 SEP", weekday:"SAMEDI", ville:"Málaga → Puerto Banús (Marbella) → Retour", color:LEG.malaga, hotel:"—", stops:[
     {time:"10:00", title:"Route vers Puerto Banús", desc:"~60 km depuis Málaga (Marbella), compter 45-60 min selon trafic.", tip:null, loc:"Puerto Banús, Marbella"},
-    {time:"11:30", title:"Croisière à Puerto Banús", desc:"Marbella — durée 2h30, réservée sur GetYourGuide.", tip:null, loc:"Puerto Banús, Marbella"},
+    {time:"11:30", title:"Croisière à Puerto Banús", desc:"Marbella — durée 2h30, réservée sur GetYourGuide.", tip:"Les yachts de Puerto Banús avec la Sierra Blanca en toile de fond — meilleure lumière en fin de matinée.", loc:"Puerto Banús, Marbella"},
     {time:"14:30", title:"Route retour vers Málaga", desc:"~60 km, compter 45-60 min.", tip:null, loc:"Málaga, España"},
     {time:"17:00", title:"Restitution voiture — Thrifty", desc:"Réservation #762525400. Agence Thrifty, hall de location de voitures du terminal aéroport de Málaga.", tip:"Procédure de restitution expliquée sur place à l'agence. Thrifty : +34 647 617 992. Vérifier plein d'essence et état des lieux avant restitution.", loc:"Thrifty, Avenida del Comandante García Morato, Málaga"},
     {time:"19:05", title:"Vol Málaga → Lyon — EJU7047", desc:"easyJet, terminal non précisé à Málaga. Arrivée 21h20 à Lyon, terminal T1. 3 adultes.", tip:null, loc:"Aeropuerto de Málaga-Costa del Sol"},
