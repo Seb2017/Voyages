@@ -161,6 +161,8 @@ const PLACES = [
   {name:"Levain Bakery", quartier:"Upper West Side", category:"Street Food"},
 ];
 
+const TRAVELERS = ["Sébastien", "Cécile"];
+
 const RESERVATIONS = [
   {id:"r1", month:"Janvier 2027", label:"Vols aller-retour — Air France AF002/AF011", note:"Via Paris CDG, cabine Premium — déjà réservés"},
   {id:"r2", month:"Janvier 2027", label:"Hard Rock Hotel", note:"Confirmer la réservation"},
@@ -208,6 +210,7 @@ const state = {
   activeDay: 1,
   checkedStops: {},
   checkedRes: {},
+  currentWho: TRAVELERS[0],
   customPlaces: [],
   customLinks: {},
   stopNotes: {},
@@ -369,7 +372,7 @@ function countdown() {
 
 function resProgress() {
   const total = RESERVATIONS.length;
-  const done = Object.values(state.checkedRes).filter(Boolean).length;
+  const done = Object.values(state.checkedRes).filter(v => v === true || (v && v.done)).length;
   return { total, done, pct: Math.round((done/total)*100) };
 }
 
@@ -571,8 +574,14 @@ function renderReservations() {
         <p class="text-sm font-semibold flex items-center gap-2">${icon("ticket",16)}Progression des réservations</p>
         <p class="font-mono text-sm text-zinc-400">${rp.done}/${rp.total}</p>
       </div>
-      <div class="h-2 rounded-full bg-zinc-800 overflow-hidden">
+      <div class="h-2 rounded-full bg-zinc-800 overflow-hidden mb-3">
         <div class="h-full rounded-full transition-all" style="width:${rp.pct}%;background:${LINE.yellow}"></div>
+      </div>
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-zinc-500">Qui coche ?</span>
+        ${TRAVELERS.map(name => `
+          <button data-who="${name}" class="who-btn px-3 py-1 rounded-full font-semibold ${state.currentWho===name ? "bg-yellow-400 text-black" : "border border-zinc-700 text-zinc-300"}">${name}</button>
+        `).join("")}
       </div>
     </div>
     <div class="space-y-6">
@@ -583,7 +592,9 @@ function renderReservations() {
             <h3 class="uppercase text-xs font-black tracking-widest text-zinc-500 mb-2">${month}</h3>
             <div class="space-y-2">
               ${items.map(item => {
-                const done = !!state.checkedRes[item.id];
+                const entry = state.checkedRes[item.id];
+                const done = entry === true || !!(entry && entry.done);
+                const by = entry && entry.by ? entry.by : null;
                 const savedLink = state.customLinks[item.id];
                 return `
                   <div class="rounded-lg border px-4 py-3 ${done ? "border-zinc-800" : "border-zinc-800 bg-zinc-900"}" style="background:${done ? '#0a0a0a' : ''}">
@@ -591,7 +602,7 @@ function renderReservations() {
                       <span class="mt-0.5 shrink-0">${done ? icon("check-circle-2",18,"text-yellow-400") : icon("circle",18,"text-zinc-600")}</span>
                       <span class="min-w-0 flex-1">
                         <p class="text-sm font-semibold ${done ? "line-through text-zinc-500" : ""}">${item.label}</p>
-                        <p class="text-xs text-zinc-500 mt-0.5">${item.note}</p>
+                        <p class="text-xs text-zinc-500 mt-0.5">${item.note}${done && by ? ` · coché par ${by}` : ""}</p>
                       </span>
                     </button>
                     <div class="flex items-center gap-2 mt-2 flex-wrap pl-7">
@@ -708,10 +719,15 @@ function attachEvents() {
   document.querySelectorAll(".res-btn").forEach(btn => {
     btn.onclick = () => {
       const id = btn.dataset.res;
-      state.checkedRes[id] = !state.checkedRes[id];
+      const entry = state.checkedRes[id];
+      const isDone = entry === true || !!(entry && entry.done);
+      state.checkedRes[id] = isDone ? { done: false, by: null } : { done: true, by: state.currentWho };
       render();
       scheduleSave();
     };
+  });
+  document.querySelectorAll(".who-btn").forEach(btn => {
+    btn.onclick = () => { state.currentWho = btn.dataset.who; render(); };
   });
   document.querySelectorAll(".filter-btn").forEach(btn => {
     btn.onclick = () => { state.placeFilter = btn.dataset.filter; render(); };
