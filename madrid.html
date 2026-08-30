@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Madrid — Carnet de voyage</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Madrid">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1A1013">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23C81E3A' rx='18'/%3E%3Ctext x='50' y='63' font-size='30' font-weight='900' text-anchor='middle' font-family='Georgia' fill='%23F5E8DE'%3EMAD%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23C81E3A' rx='18'/%3E%3Ctext x='50' y='63' font-size='30' font-weight='900' text-anchor='middle' font-family='Georgia' fill='%23F5E8DE'%3EMAD%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  html, body { background:#1A1013; }
+  body { font-family:'Inter', ui-sans-serif, system-ui; }
+  #app { background:#1A1013; min-height:100vh; }
+  .font-display { font-family:'Fraunces', serif; }
+  .no-scrollbar::-webkit-scrollbar { display:none; }
+  .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+  * { -webkit-tap-highlight-color: transparent; }
+  .arch { border-radius: 50% 50% 6px 6px; }
+</style>
+</head>
+<body class="min-h-screen text-[#F5E8DE]" style="background:#1A1013">
+
+<!-- ============================================================
+     CONFIGURATION — même URL Apps Script que les autres carnets,
+     seul le paramètre "trip" change (clé de stockage séparée)
+     ============================================================ -->
+<script>
+  const CONFIG = {
+    API_URL: "https://script.google.com/macros/s/AKfycbyTzO4ZS-OETOHdBxlL1KFcX9idXobLJx79Y6dt1u_qipSR6Fc-r_mR4yKLr8brocWAWw/exec",
+    TRIP_ID: "madrid",
+  };
+</script>
+
+<!-- Onglets de navigation entre voyages -->
+<div style="background:#000;border-bottom:1px solid #2E241B;padding-top:env(safe-area-inset-top)">
+  <div class="max-w-4xl mx-auto flex text-xs font-bold uppercase tracking-wide">
+    <a href="index.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🗽 New York</a>
+    <a href="andalousie.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">☀️ Andalousie</a>
+    <a href="ouest-americain.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🏜️ Ouest US</a>
+    <a href="madrid.html" class="flex-1 text-center py-2.5" style="color:#fff;border-bottom:2px solid #C81E3A">🇪🇸 Madrid</a>
+  </div>
+</div>
+
+<div id="app"></div>
+
+<script>
+// ---------------------------------------------------------------
+// DATA
+// ---------------------------------------------------------------
+const LEG = {
+  madrid:  "#C81E3A", // rouge madrilène
+  tolede:  "#A9782E", // pierre dorée du Tage
+  segovia: "#5D7B93", // pierre bleutée de l'aqueduc
+};
+
+// Rappel : rien n'est réservé à ce stade — dates et étapes sont posées,
+// vols / hôtels / voiture sont à confirmer (cf onglet Réservations).
+// Itinéraire resserré : Tolède (2 nuits) → Ségovie (1 nuit) → Madrid (1 nuit),
+// pour limiter la route par rapport à une boucle avec la Manche/Aranjuez/Chinchón.
+const DAYS = [
+  { id:1, date:"18 JUIN", weekday:"VENDREDI", ville:"Arrivée Madrid → Tolède", color:LEG.madrid, hotel:"Tolède — à réserver", stops:[
+    {time:"À définir", title:"Vol Toulouse → Madrid (Mathilde & Thomas)", desc:"Vol à réserver — matinée du 18/06 suggérée pour arriver avant midi.", tip:"Comparer easyJet / Vueling / Iberia — vols directs Toulouse-Blagnac → Madrid-Barajas, environ 1h20 de vol.", loc:"Aéroport de Toulouse-Blagnac"},
+    {time:"À définir", title:"Vol Lyon → Madrid (Sébastien, Cécile, Margaux & Mélanie)", desc:"Vol à réserver — viser un horaire proche de celui de Toulouse pour se retrouver à l'arrivée.", tip:"Vols directs Lyon-Saint Exupéry → Madrid-Barajas, environ 1h50 de vol (Vueling, Iberia, Air France).", loc:"Aéroport de Lyon-Saint Exupéry"},
+    {time:"Matin", title:"Retrouvailles à Madrid-Barajas", desc:"Les deux groupes se rejoignent à l'aéroport avant de prendre la route.", tip:"Prévoir un point de rendez-vous précis (ex. zone retrait bagages T4) vu que les vols arrivent de terminaux potentiellement différents.", loc:"Aeropuerto Adolfo Suárez Madrid-Barajas"},
+    {time:"Matin", title:"Récupération voiture(s) de location", desc:"À réserver — un monospace 7 places ou deux voitures pour le groupe de 6.", tip:"Comptoir à l'aéroport de Madrid-Barajas. Prévoir permis + carte bancaire au nom du conducteur principal.", loc:"Location de voitures, Aeropuerto Madrid-Barajas"},
+    {time:"~10h30", title:"Route vers Tolède", desc:"~70 km depuis l'aéroport de Madrid, environ 1h.", tip:null, loc:"Toledo, España"},
+    {time:"Midi", title:"Déjeuner à Tolède", desc:"Le vieux centre regorge de bars à tapas — à choisir sur place ou repérer une adresse à l'avance.", tip:null, loc:"Casco Histórico, Toledo"},
+    {time:"Après-midi", title:"Premier tour de Tolède", desc:"Alcázar et cathédrale primatiale vus de l'extérieur, prise de repères dans les ruelles du Casco Histórico avant la visite complète du lendemain.", tip:null, loc:"Catedral Primada, Toledo"},
+    {time:"Soir", title:"Check-in hébergement — Tolède", desc:"À réserver (2 nuits).", tip:"Le centre historique est en grande partie fermé à la circulation — se garer en périphérie et vérifier l'accès avec l'hébergement avant d'arriver.", loc:"Toledo, España"},
+  ]},
+  { id:2, date:"19 JUIN", weekday:"SAMEDI", ville:"Tolède", color:LEG.tolede, hotel:"Tolède — à réserver", stops:[
+    {time:"Matin", title:"Alcázar de Tolède", desc:"Forteresse dominant la ville, aujourd'hui musée de l'armée.", tip:null, loc:"Alcázar de Toledo"},
+    {time:"Matin", title:"Cathédrale primatiale", desc:"L'une des plus grandes cathédrales gothiques d'Espagne.", tip:null, loc:"Catedral Primada, Toledo"},
+    {time:"Midi", title:"Déjeuner dans le Casco Histórico", desc:"Spécialités locales : carcamusas, mazapán de Toledo en dessert.", tip:null, loc:"Casco Histórico, Toledo"},
+    {time:"Après-midi", title:"Synagogues & Monasterio San Juan de los Reyes", desc:"Sinagoga del Tránsito, Sinagoga de Santa María la Blanca, cloître du monastère franciscain.", tip:"Témoins de la coexistence historique des trois cultures (chrétienne, juive, musulmane) à Tolède.", loc:"Monasterio de San Juan de los Reyes"},
+    {time:"Fin d'après-midi", title:"Puente de Alcántara", desc:"Pont romain/mauresque enjambant le Tage, à l'entrée de la vieille ville.", tip:null, loc:"Puente de Alcántara, Toledo"},
+    {time:"Coucher du soleil", title:"Mirador del Valle", desc:"Vue panoramique classique sur Tolède juchée sur son promontoire, de l'autre côté du Tage.", tip:"Meilleure lumière environ 30-45 min avant le coucher du soleil — se garer sur le parking du mirador.", loc:"Mirador del Valle, Toledo"},
+  ]},
+  { id:3, date:"20 JUIN", weekday:"DIMANCHE", ville:"Tolède → Ségovie", color:LEG.segovia, hotel:"Ségovie — à réserver", stops:[
+    {time:"Matin", title:"Check-out Tolède", desc:"Derniers achats (mazapán, artisanat du damasquinage) avant de reprendre la route.", tip:null, loc:"Toledo, España"},
+    {time:"~11h00", title:"Route vers Ségovie", desc:"~150 km en contournant Madrid par l'ouest (M-501/AP-41), environ 1h50.", tip:null, loc:"Segovia, España"},
+    {time:"Déjeuner", title:"Arrivée & déjeuner à Ségovie", desc:"Cochinillo (cochon de lait rôti), spécialité incontournable de la ville.", tip:null, loc:"Casco Histórico, Segovia"},
+    {time:"Après-midi", title:"Aqueduc romain de Ségovie", desc:"Emblème de la ville, l'un des aqueducs romains les mieux conservés d'Europe.", tip:"Le meilleur point de vue est depuis l'escalier qui monte sur le flanc, ou depuis la Plaza del Azoguejo juste en dessous.", loc:"Acueducto de Segovia"},
+    {time:"Fin d'après-midi", title:"Alcázar de Ségovie", desc:"Château-forteresse à la silhouette de conte de fées, dominant la confluence de deux rivières.", tip:null, loc:"Alcázar de Segovia"},
+    {time:"Soir", title:"Check-in hébergement — Ségovie", desc:"À réserver (1 nuit).", tip:null, loc:"Segovia, España"},
+  ]},
+  { id:4, date:"21 JUIN", weekday:"LUNDI", ville:"Ségovie → Madrid", color:LEG.madrid, hotel:"Madrid — à réserver", stops:[
+    {time:"Matin", title:"Cathédrale de Ségovie", desc:"La dernière cathédrale gothique construite en Espagne, surnommée « la dame des cathédrales ».", tip:null, loc:"Catedral de Segovia"},
+    {time:"Fin de matinée", title:"Check-out Ségovie", desc:"Derniers pas dans la vieille ville avant de reprendre la route.", tip:null, loc:"Segovia, España"},
+    {time:"~12h30", title:"Route vers Madrid", desc:"~95 km, environ 1h.", tip:null, loc:"Madrid, España"},
+    {time:"Après-midi", title:"Check-in hôtel — Madrid", desc:"À réserver (1 nuit).", tip:"Zone à Basses Émissions (Madrid Central) sur une partie du centre — vérifier l'accès en voiture jusqu'à l'hôtel ou privilégier un parking dédié.", loc:"Madrid, España"},
+    {time:"Après-midi", title:"Puerta del Sol & Plaza Mayor", desc:"Cœur historique de Madrid, point de départ classique pour explorer le centre à pied.", tip:null, loc:"Plaza Mayor, Madrid"},
+    {time:"Soirée", title:"Tapas à La Latina", desc:"L'un des quartiers les plus vivants de Madrid pour enchaîner les bars à tapas.", tip:"Petite pensée pour les anniversaires : bon moment pour une surprise ou un verre dédié à Mathilde (25 ans) et Margaux (30 ans).", loc:"La Latina, Madrid"},
+  ]},
+  { id:5, date:"22 JUIN", weekday:"MARDI", ville:"Madrid → Retour", color:LEG.madrid, hotel:"—", stops:[
+    {time:"Matin", title:"Madrid en libre", desc:"Palacio Real, Parque del Retiro, Gran Vía selon les envies de chacun.", tip:"Le Templo de Debod (temple égyptien offert à l'Espagne) est un joli mirador si le timing le permet.", loc:"Palacio Real de Madrid"},
+    {time:"À définir", title:"Restitution voiture(s) de location", desc:"Retour à l'agence de l'aéroport de Madrid-Barajas.", tip:"Vérifier le plein et l'état des lieux avant restitution.", loc:"Location de voitures, Aeropuerto Madrid-Barajas"},
+    {time:"À définir", title:"Vol Madrid → Toulouse (Mathilde & Thomas)", desc:"Vol retour à réserver.", tip:null, loc:"Aeropuerto Adolfo Suárez Madrid-Barajas"},
+    {time:"À définir", title:"Vol Madrid → Lyon (Sébastien, Cécile, Margaux & Mélanie)", desc:"Vol retour à réserver.", tip:null, loc:"Aeropuerto Adolfo Suárez Madrid-Barajas"},
+  ]},
+];
+
+const STAGES = [
+  {ville:"Tolède", dates:"18 → 20 juin", logement:"À réserver (2 nuits)", color:LEG.tolede},
+  {ville:"Ségovie", dates:"20 → 21 juin", logement:"À réserver (1 nuit)", color:LEG.segovia},
+  {ville:"Madrid", dates:"21 → 22 juin", logement:"À réserver (1 nuit)", color:LEG.madrid},
+];
+
+const RESERVATIONS_RECAP = [
+  {cat:"Vols", items:[
+    {id:"r-vol-tls-aller", label:"Toulouse → Madrid (Mathilde & Thomas)", note:"18/06, matinée — à réserver"},
+    {id:"r-vol-lyon-aller", label:"Lyon → Madrid (Sébastien, Cécile, Margaux & Mélanie)", note:"18/06, matinée — à réserver"},
+    {id:"r-vol-tls-retour", label:"Madrid → Toulouse (Mathilde & Thomas)", note:"22/06 — à réserver"},
+    {id:"r-vol-lyon-retour", label:"Madrid → Lyon (Sébastien, Cécile, Margaux & Mélanie)", note:"22/06 — à réserver"},
+  ]},
+  {cat:"Voiture de location", items:[
+    {id:"r-voiture", label:"Voiture(s) — aéroport Madrid-Barajas", note:"Pour 6 personnes : monospace 7 places ou 2 voitures. Prise en charge 18/06 matin, restitution 22/06."},
+  ]},
+  {cat:"Hébergements", items: STAGES.map((s,i) => ({id:`r-hebergement-${i}`, label: s.ville, note: `${s.logement} (${s.dates})`}))},
+];
+
+const CHECKLIST_PRATIQUE = [
+  {id:"c1", label:"Réserver les 2 vols (Toulouse ↔ Madrid et Lyon ↔ Madrid)"},
+  {id:"c2", label:"Réserver la/les voiture(s) de location à Madrid-Barajas"},
+  {id:"c3", label:"Réserver l'hébergement à Tolède (2 nuits)"},
+  {id:"c4", label:"Réserver l'hébergement à Ségovie (1 nuit)"},
+  {id:"c5", label:"Réserver l'hébergement à Madrid (1 nuit)"},
+  {id:"c6", label:"Vérifier les cartes d'identité (valides, suffisantes pour l'UE)"},
+  {id:"c7", label:"Prévoir une surprise pour les 25 ans de Mathilde et les 30 ans de Margaux"},
+  {id:"c8", label:"Chaussures confortables (pavés de Tolède et Ségovie)"},
+  {id:"c9", label:"Vérifier l'accès en voiture aux centres historiques (Tolède, Madrid Central) avant chaque check-in"},
+];
+
+const EXPERIENCES = [
+  {name:"Spectacle de flamenco à Madrid", when:"Suggestion — soirée du 21/06", ville:"Madrid", color:LEG.madrid, desc:"Tablao traditionnel type Corral de la Morería ou Cardamomo — à réserver à l'avance, les meilleures places partent vite.", booking:"Suggestion — à réserver"},
+  {name:"Montgolfière au lever du soleil sur Tolède", when:"Suggestion — tôt le matin du 19/06", ville:"Tolède", color:LEG.tolede, desc:"Survol de la ville et de la vallée du Tage au petit matin, activité assez demandée à cette période.", booking:"Suggestion — à réserver"},
+  {name:"Tour à vélo électrique — Madrid historique", when:"Suggestion — matinée du 22/06", ville:"Madrid", color:LEG.madrid, desc:"Retiro, Gran Vía, Plaza Mayor à vélo, bon moyen de couvrir le centre rapidement en groupe.", booking:"Suggestion — à réserver"},
+  {name:"Tour tapas & vermouth à La Latina", when:"Suggestion — soirée du 21/06", ville:"Madrid (La Latina)", color:LEG.madrid, desc:"Visite guidée de bars à tapas dans l'un des quartiers les plus vivants de Madrid, en soirée.", booking:"Suggestion — à réserver"},
+  {name:"Visite guidée du Palais Royal de Madrid", when:"Suggestion — matinée du 22/06", ville:"Madrid", color:LEG.segovia, desc:"Coupe-file conseillé pour la dernière matinée avant le vol retour.", booking:"Suggestion — à réserver"},
+];
+
+const PLACE_CATEGORY_COLORS = {
+  Monument: "#C9972C",
+  Mirador: "#1B6B93",
+  Jardin: "#4F7942",
+  Tapas: "#A13D2D",
+};
+
+const PLACES = [
+  {name:"Puerta del Sol", ville:"Madrid", category:"Monument"},
+  {name:"Plaza Mayor", ville:"Madrid", category:"Monument"},
+  {name:"Palacio Real de Madrid", ville:"Madrid", category:"Monument"},
+  {name:"Parque del Retiro", ville:"Madrid", category:"Jardin"},
+  {name:"Templo de Debod", ville:"Madrid", category:"Mirador"},
+  {name:"Mercado de San Miguel", ville:"Madrid", category:"Tapas"},
+  {name:"Gran Vía", ville:"Madrid", category:"Monument"},
+  {name:"La Latina (bars à tapas)", ville:"Madrid", category:"Tapas"},
+  {name:"Alcázar de Toledo", ville:"Tolède", category:"Monument"},
+  {name:"Catedral Primada", ville:"Tolède", category:"Monument"},
+  {name:"Puente de Alcántara", ville:"Tolède", category:"Monument"},
+  {name:"Monasterio de San Juan de los Reyes", ville:"Tolède", category:"Monument"},
+  {name:"Sinagoga del Tránsito", ville:"Tolède", category:"Monument"},
+  {name:"Mirador del Valle", ville:"Tolède", category:"Mirador"},
+  {name:"Acueducto de Segovia", ville:"Ségovie", category:"Monument"},
+  {name:"Alcázar de Segovia", ville:"Ségovie", category:"Monument"},
+  {name:"Catedral de Segovia", ville:"Ségovie", category:"Monument"},
+];
+
+const INFOS_PRATIQUES = [
+  {icon:"route", titre:"Distance totale estimée", texte:"~320 km de route sur l'ensemble du circuit (aéroport → Tolède → Ségovie → Madrid). L'étape la plus longue est Tolède → Ségovie (~150 km, en contournant Madrid par l'ouest)."},
+  {icon:"car", titre:"Conduite & stationnement — vue d'ensemble", texte:"Conduite à droite comme en France. Le centre historique de Tolède est en grande partie fermé aux véhicules non-résidents — se garer en périphérie et marcher. Madrid Central (partie du centre) est une zone à basses émissions : vérifier l'accès en voiture jusqu'à l'hôtel avant d'y entrer."},
+  {icon:"map-pin", titre:"Tolède — vieille ville restreinte", texte:"Ruelles étroites et pentues, en grande partie interdites aux véhicules non-résidents. Parkings en périphérie du Casco Histórico (ex. Parking Alcázar, Parking Recaredo) recommandés."},
+  {icon:"map-pin", titre:"Madrid — Zone à Basses Émissions (Madrid Central)", texte:"Restrictions de circulation sur une partie du centre historique. À vérifier selon l'emplacement exact de l'hôtel réservé — privilégier un parking de l'hôtel ou un parking public en périphérie de la zone."},
+  {icon:"clock", titre:"Horaires & rythme espagnol", texte:"Déjeuner tard (14h-15h30), dîner tard (21h-22h30). Beaucoup de petits commerces ferment en début d'après-midi. Les musées et monuments sont souvent fermés le lundi — à vérifier avant chaque visite (notamment pour Ségovie le 21/06)."},
+  {icon:"sun", titre:"Météo mi-juin en Castille", texte:"Chaud et sec à Madrid (28-34°C en journée), légèrement plus frais à Ségovie et Tolède le soir. Prévoir vêtements légers, chapeau/casquette et eau pour les visites en extérieur (aqueduc, mirador)."},
+  {icon:"plug", titre:"Électricité", texte:"Prises de type C/F, standard européen identique à la France — aucun adaptateur nécessaire."},
+  {icon:"siren", titre:"Urgences", texte:"112 — numéro d'urgence unique dans toute l'Union européenne (police, pompiers, ambulance), valable en Espagne. Ambassade de France à Madrid en cas de besoin."},
+  {icon:"wifi-off", titre:"Rappel — carnet hors-ligne", texte:"Ce carnet reste consultable sans réseau une fois mis en cache, mais Safari iOS purge ce cache s'il n'est pas rouvert depuis ~7 jours. Réflexe : recharger le carnet en wifi la veille du départ."},
+];
+
+const TABS = [
+  {id:"itineraire", label:"Itinéraire", icon:"calendar"},
+  {id:"etapes", label:"Étapes & hôtels", icon:"map"},
+  {id:"lieux", label:"Lieux clés", icon:"landmark"},
+  {id:"reservations", label:"Réservations", icon:"ticket"},
+  {id:"experiences", label:"Expériences", icon:"sparkles"},
+  {id:"infos", label:"Infos pratiques", icon:"info"},
+];
+
+// ---------------------------------------------------------------
+// STATE
+// ---------------------------------------------------------------
+const state = {
+  activeTab: "itineraire",
+  activeDay: 1,
+  checkedStops: {},
+  checkedChecklist: {},
+  customLinks: {},
+  stopNotes: {},
+  customPlaces: [],
+  placeFilter: "Toutes",
+  isLoaded: false,
+  syncStatus: "idle",
+  syncError: "",
+  now: new Date(),
+};
+
+let saveTimer = null;
+function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveState, 400); }
+
+function apiUrl(action) {
+  return `${CONFIG.API_URL}?action=${action}&trip=${encodeURIComponent(CONFIG.TRIP_ID)}`;
+}
+
+async function loadState() {
+  if (!CONFIG.API_URL) { state.isLoaded = true; state.syncStatus = "error"; state.syncError = "Aucune URL Apps Script configurée."; render(); return; }
+  try {
+    const res = await fetch(apiUrl("get"), { method: "GET" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    state.checkedStops = data.checkedStops || {};
+    state.checkedChecklist = data.checkedChecklist || {};
+    state.customLinks = data.customLinks || {};
+    state.stopNotes = data.stopNotes || {};
+    state.customPlaces = data.customPlaces || [];
+    state.isLoaded = true;
+    state.syncStatus = "saved";
+  } catch (err) {
+    state.isLoaded = true;
+    state.syncStatus = "error";
+    state.syncError = err && err.message ? err.message : String(err);
+  }
+  render();
+}
+
+async function saveState() {
+  if (!CONFIG.API_URL) return;
+  state.syncStatus = "saving";
+  render();
+  try {
+    const res = await fetch(apiUrl("set"), {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ checkedStops: state.checkedStops, checkedChecklist: state.checkedChecklist, customLinks: state.customLinks, customPlaces: state.customPlaces, stopNotes: state.stopNotes }),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    state.syncStatus = data && data.ok ? "saved" : "error";
+    state.syncError = data && data.ok ? "" : "Réponse inattendue du serveur.";
+  } catch (err) {
+    state.syncStatus = "error";
+    state.syncError = err && err.message ? err.message : String(err);
+  }
+  render();
+}
+
+function resetProgress() {
+  state.checkedStops = {};
+  state.checkedChecklist = {};
+  saveState();
+}
+
+function addLink(key, prefill) {
+  const existing = state.customLinks[key] || prefill || "";
+  const url = window.prompt("Colle le lien de réservation :", existing);
+  if (url === null) return; // annulé
+  if (url.trim() === "") {
+    delete state.customLinks[key];
+  } else {
+    state.customLinks[key] = url.trim();
+  }
+  render();
+  scheduleSave();
+}
+
+function addNote(key) {
+  const existing = state.stopNotes[key] || "";
+  const note = window.prompt("Ta note personnelle :", existing);
+  if (note === null) return; // annulé
+  if (note.trim() === "") {
+    delete state.stopNotes[key];
+  } else {
+    state.stopNotes[key] = note.trim();
+  }
+  render();
+  scheduleSave();
+}
+
+function addPlace() {
+  const name = window.prompt("Nom du resto :");
+  if (!name || !name.trim()) return;
+  const ville = window.prompt("Ville :", "") || "";
+  const note = window.prompt("Note (optionnel) :", "") || "";
+  const link = window.prompt("Lien (site, réservation... optionnel) :", "") || "";
+  state.customPlaces.push({ id: "cp" + Date.now(), name: name.trim(), ville: ville.trim(), note: note.trim(), link: link.trim() });
+  render();
+  scheduleSave();
+}
+
+function editPlace(id) {
+  const p = state.customPlaces.find(x => x.id === id);
+  if (!p) return;
+  const name = window.prompt("Nom du resto :", p.name);
+  if (name === null) return; // annulé
+  if (!name.trim()) return;
+  const ville = window.prompt("Ville :", p.ville || "");
+  if (ville === null) return;
+  const note = window.prompt("Note (optionnel) :", p.note || "");
+  if (note === null) return;
+  const link = window.prompt("Lien (site, réservation... optionnel) :", p.link || "");
+  if (link === null) return;
+  p.name = name.trim();
+  p.ville = ville.trim();
+  p.note = note.trim();
+  p.link = link.trim();
+  render();
+  scheduleSave();
+}
+
+function deletePlace(id) {
+  state.customPlaces = state.customPlaces.filter(p => p.id !== id);
+  render();
+  scheduleSave();
+}
+
+// ---------------------------------------------------------------
+// HELPERS
+// ---------------------------------------------------------------
+function icon(name, size, extraClass) {
+  return `<i data-lucide="${name}" style="width:${size}px;height:${size}px" class="${extraClass||''} shrink-0"></i>`;
+}
+function mapsLink(query) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+function wazeLink(query) {
+  return `https://www.waze.com/ul?q=${encodeURIComponent(query)}&navigate=yes`;
+}
+function linkChip(href, label, iconName) {
+  return `<a href="${href}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full" style="background:#1A1013;color:#F5E8DE" onclick="event.stopPropagation()">${icon(iconName,10)}${label}</a>`;
+}
+function countdown() {
+  const target = new Date("2027-06-18T06:00:00");
+  const diffMs = target - state.now;
+  if (diffMs <= 0) return { live: true };
+  const days = Math.floor(diffMs / 86400000);
+  return { live: false, days };
+}
+
+// ---------------------------------------------------------------
+// RENDER
+// ---------------------------------------------------------------
+function render() {
+  const cd = countdown();
+  const app = document.getElementById("app");
+
+  app.innerHTML = `
+    <header class="border-b-4 border-[#1A1013]" style="background:#F5E8DE;color:#231216">
+      <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 arch flex items-center justify-center font-display font-black text-sm shrink-0" style="background:${LEG.madrid};color:#F5E8DE">MAD</div>
+          <div>
+            <p class="uppercase tracking-widest text-[11px] font-semibold text-[#231216]/50 leading-none">Anniversaires Mathilde & Margaux</p>
+            <h1 class="font-display font-black text-xl sm:text-2xl tracking-tight leading-tight">Madrid</h1>
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="uppercase text-[11px] font-semibold text-[#231216]/50 leading-none">${cd.live ? "Bon voyage !" : "Départ dans"}</p>
+          <p class="font-display font-black text-xl sm:text-2xl leading-tight">${cd.live ? "J-J" : "J-"+cd.days}</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="border-b" style="background:#241318;border-color:#3A1F26">
+      <div class="max-w-4xl mx-auto px-4 py-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div class="flex items-center gap-2">${icon("calendar",16,"text-[#C9972C]")}<span>18 → 22 juin 2027</span></div>
+        <div class="flex items-center gap-2">${icon("users",16,"text-[#C9972C]")}<span>6 pers. — 3 couples</span></div>
+        <div class="flex items-center gap-2">${icon("plane",16,"text-[#C9972C]")}<span>Toulouse & Lyon → Madrid</span></div>
+        <div class="flex items-center gap-2">${icon("car",16,"text-[#C9972C]")}<span>Voiture(s) — à réserver</span></div>
+      </div>
+    </div>
+
+    <div class="border-b" style="background:#1A1013;border-color:#2E1A20">
+      <div class="max-w-4xl mx-auto px-4 py-2.5 flex gap-2">
+        <button id="btn-share" class="flex-1 flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2 border" style="border-color:#3A1F26;color:#F5E8DE">
+          ${icon("share-2",14)}Partager le carnet
+        </button>
+      </div>
+    </div>
+
+    <div class="border-b" style="background:#1A1013;border-color:#2E1A20">
+      <div class="max-w-4xl mx-auto px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+        <div class="flex items-center gap-1.5 text-[#F5E8DE]/70">${icon("users",13)}<span>Suivi partagé — visible par toute personne ayant ce lien</span></div>
+        <div class="flex items-center gap-3 shrink-0">
+          <span class="flex items-center gap-1.5">
+            ${!state.isLoaded ? icon("refresh-cw",12,"animate-spin text-[#F5E8DE]/70") + '<span class="text-[#F5E8DE]/70">Chargement…</span>' : ""}
+            ${state.isLoaded && state.syncStatus==="saving" ? icon("refresh-cw",12,"animate-spin text-[#C9972C]") + '<span style="color:#C9972C">Synchronisation…</span>' : ""}
+            ${state.isLoaded && state.syncStatus==="saved" ? icon("check-circle-2",12,"text-[#8FA07C]") + '<span style="color:#8FA07C">Synchronisé</span>' : ""}
+            ${state.isLoaded && state.syncStatus==="error" ? icon("cloud-off",12,"text-[#C15060]") + '<span style="color:#C15060">Échec de synchronisation</span>' : ""}
+          </span>
+          ${state.isLoaded && state.syncStatus==="error" ? `<button id="btn-retry" class="flex items-center gap-1 underline decoration-dotted" style="color:#C15060">${icon("refresh-cw",12)}Réessayer</button>` : ""}
+          <button id="btn-reset" class="flex items-center gap-1 text-[#F5E8DE]/70">${icon("rotate-ccw",12)}Réinitialiser</button>
+        </div>
+        ${state.isLoaded && state.syncStatus==="error" && state.syncError ? `<p class="w-full font-mono text-[10px] break-all" style="color:#C15060">Détail : ${state.syncError}</p>` : ""}
+      </div>
+    </div>
+
+    <nav class="sticky top-0 z-20 border-b" style="background:#1A1013;border-color:#2E1A20">
+      <div class="max-w-4xl mx-auto px-4 flex gap-1 overflow-x-auto no-scrollbar">
+        ${TABS.map(t => `
+          <button data-tab="${t.id}" class="tab-btn flex items-center gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap border-b-2 transition-colors" style="color:${state.activeTab===t.id ? '#F5E8DE' : 'rgba(245,232,222,0.55)'};border-color:${state.activeTab===t.id ? '#C81E3A' : 'transparent'}">
+            ${icon(t.icon,16)}${t.label}
+          </button>
+        `).join("")}
+      </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-6" style="background:#1A1013">
+      ${state.activeTab==="itineraire" ? renderItineraire() : ""}
+      ${state.activeTab==="etapes" ? renderEtapes() : ""}
+      ${state.activeTab==="lieux" ? renderLieux() : ""}
+      ${state.activeTab==="reservations" ? renderReservations() : ""}
+      ${state.activeTab==="experiences" ? renderExperiences() : ""}
+      ${state.activeTab==="infos" ? renderInfos() : ""}
+    </main>
+
+    <footer class="max-w-4xl mx-auto px-4 pt-4 pb-10 border-t text-center text-[11px] text-[#F5E8DE]/65" style="border-color:#2E1A20">
+      Road trip Madrid → Tolède → Ségovie → Madrid
+    </footer>
+  `;
+
+  attachEvents();
+  if (window.lucide) lucide.createIcons();
+}
+
+function renderRoute() {
+  return `
+    <div class="flex items-center gap-1 overflow-x-auto no-scrollbar pb-3 mb-4">
+      ${STAGES.map((s, i) => `
+        <div class="flex items-center shrink-0">
+          <div class="flex flex-col items-center gap-1">
+            <div class="w-8 h-8 arch flex items-center justify-center text-[10px] font-bold" style="background:${s.color};color:#1A1013">${i+1}</div>
+            <p class="text-[9px] uppercase font-semibold text-[#F5E8DE]/75 whitespace-nowrap">${s.ville}</p>
+          </div>
+          ${i < STAGES.length-1 ? `<div class="w-6 sm:w-10 h-[2px] mx-1" style="background:#3A1F26"></div>` : ""}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderItineraire() {
+  const day = DAYS.find(d => d.id === state.activeDay);
+  return `
+    ${renderRoute()}
+    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 mb-6">
+      ${DAYS.map(d => {
+        const done = d.stops.filter((_,i) => state.checkedStops[`${d.id}-${i}`]).length;
+        const active = state.activeDay === d.id;
+        return `
+          <button data-day="${d.id}" class="day-btn shrink-0 w-20 rounded-lg border px-2 py-2 text-center transition-colors" style="border-color:${active?'#F5E8DE':'#2E1A20'};background:${active?'#241318':'#1A1013'}">
+            <div class="w-6 h-6 arch mx-auto mb-1 flex items-center justify-center text-[10px] font-black" style="background:${d.color};color:#1A1013">${d.id}</div>
+            <p class="text-[10px] uppercase font-bold text-[#F5E8DE]/75">${d.weekday.slice(0,3)}</p>
+            <p class="text-xs font-mono text-[#F5E8DE]/65">${done}/${d.stops.length}</p>
+          </button>
+        `;
+      }).join("")}
+    </div>
+
+    <div class="flex items-center gap-3 mb-1">
+      <span class="w-3 h-3 arch shrink-0" style="background:${day.color}"></span>
+      <h2 class="font-display font-black text-2xl tracking-tight">${day.weekday} ${day.date}</h2>
+    </div>
+    <p class="text-[#F5E8DE]/70 text-sm mb-1 ml-6">${day.ville}</p>
+    ${day.hotel !== "—" ? `<p class="text-[#F5E8DE]/65 text-xs mb-6 ml-6 flex items-center gap-1">${icon("bed",11)}${day.hotel}</p>` : `<div class="mb-6"></div>`}
+
+    <div class="relative pl-8">
+      <div class="absolute left-[11px] top-2 bottom-2 w-[3px] rounded-full" style="background:${day.color};opacity:0.3"></div>
+      <div class="space-y-4">
+        ${day.stops.map((s, idx) => {
+          const key = `${day.id}-${idx}`;
+          const done = !!state.checkedStops[key];
+          return `
+            <div class="relative">
+              <button data-stop="${key}" class="stop-btn absolute -left-8 top-1 w-6 h-6 rounded-full border-2 flex items-center justify-center" style="border-color:${day.color};background:#1A1013">
+                ${done ? icon("check-circle-2",16) : `<span style="width:8px;height:8px;border-radius:9999px;background:${day.color}"></span>`}
+              </button>
+              <div class="rounded-lg border px-4 py-3" style="border-color:#2E1A20;background:${done ? '#1A1013' : '#241318'};opacity:${done?0.5:1}">
+                <span class="font-mono text-xs font-bold text-[#F5E8DE]/70 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
+                ${s.loc
+                  ? `<a href="${wazeLink(s.loc)}" target="_blank" rel="noopener" class="font-semibold text-sm inline-flex items-center gap-1.5 ${done ? "line-through" : ""}" style="color:#F5E8DE">${s.title}${icon("navigation",12,"text-[#C9972C]")}</a>`
+                  : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
+                <p class="text-[#F5E8DE]/70 text-xs mt-1">${s.desc}</p>
+                ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] mt-2" style="color:#C9972C">${icon("info",12,"mt-0.5")}${s.tip}</p>` : ""}
+                ${state.stopNotes[key] ? `<p class="flex items-start gap-1.5 text-[11px] mt-2 italic" style="color:#F5E8DE">${icon("pencil",12,"mt-0.5 text-[#8A7A78]")}${state.stopNotes[key]}</p>` : ""}
+                <button data-addnote="${key}" class="addnote-btn mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A1F26;color:#F5E8DE">
+                  ${icon(state.stopNotes[key] ? "pencil" : "plus",10)}${state.stopNotes[key] ? "Modifier ma note" : "Ajouter une note"}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderEtapes() {
+  return `
+    <div class="space-y-3">
+      ${STAGES.map((s, i) => `
+        <div class="flex items-start gap-3 rounded-lg border px-4 py-3" style="border-color:#2E1A20;background:#241318">
+          <div class="w-8 h-8 arch flex items-center justify-center text-xs font-bold shrink-0" style="background:${s.color};color:#1A1013">${i+1}</div>
+          <div class="min-w-0">
+            <p class="font-display font-bold text-base">${s.ville}</p>
+            <p class="text-[#F5E8DE]/70 text-xs flex items-center gap-1 mt-0.5">${icon("calendar",11)}${s.dates}</p>
+            <p class="text-[#F5E8DE]/70 text-xs mt-1 flex items-center gap-1">${icon("bed",11)}${s.logement}</p>
+            <div class="mt-2">${linkChip(mapsLink(s.ville + ", España"), "Maps", "map-pin")}</div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderReservations() {
+  const doneCount = Object.values(state.checkedChecklist).filter(Boolean).length;
+  return `
+    <div class="rounded-lg border px-4 py-4 mb-6" style="border-color:#2E1A20;background:#241318">
+      <p class="text-sm font-semibold flex items-center gap-2 mb-1">${icon("check-square",16)}Checklist avant le départ</p>
+      <p class="text-xs text-[#F5E8DE]/65 mb-3">${doneCount}/${CHECKLIST_PRATIQUE.length} — rien n'est encore réservé, coche au fur et à mesure.</p>
+      <div class="space-y-2">
+        ${CHECKLIST_PRATIQUE.map(item => {
+          const done = !!state.checkedChecklist[item.id];
+          return `
+            <button data-check="${item.id}" class="check-btn w-full flex items-center gap-3 text-left rounded-md border px-3 py-2" style="border-color:#2E1A20;background:${done?'#241318':'#1A1013'}">
+              <span class="shrink-0">${done ? icon("check-circle-2",16,"") : icon("circle",16,"text-[#F5E8DE]/50")}</span>
+              <span class="text-sm ${done ? "line-through text-[#F5E8DE]/65" : ""}">${item.label}</span>
+            </button>
+          `;
+        }).join("")}
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      ${RESERVATIONS_RECAP.map(group => `
+        <div>
+          <h3 class="uppercase text-xs font-black tracking-widest text-[#F5E8DE]/65 mb-2">${group.cat}</h3>
+          <div class="space-y-2">
+            ${group.items.map(item => {
+              const done = !!state.checkedChecklist[item.id];
+              return `
+              <button data-check="${item.id}" class="check-btn w-full flex items-start justify-between gap-3 text-left rounded-lg border px-4 py-3" style="border-color:#2E1A20;background:#241318">
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold">${item.label}</p>
+                  <p class="text-xs text-[#F5E8DE]/70 mt-0.5">${item.note}</p>
+                </div>
+                <span class="flex items-center gap-1 text-[10px] font-bold shrink-0 mt-0.5" style="color:${done ? '#8FA07C' : '#C9972C'}">${icon(done ? "check" : "clock",11)}${done ? "RÉSERVÉ" : "À RÉSERVER"}</span>
+              </button>
+            `;
+            }).join("")}
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderLieux() {
+  const cats = ["Toutes","Monument","Jardin","Mirador","Tapas"];
+  const allPlaces = [...PLACES, ...state.customPlaces.map(p => ({ ...p, category: "Tapas", custom: true }))];
+  const filtered = state.placeFilter==="Toutes" ? allPlaces : allPlaces.filter(p => p.category===state.placeFilter);
+  return `
+    <button id="btn-addplace" class="w-full flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2 mb-4 border border-dashed" style="border-color:#3A1F26;color:#F5E8DE">
+      ${icon("plus",14)}Ajouter un resto
+    </button>
+    <div class="flex items-center gap-2 mb-4 overflow-x-auto no-scrollbar pb-1">
+      ${icon("filter",14,"text-[#F5E8DE]/60")}
+      ${cats.map(cat => {
+        const active = state.placeFilter===cat;
+        const color = PLACE_CATEGORY_COLORS[cat];
+        return `
+          <button data-placefilter="${cat}" class="placefilter-btn shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border" style="border-color:${active?'#F5E8DE':'#3A1F26'};background:${active?'#F5E8DE':'transparent'};color:${active?'#1A1013':'#F5E8DE'}">
+            ${color ? `<span class="w-2 h-2 rounded-full" style="background:${active?'#1A1013':color}"></span>` : ""}${cat}
+          </button>
+        `;
+      }).join("")}
+    </div>
+    <div class="grid sm:grid-cols-2 gap-3">
+      ${filtered.map(p => `
+        <div class="flex items-start gap-3 rounded-lg border px-4 py-3" style="border-color:#2E1A20;background:#241318">
+          <span class="w-2.5 h-2.5 rounded-full mt-1.5 shrink-0" style="background:${PLACE_CATEGORY_COLORS[p.category]}"></span>
+          <div class="min-w-0 flex-1">
+            <p class="font-semibold text-sm">${p.name}</p>
+            <p class="text-[#F5E8DE]/60 text-xs flex items-center gap-1 mt-0.5">${icon("map-pin",11)}${p.ville}</p>
+            ${p.note ? `<p class="text-[#F5E8DE]/70 text-xs mt-1">${p.note}</p>` : ""}
+            <div class="flex items-center gap-2 mt-2 flex-wrap">
+              <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.category}</span>
+              ${p.custom ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#2E1A20;color:#C9972C">${icon("user",10)} Ajouté par vous</span>` : ""}
+              ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
+              ${p.custom && p.link ? linkChip(p.link, "Lien", "external-link") : ""}
+            </div>
+          </div>
+          ${p.custom ? `
+            <div class="flex flex-col gap-1 shrink-0">
+              <button data-editplace="${p.id}" style="color:#8A7A78" class="editplace-btn">${icon("pencil",13)}</button>
+              <button data-delplace="${p.id}" style="color:#8A7A78" class="delplace-btn">${icon("x",14)}</button>
+            </div>
+          ` : ""}
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderInfos() {
+  return `
+    <div class="space-y-3">
+      ${INFOS_PRATIQUES.map(info => `
+        <div class="flex items-start gap-3 rounded-lg border px-4 py-3" style="border-color:#2E1A20;background:#241318">
+          <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style="background:#1A1013">${icon(info.icon,15,"text-[#C9972C]")}</div>
+          <div class="min-w-0">
+            <p class="font-display font-bold text-base mb-1">${info.titre}</p>
+            <p class="text-[#F5E8DE]/70 text-sm">${info.texte}</p>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderExperiences() {
+  return `
+    <div class="space-y-4">
+      ${EXPERIENCES.map(r => {
+        const savedLink = state.customLinks[r.name];
+        return `
+        <div class="rounded-lg border overflow-hidden" style="border-color:#2E1A20;background:#241318">
+          <div class="h-1.5" style="background:${r.color}"></div>
+          <div class="p-4">
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <h3 class="font-display font-black text-lg">${r.name}</h3>
+            </div>
+            <p class="text-xs text-[#F5E8DE]/70 flex items-center gap-3 mb-3">
+              <span class="flex items-center gap-1">${icon("clock",12)}${r.when}</span>
+              <span class="flex items-center gap-1">${icon("map-pin",12)}${r.ville}</span>
+            </p>
+            <p class="text-sm text-[#F5E8DE]/80 mb-3">${r.desc}</p>
+            <div class="flex items-center gap-2 text-xs rounded-md px-3 py-2 mb-3" style="background:#1A1013">${icon("ticket",13,"text-[#F5E8DE]/65")}<span style="color:#C9972C">${r.booking}</span></div>
+            <div class="flex items-center gap-2 flex-wrap">
+              ${linkChip(mapsLink(r.name + ", " + r.ville), "Maps", "map-pin")}
+              ${savedLink ? linkChip(savedLink, "Lien", "external-link") : ""}
+              <button data-addlink="${r.name}" data-prefill="" class="addlink-btn inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A1F26;color:#F5E8DE">
+                ${icon(savedLink ? "pencil" : "plus",10)}${savedLink ? "Modifier le lien" : "Ajouter le lien"}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      }).join("")}
+    </div>
+  `;
+}
+
+// ---------------------------------------------------------------
+// EVENTS
+// ---------------------------------------------------------------
+function attachEvents() {
+  document.querySelectorAll(".tab-btn").forEach(btn => { btn.onclick = () => { state.activeTab = btn.dataset.tab; render(); }; });
+  document.querySelectorAll(".day-btn").forEach(btn => { btn.onclick = () => { state.activeDay = Number(btn.dataset.day); render(); }; });
+  document.querySelectorAll(".stop-btn").forEach(btn => {
+    btn.onclick = () => { const key = btn.dataset.stop; state.checkedStops[key] = !state.checkedStops[key]; render(); scheduleSave(); };
+  });
+  document.querySelectorAll(".check-btn").forEach(btn => {
+    btn.onclick = () => { const id = btn.dataset.check; state.checkedChecklist[id] = !state.checkedChecklist[id]; render(); scheduleSave(); };
+  });
+  document.querySelectorAll(".placefilter-btn").forEach(btn => {
+    btn.onclick = () => { state.placeFilter = btn.dataset.placefilter; render(); };
+  });
+  document.querySelectorAll(".addlink-btn").forEach(btn => {
+    btn.onclick = () => { addLink(btn.dataset.addlink, btn.dataset.prefill); };
+  });
+  document.querySelectorAll(".addnote-btn").forEach(btn => {
+    btn.onclick = () => { addNote(btn.dataset.addnote); };
+  });
+  document.querySelectorAll(".delplace-btn").forEach(btn => {
+    btn.onclick = () => { deletePlace(btn.dataset.delplace); };
+  });
+  document.querySelectorAll(".editplace-btn").forEach(btn => {
+    btn.onclick = () => { editPlace(btn.dataset.editplace); };
+  });
+  const addPlaceBtn = document.getElementById("btn-addplace");
+  if (addPlaceBtn) addPlaceBtn.onclick = addPlace;
+  const retryBtn = document.getElementById("btn-retry");
+  if (retryBtn) retryBtn.onclick = saveState;
+  const resetBtn = document.getElementById("btn-reset");
+  if (resetBtn) resetBtn.onclick = resetProgress;
+  const shareBtn = document.getElementById("btn-share");
+  if (shareBtn) shareBtn.onclick = shareApp;
+}
+
+async function shareApp() {
+  const shareData = {
+    title: "Madrid — Carnet de voyage",
+    text: "Notre carnet de voyage à Madrid",
+    url: window.location.href,
+  };
+  if (navigator.share) {
+    try { await navigator.share(shareData); } catch (err) { /* annulé par l'utilisateur */ }
+  } else if (navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(shareData.url);
+      window.alert("Lien copié dans le presse-papier !");
+    } catch (err) {
+      window.prompt("Copie ce lien :", shareData.url);
+    }
+  } else {
+    window.prompt("Copie ce lien :", shareData.url);
+  }
+}
+
+// ---------------------------------------------------------------
+// INIT
+// ---------------------------------------------------------------
+function jumpToToday() {
+  const tripStart = new Date("2027-06-18T00:00:00");
+  const diffDays = Math.floor((state.now - tripStart) / 86400000) + 1;
+  if (diffDays >= 1 && diffDays <= DAYS.length) {
+    state.activeDay = diffDays;
+    state.activeTab = "itineraire";
+  }
+}
+
+jumpToToday();
+setInterval(() => { state.now = new Date(); render(); }, 60000);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+
+render();
+loadState();
+</script>
+</body>
+</html>

@@ -47,6 +47,7 @@
     <a href="index.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🗽 New York</a>
     <a href="andalousie.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">☀️ Andalousie</a>
     <a href="ouest-americain.html" class="flex-1 text-center py-2.5" style="color:#fff;border-bottom:2px solid #C1440E">🏜️ Ouest US</a>
+    <a href="madrid.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🇪🇸 Madrid</a>
   </div>
 </div>
 
@@ -247,8 +248,6 @@ const RESERVATIONS_RECAP = [
   ]},
 ];
 
-const TRAVELERS = ["Sébastien", "Cécile"]; // à ajuster si d'autres voyageurs rejoignent ce voyage
-
 const CHECKLIST_PRATIQUE = [
   {id:"c1", label:"ESTA (40$/pers, valable 2 ans) — nom identique au billet d'avion"},
   {id:"c2", label:"America the Beautiful annual pass (~80$) — rentabilisé dès 3-4 parcs"},
@@ -274,7 +273,6 @@ const state = {
   activeDay: 1,
   checkedStops: {},
   checkedChecklist: {},
-  currentWho: TRAVELERS[0],
   customLinks: {},
   stopNotes: {},
   customPlaces: [],
@@ -613,26 +611,18 @@ function renderLieux() {
 }
 
 function renderReservations() {
-  const doneCount = Object.values(state.checkedChecklist).filter(v => v === true || (v && v.done)).length;
+  const doneCount = Object.values(state.checkedChecklist).filter(Boolean).length;
   return `
     <div class="rounded-lg border px-4 py-4 mb-6" style="border-color:#2E241B;background:#211C17">
       <p class="text-sm font-semibold flex items-center gap-2 mb-1">${icon("check-square",16)}Checklist pratique</p>
       <p class="text-xs text-[#F2ECE1]/60 mb-3">${doneCount}/${CHECKLIST_PRATIQUE.length}</p>
-      <div class="flex items-center gap-2 text-xs mb-3">
-        <span class="text-[#F2ECE1]/60">Qui coche ?</span>
-        ${TRAVELERS.map(name => `
-          <button data-who="${name}" class="who-btn px-3 py-1 rounded-full font-semibold" style="background:${state.currentWho===name ? '#F2ECE1' : 'transparent'};color:${state.currentWho===name ? '#161311' : '#F2ECE1'};border:1px solid #3A2E23">${name}</button>
-        `).join("")}
-      </div>
       <div class="space-y-2">
         ${CHECKLIST_PRATIQUE.map(item => {
-          const entry = state.checkedChecklist[item.id];
-          const done = entry === true || !!(entry && entry.done);
-          const by = entry && entry.by ? entry.by : null;
+          const done = !!state.checkedChecklist[item.id];
           return `
             <button data-check="${item.id}" class="check-btn w-full flex items-center gap-3 text-left rounded-md border px-3 py-2" style="border-color:#2E241B;background:${done?'#211C17':'#161311'}">
               <span class="shrink-0">${done ? icon("check-circle-2",16,"") : icon("circle",16,"text-[#F2ECE1]/40")}</span>
-              <span class="text-sm ${done ? "line-through text-[#F2ECE1]/50" : ""}">${item.label}${done && by ? ` <span class="text-[#F2ECE1]/40">· coché par ${by}</span>` : ""}</span>
+              <span class="text-sm ${done ? "line-through text-[#F2ECE1]/50" : ""}">${item.label}</span>
             </button>
           `;
         }).join("")}
@@ -707,17 +697,7 @@ function attachEvents() {
     btn.onclick = () => { const key = btn.dataset.stop; state.checkedStops[key] = !state.checkedStops[key]; render(); scheduleSave(); };
   });
   document.querySelectorAll(".check-btn").forEach(btn => {
-    btn.onclick = () => {
-      const id = btn.dataset.check;
-      const entry = state.checkedChecklist[id];
-      const isDone = entry === true || !!(entry && entry.done);
-      state.checkedChecklist[id] = isDone ? { done: false, by: null } : { done: true, by: state.currentWho };
-      render();
-      scheduleSave();
-    };
-  });
-  document.querySelectorAll(".who-btn").forEach(btn => {
-    btn.onclick = () => { state.currentWho = btn.dataset.who; render(); };
+    btn.onclick = () => { const id = btn.dataset.check; state.checkedChecklist[id] = !state.checkedChecklist[id]; render(); scheduleSave(); };
   });
   document.querySelectorAll(".placefilter-btn").forEach(btn => {
     btn.onclick = () => { state.placeFilter = btn.dataset.placefilter; render(); };
