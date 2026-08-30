@@ -389,6 +389,65 @@ function deletePlace(id) {
   scheduleSave();
 }
 
+function removeCustomLink(key) {
+  delete state.customLinks[key];
+  render();
+  scheduleSave();
+}
+
+function removeStopNote(key) {
+  delete state.stopNotes[key];
+  render();
+  scheduleSave();
+}
+
+function stopLabelFromKey(key) {
+  const [dayId, idx] = key.split("-").map(Number);
+  const day = DAYS.find(d => d.id === dayId);
+  if (!day || !day.stops[idx]) return key;
+  return day.stops[idx].title;
+}
+
+function renderCustomItemsList() {
+  const places = state.customPlaces || [];
+  const links = Object.entries(state.customLinks || {});
+  const notes = Object.entries(state.stopNotes || {});
+  if (places.length === 0 && links.length === 0 && notes.length === 0) {
+    return `<p class="text-xs text-[#F2ECE1]/55">Aucun élément personnalisé pour l'instant — les restos, liens et notes que vous ajoutez apparaîtront ici, chacun avec son propre bouton de suppression.</p>`;
+  }
+  return `
+    <div class="space-y-2">
+      ${places.map(p => `
+        <div class="flex items-center justify-between gap-3 rounded-md border px-3 py-2" style="border-color:#2E241B;background:#161311">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold flex items-center gap-1.5">${icon("utensils",11)}${p.name}</p>
+            <p class="text-[10px] text-[#F2ECE1]/55 mt-0.5">${p.ville || ""}</p>
+          </div>
+          <button data-delplace="${p.id}" class="delplace-btn shrink-0" style="color:#8A7A6A">${icon("x",14)}</button>
+        </div>
+      `).join("")}
+      ${links.map(([key, url]) => `
+        <div class="flex items-center justify-between gap-3 rounded-md border px-3 py-2" style="border-color:#2E241B;background:#161311">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold flex items-center gap-1.5">${icon("link",11)}${key}</p>
+            <p class="text-[10px] text-[#F2ECE1]/55 mt-0.5 truncate">${url}</p>
+          </div>
+          <button data-rmlink="${key}" class="rmlink-btn shrink-0" style="color:#8A7A6A">${icon("x",14)}</button>
+        </div>
+      `).join("")}
+      ${notes.map(([key, note]) => `
+        <div class="flex items-center justify-between gap-3 rounded-md border px-3 py-2" style="border-color:#2E241B;background:#161311">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold flex items-center gap-1.5">${icon("pencil",11)}${stopLabelFromKey(key)}</p>
+            <p class="text-[10px] text-[#F2ECE1]/55 mt-0.5">${note}</p>
+          </div>
+          <button data-rmnote="${key}" class="rmnote-btn shrink-0" style="color:#8A7A6A">${icon("x",14)}</button>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 // ---------------------------------------------------------------
 // HELPERS
 // ---------------------------------------------------------------
@@ -684,6 +743,13 @@ function renderInfos() {
         </div>
       `).join("")}
     </div>
+    <div class="mt-6 pt-5 border-t" style="border-color:#2E241B">
+      <h3 class="uppercase text-xs font-black tracking-widest text-[#F2ECE1]/65 mb-3">Éléments ajoutés à ce voyage</h3>
+      ${renderCustomItemsList()}
+      <a href="${apiUrl('get')}" target="_blank" rel="noopener" class="mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A2E20;color:#F2ECE1">
+        ${icon("code-2",10)}Voir les données brutes de ce voyage
+      </a>
+    </div>
   `;
 }
 
@@ -713,6 +779,12 @@ function attachEvents() {
   });
   document.querySelectorAll(".editplace-btn").forEach(btn => {
     btn.onclick = () => { editPlace(btn.dataset.editplace); };
+  });
+  document.querySelectorAll(".rmlink-btn").forEach(btn => {
+    btn.onclick = () => { removeCustomLink(btn.dataset.rmlink); };
+  });
+  document.querySelectorAll(".rmnote-btn").forEach(btn => {
+    btn.onclick = () => { removeStopNote(btn.dataset.rmnote); };
   });
   const addPlaceBtn = document.getElementById("btn-addplace");
   if (addPlaceBtn) addPlaceBtn.onclick = addPlace;
