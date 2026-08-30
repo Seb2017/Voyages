@@ -587,12 +587,11 @@ function renderItineraire() {
               </button>
               <div class="rounded-lg border px-4 py-3" style="border-color:#2E241B;background:${done ? '#161311' : '#211C17'};opacity:${done?0.5:1}">
                 <span class="font-mono text-xs font-bold text-[#F2ECE1]/50 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
-                ${s.loc
-                  ? `<a href="${wazeLink(s.loc)}" target="_blank" rel="noopener" class="font-semibold text-sm inline-flex items-center gap-1.5" style="color:#F2ECE1">${s.title}${icon("navigation",12,"text-[#D4A24C]")}</a>`
-                  : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
+                <p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>
                 <p class="text-[#F2ECE1]/60 text-xs mt-1">${s.desc}</p>
                 ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] mt-2" style="color:#D4A24C">${icon("info",12,"mt-0.5")}${s.tip}</p>` : ""}
                 ${state.stopNotes[key] ? `<p class="flex items-start gap-1.5 text-[11px] mt-2 italic" style="color:#F2ECE1">${icon("pencil",12,"mt-0.5 text-[#8A7A6A]")}${state.stopNotes[key]}</p>` : ""}
+                ${s.loc ? `<div class="flex items-center gap-2 mt-2">${linkChip(mapsLink(s.loc), "Maps", "map-pin")}${linkChip(wazeLink(s.loc), "Waze", "navigation")}</div>` : ""}
                 <button data-addnote="${key}" class="addnote-btn mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A2E23;color:#F2ECE1">
                   ${icon(state.stopNotes[key] ? "pencil" : "plus",10)}${state.stopNotes[key] ? "Modifier ma note" : "Ajouter une note"}
                 </button>
@@ -654,6 +653,7 @@ function renderLieux() {
             <div class="flex items-center gap-2 mt-2 flex-wrap">
               <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${CATEGORY_COLORS[p.category]}">${p.category}</span>
               ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
+              ${linkChip(wazeLink(p.name + ", " + p.ville), "Waze", "navigation")}
               ${p.custom && p.link ? linkChip(p.link, "Lien", "external-link") : ""}
             </div>
           </div>

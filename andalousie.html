@@ -631,12 +631,11 @@ function renderItineraire() {
               </button>
               <div class="rounded-lg border px-4 py-3" style="border-color:#2E241B;background:${done ? '#1C1712' : '#241C15'};opacity:${done?0.5:1}">
                 <span class="font-mono text-xs font-bold text-[#F1E9DC]/70 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
-                ${s.loc
-                  ? `<a href="${wazeLink(s.loc)}" target="_blank" rel="noopener" class="font-semibold text-sm inline-flex items-center gap-1.5 ${done ? "line-through" : ""}" style="color:#F1E9DC">${s.title}${icon("navigation",12,"text-[#C9972C]")}</a>`
-                  : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
+                <p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>
                 <p class="text-[#F1E9DC]/70 text-xs mt-1">${s.desc}</p>
                 ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] mt-2" style="color:#C9972C">${icon("info",12,"mt-0.5")}${s.tip}</p>` : ""}
                 ${state.stopNotes[key] ? `<p class="flex items-start gap-1.5 text-[11px] mt-2 italic" style="color:#F1E9DC">${icon("pencil",12,"mt-0.5 text-[#8A7A6A]")}${state.stopNotes[key]}</p>` : ""}
+                ${s.loc ? `<div class="flex items-center gap-2 mt-2">${linkChip(mapsLink(s.loc), "Maps", "map-pin")}${linkChip(wazeLink(s.loc), "Waze", "navigation")}</div>` : ""}
                 <button data-addnote="${key}" class="addnote-btn mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A2E23;color:#F1E9DC">
                   ${icon(state.stopNotes[key] ? "pencil" : "plus",10)}${state.stopNotes[key] ? "Modifier ma note" : "Ajouter une note"}
                 </button>
@@ -747,6 +746,7 @@ function renderLieux() {
               ${p.badge ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#2A3A1E;color:#9FD671">${icon("thumbs-up",10)} ${p.badge}</span>` : ""}
               ${p.custom ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#2E241B;color:#C9972C">${icon("user",10)} Ajouté par vous</span>` : ""}
               ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
+              ${linkChip(wazeLink(p.name + ", " + p.ville), "Waze", "navigation")}
               ${p.custom && p.link ? linkChip(p.link, "Lien", "external-link") : ""}
             </div>
           </div>
