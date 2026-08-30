@@ -176,6 +176,63 @@ const PLACES = [
   {name:"Catedral de Segovia", ville:"Ségovie", category:"Monument"},
 ];
 
+const PHOTO_SPOTS = [
+  {
+    name: "Mirador del Valle", ville: "Tolède", color: LEG.tolede,
+    when: "30-45 min avant le coucher du soleil",
+    angle: "Grand-angle depuis le parking supérieur du mirador, légèrement décalé à droite pour aligner l'Alcázar et la cathédrale dans le même cadre. La lumière rasante du soir dore les pierres et fait ressortir le relief de la vieille ville sur son promontoire.",
+    loc: "Mirador del Valle, Toledo",
+  },
+  {
+    name: "Puente de Alcántara", ville: "Tolède", color: LEG.tolede,
+    when: "Fin de matinée (lumière douce, moins de monde)",
+    angle: "Depuis la rive opposée du Tage, en légère contre-plongée pour donner de la hauteur au pont et à la Puerta del Sol qui le surplombe.",
+    loc: "Puente de Alcántara, Toledo",
+  },
+  {
+    name: "Ruelles du Casco Histórico", ville: "Tolède", color: LEG.tolede,
+    when: "Heure bleue, juste après le coucher du soleil",
+    angle: "Petites rues étroites autour de la cathédrale : les éclairages publics s'allument et donnent une ambiance chaude qui contraste avec le ciel encore bleu — cadrer serré, sans ciel, pour ne pas perdre le contraste.",
+    loc: "Catedral Primada, Toledo",
+  },
+  {
+    name: "Acueducto de Segovia", ville: "Ségovie", color: LEG.segovia,
+    when: "Lever du soleil, ou golden hour en fin d'après-midi",
+    angle: "Depuis la Plaza del Azoguejo, juste en dessous, en contre-plongée pour montrer toute la hauteur des arches. Alternative : monter l'escalier latéral pour une vue en perspective qui suit l'alignement des arches sur la longueur.",
+    loc: "Acueducto de Segovia",
+  },
+  {
+    name: "Alcázar de Ségovie", ville: "Ségovie", color: LEG.segovia,
+    when: "Golden hour, fin d'après-midi",
+    angle: "Depuis le Mirador de la Pradera de San Marcos, en contrebas du château — c'est la vue « carte postale » classique, avec la façade principale qui capte bien la lumière rasante du soir.",
+    loc: "Mirador de la Pradera de San Marcos, Segovia",
+  },
+  {
+    name: "Plaza Mayor", ville: "Madrid", color: LEG.madrid,
+    when: "Tôt le matin (place vide) ou heure bleue le soir",
+    angle: "Depuis le centre de la place, cadrage symétrique captant les arcades des deux côtés et la Casa de la Panadería en fond.",
+    loc: "Plaza Mayor, Madrid",
+  },
+  {
+    name: "Templo de Debod", ville: "Madrid", color: LEG.madrid,
+    when: "Coucher du soleil — l'un des meilleurs spots de la ville pour ça",
+    angle: "Depuis les jardins, en contre-plongée légère, avec le temple égyptien qui encadre le soleil couchant. Arriver 30 min avant pour avoir le temps de trouver son axe, l'endroit se remplit vite.",
+    loc: "Templo de Debod, Madrid",
+  },
+  {
+    name: "Gran Vía", ville: "Madrid", color: LEG.madrid,
+    when: "Heure bleue / nuit, néons allumés",
+    angle: "Vue plongeante depuis le rooftop du Círculo de Bellas Artes (accès payant, quelques euros) — c'est le point de vue le plus reconnu sur toute l'avenue illuminée.",
+    loc: "Círculo de Bellas Artes, Madrid",
+  },
+  {
+    name: "Palacio Real de Madrid", ville: "Madrid", color: LEG.madrid,
+    when: "Tôt le matin (lumière douce, peu de monde)",
+    angle: "Depuis la Plaza de Oriente, en contre-plongée pour donner de l'ampleur à la façade blanche. Alternative : depuis les Jardines de Sabatini, avec les jardins en premier plan.",
+    loc: "Palacio Real de Madrid",
+  },
+];
+
 const INFOS_PRATIQUES = [
   {icon:"route", titre:"Distance totale estimée", texte:"~320 km de route sur l'ensemble du circuit (aéroport → Tolède → Ségovie → Madrid). L'étape la plus longue est Tolède → Ségovie (~150 km, en contournant Madrid par l'ouest)."},
   {icon:"car", titre:"Conduite & stationnement — vue d'ensemble", texte:"Conduite à droite comme en France. Le centre historique de Tolède est en grande partie fermé aux véhicules non-résidents — se garer en périphérie et marcher. Madrid Central (partie du centre) est une zone à basses émissions : vérifier l'accès en voiture jusqu'à l'hôtel avant d'y entrer."},
@@ -192,6 +249,7 @@ const TABS = [
   {id:"itineraire", label:"Itinéraire", icon:"calendar"},
   {id:"etapes", label:"Étapes & hôtels", icon:"map"},
   {id:"lieux", label:"Lieux clés", icon:"landmark"},
+  {id:"photos", label:"Photos", icon:"camera"},
   {id:"reservations", label:"Réservations", icon:"ticket"},
   {id:"experiences", label:"Expériences", icon:"sparkles"},
   {id:"infos", label:"Infos pratiques", icon:"info"},
@@ -487,6 +545,7 @@ function render() {
       ${state.activeTab==="itineraire" ? renderItineraire() : ""}
       ${state.activeTab==="etapes" ? renderEtapes() : ""}
       ${state.activeTab==="lieux" ? renderLieux() : ""}
+      ${state.activeTab==="photos" ? renderPhotos() : ""}
       ${state.activeTab==="reservations" ? renderReservations() : ""}
       ${state.activeTab==="experiences" ? renderExperiences() : ""}
       ${state.activeTab==="infos" ? renderInfos() : ""}
@@ -555,12 +614,11 @@ function renderItineraire() {
               </button>
               <div class="rounded-lg border px-4 py-3" style="border-color:#2E1A20;background:${done ? '#1A1013' : '#241318'};opacity:${done?0.5:1}">
                 <span class="font-mono text-xs font-bold text-[#F5E8DE]/70 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
-                ${s.loc
-                  ? `<a href="${wazeLink(s.loc)}" target="_blank" rel="noopener" class="font-semibold text-sm inline-flex items-center gap-1.5 ${done ? "line-through" : ""}" style="color:#F5E8DE">${s.title}${icon("navigation",12,"text-[#C9972C]")}</a>`
-                  : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
+                <p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>
                 <p class="text-[#F5E8DE]/70 text-xs mt-1">${s.desc}</p>
                 ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] mt-2" style="color:#C9972C">${icon("info",12,"mt-0.5")}${s.tip}</p>` : ""}
                 ${state.stopNotes[key] ? `<p class="flex items-start gap-1.5 text-[11px] mt-2 italic" style="color:#F5E8DE">${icon("pencil",12,"mt-0.5 text-[#8A7A78]")}${state.stopNotes[key]}</p>` : ""}
+                ${s.loc ? `<div class="flex items-center gap-2 mt-2">${linkChip(mapsLink(s.loc), "Maps", "map-pin")}${linkChip(wazeLink(s.loc), "Waze", "navigation")}</div>` : ""}
                 <button data-addnote="${key}" class="addnote-btn mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A1F26;color:#F5E8DE">
                   ${icon(state.stopNotes[key] ? "pencil" : "plus",10)}${state.stopNotes[key] ? "Modifier ma note" : "Ajouter une note"}
                 </button>
@@ -584,6 +642,33 @@ function renderEtapes() {
             <p class="text-[#F5E8DE]/70 text-xs flex items-center gap-1 mt-0.5">${icon("calendar",11)}${s.dates}</p>
             <p class="text-[#F5E8DE]/70 text-xs mt-1 flex items-center gap-1">${icon("bed",11)}${s.logement}</p>
             <div class="mt-2">${linkChip(mapsLink(s.ville + ", España"), "Maps", "map-pin")}</div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderPhotos() {
+  return `
+    <p class="text-xs text-[#F5E8DE]/60 mb-4">Meilleur moment de la journée et angle de prise de vue pour chaque spot — basé sur l'orientation des lieux, pas sur une réservation.</p>
+    <div class="space-y-3">
+      ${PHOTO_SPOTS.map(p => `
+        <div class="rounded-lg border overflow-hidden" style="border-color:#2E1A20;background:#241318">
+          <div class="h-1.5" style="background:${p.color}"></div>
+          <div class="p-4">
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <h3 class="font-display font-black text-base">${p.name}</h3>
+              <span class="text-[10px] uppercase tracking-wide font-bold shrink-0" style="color:${p.color}">${p.ville}</span>
+            </div>
+            <div class="mt-2 space-y-2">
+              <p class="flex items-start gap-2 text-xs" style="color:#C9972C">${icon("sun",13,"mt-0.5 shrink-0")}<span><span class="font-semibold">Moment idéal —</span> ${p.when}</span></p>
+              <p class="flex items-start gap-2 text-xs text-[#F5E8DE]/80">${icon("camera",13,"mt-0.5 shrink-0 text-[#F5E8DE]/50")}<span><span class="font-semibold">Angle & cadrage —</span> ${p.angle}</span></p>
+            </div>
+            <div class="flex items-center gap-2 mt-3">
+              ${linkChip(mapsLink(p.loc), "Maps", "map-pin")}
+              ${linkChip(wazeLink(p.loc), "Waze", "navigation")}
+            </div>
           </div>
         </div>
       `).join("")}
@@ -666,6 +751,7 @@ function renderLieux() {
               <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${PLACE_CATEGORY_COLORS[p.category]}">${p.category}</span>
               ${p.custom ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#2E1A20;color:#C9972C">${icon("user",10)} Ajouté par vous</span>` : ""}
               ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
+              ${linkChip(wazeLink(p.name + ", " + p.ville), "Waze", "navigation")}
               ${p.custom && p.link ? linkChip(p.link, "Lien", "external-link") : ""}
             </div>
           </div>
