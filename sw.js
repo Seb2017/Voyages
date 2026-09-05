@@ -1,8 +1,9 @@
 // Service Worker — carnets de voyage (NYC / Andalousie / Ouest Américain)
 // Stratégie : cache-first pour la coquille de l'app (HTML, CDN Tailwind/Fonts/Lucide),
 // afin que le carnet reste consultable sans réseau une fois ouvert au moins une fois
-// (typiquement avant de partir, en wifi). Les appels de synchro (Apps Script) restent
-// en network-first : ils échouent proprement hors-ligne, sans casser l'affichage.
+// (typiquement avant de partir, en wifi). Les appels de synchro (Apps Script) et la
+// météo (Open-Meteo) restent en network-first natif : ils échouent proprement
+// hors-ligne, sans casser l'affichage.
 
 const CACHE_NAME = "carnets-voyage-v1";
 
@@ -24,7 +25,7 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return; // ne jamais intercepter les POST (sauvegarde)
 
   const url = new URL(req.url);
-  const isApiCall = url.hostname.includes("script.google.com");
+  const isApiCall = url.hostname.includes("script.google.com") || url.hostname.includes("open-meteo.com");
   if (isApiCall) return; // laisser passer normalement (network-first natif du navigateur)
 
   // Coquille de page + ressources CDN : cache-first, avec mise à jour en arrière-plan
