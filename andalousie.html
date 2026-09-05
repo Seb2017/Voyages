@@ -119,7 +119,7 @@ const DAYS = [
     {time:"16:00", title:"Cours de surf", desc:"El Palmar — réservé sur GetYourGuide.", tip:null, loc:"Playa de El Palmar, Vejer de la Frontera"},
   ]},
   { id:9, date:"23 SEP", weekday:"MERCREDI", ville:"Tarifa → Ronda", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", coords:COORDS.ronda, tags:["exterieur"], stops:[
-    {time:"11:00", title:"Rocher de Gibraltar", desc:"Visite guidée, durée 2h30.", tip:"Prendre son passeport — passage de frontière.", loc:"Rock of Gibraltar"},
+    {time:"11:00", title:"Rocher de Gibraltar", desc:"Visite guidée, durée 2h30.", tip:"Depuis le 15 juillet 2026, la frontière a rejoint l'espace Schengen — plus de contrôle de passeport systématique. Garder une pièce d'identité sur soi par précaution.", loc:"Rock of Gibraltar"},
     {time:"15:30", title:"Route vers Ronda", desc:"~100 km depuis Gibraltar.", tip:null, loc:"Ronda, España"},
     {time:"18:00", title:"Check-in — Catalonia Reina Victoria", desc:"Ronda.", tip:"Le Puente Nuevo est désormais interdit à la circulation — privilégier un parking dédié plutôt que le centre historique.", loc:"Hotel Catalonia Reina Victoria, Ronda"},
   ]},
@@ -182,7 +182,7 @@ const RESERVATIONS_RECAP = [
 
 const CHECKLIST_PRATIQUE = [
   {id:"c1", label:"Imprimer / télécharger les vouchers GetYourGuide"},
-  {id:"c2", label:"Vérifier passeports (passage frontière Gibraltar)"},
+  {id:"c2", label:"Pièce d'identité valide (plus de contrôle systématique à Gibraltar depuis juillet 2026)"},
   {id:"c3", label:"Permis de conduire + carte bancaire pour la caution voiture"},
   {id:"c4", label:"Chaussures fermées pour le Caminito del Rey"},
   {id:"c5", label:"Maillot de bain / affaires de surf pour El Palmar"},
@@ -196,7 +196,7 @@ const EXPERIENCES = [
   {name:"Flamenco & Tapas", when:"Vendredi 19 sept., 19h30", ville:"Séville", color:LEG.seville, desc:"Soirée spectacle flamenco accompagnée de tapas.", booking:"Réservé — GetYourGuide"},
   {name:"Bodegas & dégustation de vin", when:"Lundi 21 sept., 12h00", ville:"Route Séville → Cadix", color:LEG.cadix, desc:"Visite de bodegas avec dégustation.", booking:"Réservé — GetYourGuide"},
   {name:"Cours de surf", when:"Mardi 22 sept., 16h00", ville:"El Palmar", color:LEG.tarifa, desc:"Initiation surf sur la côte atlantique.", booking:"Réservé — GetYourGuide"},
-  {name:"Rocher de Gibraltar", when:"Mercredi 23 sept., 11h00 (2h30)", ville:"Gibraltar", color:LEG.ronda, desc:"Visite guidée du Rocher — passage de frontière.", booking:"Réservé — GetYourGuide"},
+  {name:"Rocher de Gibraltar", when:"Mercredi 23 sept., 11h00 (2h30)", ville:"Gibraltar", color:LEG.ronda, desc:"Visite guidée du Rocher — frontière désormais intégrée à l'espace Schengen.", booking:"Réservé — GetYourGuide"},
   {name:"Caminito del Rey", when:"Vendredi 25 sept., 10h30", ville:"Ronda / El Chorro", color:LEG.malaga, desc:"Randonnée sur les passerelles suspendues.", booking:"Réservé — GetYourGuide"},
   {name:"Croisière Puerto Banús", when:"Samedi 26 sept., 11h30 (2h30)", ville:"Puerto Banús, Marbella", color:LEG.malaga, desc:"Croisière côtière au départ de Puerto Banús, le jour du départ.", booking:"Réservé — GetYourGuide"},
 ];
@@ -260,7 +260,7 @@ const INFOS_PRATIQUES = [
   {icon:"map-pin", titre:"Cordoue — Judería piétonne", texte:"Rues étroites, largement fermées à la circulation autour de la Mezquita. Parking El Vial (près de la gare) conseillé ; stationnement gratuit possible au sud du pont romain."},
   {icon:"map-pin", titre:"Ronda — Puente Nuevo fermé aux voitures", texte:"Le pont emblématique est désormais interdit à la circulation. Stationnement limité en vieille ville — privilégier un parking dédié plutôt que chercher une place sur place."},
   {icon:"clock", titre:"Horaires & sieste", texte:"Beaucoup de commerces ferment entre 14h et 17h. Les Espagnols dînent tard (21h-22h). Les musées et monuments sont souvent fermés le lundi — à vérifier avant chaque visite."},
-  {icon:"flag", titre:"Frontière de Gibraltar", texte:"Territoire britannique d'outre-mer : passeport obligatoire (pas seulement carte d'identité). Prévoir un peu d'attente au poste-frontière piéton/véhicule. La monnaie officielle est la livre de Gibraltar, mais l'euro est largement accepté."},
+  {icon:"flag", titre:"Frontière de Gibraltar — Schengen depuis juillet 2026", texte:"Depuis le 15 juillet 2026, un traité UE-Royaume-Uni a intégré Gibraltar à l'espace Schengen : la frontière terrestre avec l'Espagne n'a plus de contrôle de passeport systématique (l'ancienne clôture 'La Verja' a été démontée). Garder une pièce d'identité sur soi reste conseillé. Gibraltar demeure hors zone euro officiellement (livre de Gibraltar), mais l'euro est largement accepté partout."},
   {icon:"sun", titre:"Météo mi-septembre", texte:"Chaud à l'intérieur des terres (Séville, Cordoue : 28-32°C en journée), plus tempéré et venteux sur la côte (Cadix, Tarifa — capitale européenne du vent/kitesurf). Prévoir vêtements légers et une couche pour le soir."},
   {icon:"plug", titre:"Électricité", texte:"Prises de type C/F, standard européen identique à la France — aucun adaptateur nécessaire."},
   {icon:"siren", titre:"Urgences", texte:"112 — numéro d'urgence unique dans toute l'Union européenne (police, pompiers, ambulance), fonctionne aussi en Espagne. Consulat de France le plus proche selon l'étape : Séville (Plaza de Santa Cruz) ou Málaga."},
