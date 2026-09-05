@@ -266,30 +266,57 @@ function weatherInfo(code) {
   return WEATHER_CODES[code] || {icon:"cloud", label:"—"};
 }
 
+async function fetchWeatherJson(url, alreadyRetried) {
+  const res = await fetch(url);
+  if (res.status === 429 && !alreadyRetried) {
+    await new Promise(r => setTimeout(r, 2000));
+    return fetchWeatherJson(url, true);
+  }
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return res.json();
+}
+
 async function loadWeather() {
-  const targets = DAYS.filter(d => d.coords);
-  await Promise.all(targets.map(async day => {
-    const dateISO = dayISODate(day);
-    state.weather[day.id] = { status: "loading" };
+  // Regroupe les jours par lieu identique pour ne faire qu'UN appel API
+  // par ville plutôt qu'un appel par jour — réduit le risque de 429.
+  // Sur NYC, tous les jours partagent les mêmes coordonnées : un seul
+  // appel couvre tout le séjour.
+  const groups = {};
+  DAYS.filter(d => d.coords).forEach(d => {
+    const key = `${d.coords.lat},${d.coords.lon}`;
+    if (!groups[key]) groups[key] = { coords: d.coords, days: [] };
+    groups[key].days.push(d);
+    state.weather[d.id] = { status: "loading" };
+  });
+  render();
+
+  await Promise.all(Object.values(groups).map(async group => {
+    const dates = group.days.map(d => dayISODate(d)).filter(Boolean).sort();
+    if (!dates.length) return;
+    const startDate = dates[0];
+    const endDate = dates[dates.length - 1];
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${day.coords.lat}&longitude=${day.coords.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=America%2FNew_York&start_date=${dateISO}&end_date=${dateISO}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const data = await res.json();
-      if (!data.daily || !data.daily.time || !data.daily.time.length) {
-        state.weather[day.id] = { status: "unavailable" };
-      } else {
-        state.weather[day.id] = {
-          status: "ok",
-          code: data.daily.weathercode[0],
-          tmax: Math.round(data.daily.temperature_2m_max[0]),
-          tmin: Math.round(data.daily.temperature_2m_min[0]),
-          rainProb: data.daily.precipitation_probability_max[0],
-          windMax: Math.round(data.daily.windspeed_10m_max[0]),
-        };
-      }
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${group.coords.lat}&longitude=${group.coords.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=America%2FNew_York&start_date=${startDate}&end_date=${endDate}`;
+      const data = await fetchWeatherJson(url, false);
+      group.days.forEach(day => {
+        const dateISO = dayISODate(day);
+        const idx = data.daily && data.daily.time ? data.daily.time.indexOf(dateISO) : -1;
+        if (idx === -1) {
+          state.weather[day.id] = { status: "unavailable" };
+        } else {
+          state.weather[day.id] = {
+            status: "ok",
+            code: data.daily.weathercode[idx],
+            tmax: Math.round(data.daily.temperature_2m_max[idx]),
+            tmin: Math.round(data.daily.temperature_2m_min[idx]),
+            rainProb: data.daily.precipitation_probability_max[idx],
+            windMax: Math.round(data.daily.windspeed_10m_max[idx]),
+          };
+        }
+      });
     } catch (err) {
-      state.weather[day.id] = { status: "error", errorMsg: err && err.message ? err.message : String(err) };
+      const msg = err && err.message ? err.message : String(err);
+      group.days.forEach(day => { state.weather[day.id] = { status: "error", errorMsg: msg }; });
     }
     render();
   }));
