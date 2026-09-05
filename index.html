@@ -41,7 +41,6 @@
     <a href="index.html" class="flex-1 text-center py-2.5" style="color:#fff;border-bottom:2px solid #FCCC0A">🗽 New York</a>
     <a href="andalousie.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">☀️ Andalousie</a>
     <a href="ouest-americain.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🏜️ Ouest US</a>
-    <a href="madrid.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🇪🇸 Madrid</a>
   </div>
 </div>
 
@@ -59,8 +58,11 @@ const CATEGORY_COLORS = {
   Visite: "#0039A6", Gastro: "#EE352E", "Street Food": "#6CBE45", Observatoire: "#B933AD",
 };
 
+const TRIP_START = "2027-05-01T00:00:00";
+const COORDS_NYC = {lat:40.7580, lon:-73.9855}; // Midtown Manhattan, valable pour tout le séjour
+
 const DAYS = [
-  { id:1, date:"1 MAI", weekday:"SAMEDI", quartier:"Midtown", color:LINE.yellow, stops:[
+  { id:1, date:"1 MAI", weekday:"SAMEDI", quartier:"Midtown", color:LINE.yellow, coords:COORDS_NYC, tags:["exterieur","marche"], stops:[
     {time:"—", title:"Trajet vers Paris CDG", desc:"Voiture ou vol de rapprochement Lyon → Paris — mode de transport pas encore décidé.", tip:null},
     {time:"08:30", title:"Décollage Paris CDG — AF002", desc:"Air France, Boeing 777-300, Terminal 2E. Cabine Premium, sièges 23K/23L. Durée 8h10, repas + en-cas à bord.", tip:null, loc:"Aéroport Paris-Charles de Gaulle Terminal 2E"},
     {time:"10:40", title:"Atterrissage JFK", desc:"Terminal 1. Récupération des bagages, contrôle douanier.", tip:"Garde ton passeport et ta déclaration ESTA à portée de main.", loc:"John F. Kennedy International Airport Terminal 1"},
@@ -73,7 +75,7 @@ const DAYS = [
     {time:"19:30", title:"Times Square de nuit", desc:"Néons, foule, énergie new-yorkaise.", tip:"La meilleure lumière arrive juste après le coucher du soleil.", loc:"Times Square, New York"},
     {time:"20:30", title:"Dîner", desc:"Brasserie new-yorkaise à Midtown.", tip:null},
   ]},
-  { id:2, date:"2 MAI", weekday:"DIMANCHE", quartier:"Lower Manhattan", color:LINE.red, stops:[
+  { id:2, date:"2 MAI", weekday:"DIMANCHE", quartier:"Lower Manhattan", color:LINE.red, coords:COORDS_NYC, tags:["exterieur","marche"], stops:[
     {time:"08:30", title:"Ferry — Liberty Island", desc:"Départ vers la Statue de la Liberté, accès Couronne réservé.", tip:"Résa Couronne obligatoire des mois à l'avance.", loc:"Statue of Liberty Ferry, Battery Park, New York"},
     {time:"10:00", title:"Statue de la Liberté", desc:"Montée jusqu'à la Couronne.", tip:"Vue à 360° — prévoir sécurité renforcée à l'entrée.", loc:"Statue of Liberty, New York"},
     {time:"12:00", title:"Wall Street", desc:"Charging Bull, Federal Hall, NYSE.", tip:"Le Charging Bull attire la foule dès 9h — viser une heure avant l'ouverture des bureaux pour une photo sans attente.", loc:"Wall Street, New York"},
@@ -82,7 +84,7 @@ const DAYS = [
     {time:"16:15", title:"One World Observatory", desc:"Vue panoramique depuis le sommet du One WTC.", tip:"Viser la golden hour en fin d'après-midi.", loc:"One World Observatory, New York"},
     {time:"19:00", title:"Dîner", desc:"Stone Street — ruelle pavée, terrasses animées.", tip:null, loc:"Stone Street, New York"},
   ]},
-  { id:3, date:"3 MAI", weekday:"LUNDI", quartier:"Brooklyn", color:LINE.brown, stops:[
+  { id:3, date:"3 MAI", weekday:"LUNDI", quartier:"Brooklyn", color:LINE.brown, coords:COORDS_NYC, tags:["exterieur","marche"], stops:[
     {time:"08:00", title:"Pont de Brooklyn", desc:"Traversée à pied côté Manhattan → Brooklyn.", tip:"Partir tôt pour éviter la foule sur la passerelle.", loc:"Brooklyn Bridge, New York"},
     {time:"09:30", title:"DUMBO", desc:"Spot photo iconique Washington St / Water St.", tip:"Vue alignée sur le Manhattan Bridge — lumière du matin idéale.", loc:"DUMBO, Brooklyn"},
     {time:"11:00", title:"Brooklyn Heights Promenade", desc:"Vue dégagée sur la skyline de Manhattan.", tip:"LE spot pour la skyline de Manhattan avec le Manhattan Bridge en cadrage — lumière idéale en fin d'après-midi.", loc:"Brooklyn Heights Promenade"},
@@ -90,7 +92,7 @@ const DAYS = [
     {time:"15:00", title:"Après-midi libre", desc:"Balade dans les rues de Brooklyn.", tip:null},
     {time:"19:30", title:"Coucher de soleil", desc:"Skyline de Manhattan depuis les quais de Brooklyn.", tip:"Arriver 30 min avant l'heure du coucher pour s'installer.", loc:"Brooklyn Bridge Park"},
   ]},
-  { id:4, date:"4 MAI", weekday:"MARDI", quartier:"Village & High Line", color:LINE.purple, stops:[
+  { id:4, date:"4 MAI", weekday:"MARDI", quartier:"Village & High Line", color:LINE.purple, coords:COORDS_NYC, tags:["exterieur","marche"], stops:[
     {time:"09:00", title:"Hudson Yards", desc:"Nouveau quartier, Vessel en toile de fond.", tip:null, loc:"Hudson Yards, New York"},
     {time:"10:00", title:"The Edge Observatory", desc:"Plateforme d'observation avec sol vitré.", tip:"Le sol transparent est le meilleur spot photo vertigineux.", loc:"The Edge, Hudson Yards, New York"},
     {time:"11:30", title:"High Line", desc:"Promenade suspendue sur d'anciennes voies ferrées.", tip:"Lumière rasante en fin de journée entre les immeubles — jouer avec les ombres portées sur la passerelle.", loc:"High Line, New York"},
@@ -98,14 +100,14 @@ const DAYS = [
     {time:"15:00", title:"Washington Square Park", desc:"Arc emblématique, ambiance Greenwich Village.", tip:"Cadrer l'arc avec la 5th Avenue en perspective — les musiciens de rue ajoutent de la vie au premier plan.", loc:"Washington Square Park, New York"},
     {time:"19:30", title:"Dîner — Sushi Sho", desc:"Table d'exception à NoMad, menu omakase.", tip:"Réservation SevenRooms ouverte J-30, soit vers début avril.", loc:"Sushi Sho, NoMad, New York"},
   ]},
-  { id:5, date:"5 MAI", weekday:"MERCREDI", quartier:"Central Park & Broadway", color:LINE.blue, stops:[
+  { id:5, date:"5 MAI", weekday:"MERCREDI", quartier:"Central Park & Broadway", color:LINE.blue, coords:COORDS_NYC, tags:["exterieur","marche"], stops:[
     {time:"09:00", title:"Central Park", desc:"Bethesda Terrace & Fountain.", tip:null, loc:"Bethesda Terrace, Central Park, New York"},
     {time:"10:30", title:"Bow Bridge", desc:"Pont photogénique au cœur du parc.", tip:"Meilleur point de vue du parc pour la photo.", loc:"Bow Bridge, Central Park, New York"},
     {time:"12:00", title:"MET Museum", desc:"Metropolitan Museum of Art.", tip:"Créneau d'entrée horodaté à réserver.", loc:"The Metropolitan Museum of Art, New York"},
     {time:"17:30", title:"Dîner pré-show", desc:"Repas léger et rapide avant le spectacle.", tip:null},
     {time:"20:00", title:"Broadway", desc:"Spectacle en soirée.", tip:null, loc:"Broadway Theatre District, New York"},
   ]},
-  { id:6, date:"6 MAI", weekday:"JEUDI", quartier:"SoHo & Top of the Rock", color:LINE.orange, stops:[
+  { id:6, date:"6 MAI", weekday:"JEUDI", quartier:"SoHo & Top of the Rock", color:LINE.orange, coords:COORDS_NYC, tags:["exterieur","marche"], stops:[
     {time:"09:30", title:"SoHo Cast-Iron District", desc:"Architecture en fonte, boutiques.", tip:"Les façades en fonte de Greene Street sont magnifiques en lumière du matin, avant l'affluence.", loc:"SoHo Cast Iron Historic District, New York"},
     {time:"11:30", title:"Chinatown", desc:"Déambulation, marchés, échoppes.", tip:null, loc:"Chinatown, New York"},
     {time:"13:30", title:"Déjeuner léger", desc:"Pause repas à Chinatown ou SoHo.", tip:null},
@@ -113,7 +115,7 @@ const DAYS = [
     {time:"19:58", title:"Coucher de soleil", desc:"Vue imprenable sur Manhattan et l'Empire State.", tip:"Être en place au moins 15 min avant l'heure exacte.", loc:"Top of the Rock, New York"},
     {time:"21:00", title:"Dîner — Corima", desc:"Restaurant mexicain 1 étoile Michelin.", tip:"Réservation Resy ouverte J-30, soit vers début mai — anticiper.", loc:"Corima, New York"},
   ]},
-  { id:7, date:"7 MAI", weekday:"VENDREDI", quartier:"Street Food & Départ", color:LINE.green, stops:[
+  { id:7, date:"7 MAI", weekday:"VENDREDI", quartier:"Street Food & Départ", color:LINE.green, coords:COORDS_NYC, tags:["exterieur","marche"], stops:[
     {time:"08:00", title:"Petit-déjeuner", desc:"Bagel new-yorkais classique.", tip:null},
     {time:"09:30", title:"Harlem — Apollo Theater", desc:"Façade et histoire du théâtre mythique.", tip:"L'enseigne emblématique se photographie bien de nuit, éclairée.", loc:"Apollo Theater, Harlem, New York"},
     {time:"10:30", title:"Charles Pan-Fried Chicken", desc:"Institution du poulet frit à Harlem.", tip:null, loc:"Charles Pan-Fried Chicken, Harlem, New York"},
@@ -213,6 +215,7 @@ const state = {
   customLinks: {},
   stopNotes: {},
   placeFilter: "Toutes",
+  weather: {},
   isLoaded: false,
   syncStatus: "idle", // idle | saving | saved | error
   syncError: "",
@@ -224,6 +227,129 @@ let saveTimer = null;
 function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveState, 400);
+}
+
+// ---------------------------------------------------------------
+// MÉTÉO (Open-Meteo — gratuit, sans clé, ~16 jours de prévision)
+// ---------------------------------------------------------------
+function dayISODate(day) {
+  const d = new Date(TRIP_START);
+  d.setDate(d.getDate() + (day.id - 1));
+  return d.toISOString().slice(0, 10);
+}
+
+const WEATHER_CODES = {
+  0:  {icon:"sun",           label:"Ciel dégagé"},
+  1:  {icon:"cloud-sun",     label:"Peu nuageux"},
+  2:  {icon:"cloud-sun",     label:"Partiellement nuageux"},
+  3:  {icon:"cloud",         label:"Couvert"},
+  45: {icon:"cloud-fog",     label:"Brouillard"},
+  48: {icon:"cloud-fog",     label:"Brouillard givrant"},
+  51: {icon:"cloud-drizzle", label:"Bruine légère"},
+  53: {icon:"cloud-drizzle", label:"Bruine"},
+  55: {icon:"cloud-drizzle", label:"Bruine forte"},
+  61: {icon:"cloud-rain",    label:"Pluie légère"},
+  63: {icon:"cloud-rain",    label:"Pluie"},
+  65: {icon:"cloud-rain",    label:"Pluie forte"},
+  71: {icon:"cloud-snow",    label:"Neige légère"},
+  73: {icon:"cloud-snow",    label:"Neige"},
+  75: {icon:"cloud-snow",    label:"Neige forte"},
+  80: {icon:"cloud-rain",    label:"Averses"},
+  81: {icon:"cloud-rain",    label:"Averses fortes"},
+  82: {icon:"cloud-rain",    label:"Averses violentes"},
+  95: {icon:"cloud-lightning", label:"Orage"},
+  96: {icon:"cloud-lightning", label:"Orage avec grêle"},
+  99: {icon:"cloud-lightning", label:"Orage violent"},
+};
+function weatherInfo(code) {
+  return WEATHER_CODES[code] || {icon:"cloud", label:"—"};
+}
+
+async function loadWeather() {
+  const targets = DAYS.filter(d => d.coords);
+  await Promise.all(targets.map(async day => {
+    const dateISO = dayISODate(day);
+    state.weather[day.id] = { status: "loading" };
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${day.coords.lat}&longitude=${day.coords.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=America%2FNew_York&start_date=${dateISO}&end_date=${dateISO}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      if (!data.daily || !data.daily.time || !data.daily.time.length) {
+        state.weather[day.id] = { status: "unavailable" };
+      } else {
+        state.weather[day.id] = {
+          status: "ok",
+          code: data.daily.weathercode[0],
+          tmax: Math.round(data.daily.temperature_2m_max[0]),
+          tmin: Math.round(data.daily.temperature_2m_min[0]),
+          rainProb: data.daily.precipitation_probability_max[0],
+          windMax: Math.round(data.daily.windspeed_10m_max[0]),
+        };
+      }
+    } catch (err) {
+      state.weather[day.id] = { status: "error", errorMsg: err && err.message ? err.message : String(err) };
+    }
+    render();
+  }));
+}
+
+// Règles d'alerte : croise la météo du jour avec les tags d'activité du jour
+function weatherAlerts(day, w) {
+  if (!w || w.status !== "ok") return [];
+  const tags = day.tags || [];
+  const alerts = [];
+  if (w.rainProb >= 60 && tags.includes("exterieur")) {
+    alerts.push(`Pluie probable (${w.rainProb}%) — journée avec visites en extérieur`);
+  } else if (w.rainProb >= 60 && tags.includes("marche")) {
+    alerts.push(`Pluie probable (${w.rainProb}%) — prévoir des chaussures adaptées pour la marche`);
+  } else if (w.rainProb >= 75) {
+    alerts.push(`Forte probabilité de pluie (${w.rainProb}%)`);
+  }
+  if (w.tmax >= 32 && tags.includes("marche")) {
+    alerts.push(`Chaleur importante (${w.tmax}°C) — prévoir de l'eau pour les longues marches en ville`);
+  } else if (w.tmax >= 35) {
+    alerts.push(`Chaleur extrême (${w.tmax}°C)`);
+  }
+  if (w.tmin <= 5) {
+    alerts.push(`Températures fraîches (${w.tmin}°C) — prévoir une couche chaude`);
+  }
+  return alerts;
+}
+
+function renderWeather(day) {
+  if (!day.coords) return "";
+  const w = state.weather[day.id];
+  if (!w || w.status === "loading") {
+    return `<div class="ml-6 mb-4 flex items-center gap-2 text-xs text-zinc-500">${icon("loader-circle",12,"animate-spin")}Chargement météo…</div>`;
+  }
+  if (w.status === "unavailable") {
+    return `<div class="ml-6 mb-4 flex items-center gap-2 text-xs text-zinc-500">${icon("calendar-clock",12)}Prévision pas encore disponible (visible à partir de J-16)</div>`;
+  }
+  if (w.status === "error") {
+    return `<div class="ml-6 mb-4 flex flex-col gap-1 text-xs text-red-400">
+      <span class="flex items-center gap-2">${icon("cloud-off",12)}Météo indisponible</span>
+      ${w.errorMsg ? `<span class="font-mono text-[10px] opacity-75 break-all">${w.errorMsg}</span>` : ""}
+    </div>`;
+  }
+  const info = weatherInfo(w.code);
+  const alerts = weatherAlerts(day, w);
+  return `
+    <div class="ml-6 mb-4">
+      <div class="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs">
+        ${icon(info.icon,18,"text-yellow-400")}
+        <span class="font-semibold">${info.label}</span>
+        <span class="text-zinc-400">${w.tmin}° / ${w.tmax}°C</span>
+        <span class="flex items-center gap-1 text-zinc-400">${icon("droplets",11)}${w.rainProb}%</span>
+        <span class="flex items-center gap-1 text-zinc-400">${icon("wind",11)}${w.windMax} km/h</span>
+      </div>
+      ${alerts.map(a => `
+        <div class="mt-2 flex items-start gap-2 rounded-lg px-3 py-2 text-xs font-semibold" style="background:#3A2A14;color:#F0B054;border:1px solid #5A3E1E">
+          ${icon("triangle-alert",14,"mt-0.5 shrink-0")}<span>${a}</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
 }
 
 async function loadState() {
@@ -342,65 +468,6 @@ function deletePlace(id) {
   state.customPlaces = state.customPlaces.filter(p => p.id !== id);
   render();
   scheduleSave();
-}
-
-function removeCustomLink(key) {
-  delete state.customLinks[key];
-  render();
-  scheduleSave();
-}
-
-function removeStopNote(key) {
-  delete state.stopNotes[key];
-  render();
-  scheduleSave();
-}
-
-function stopLabelFromKey(key) {
-  const [dayId, idx] = key.split("-").map(Number);
-  const day = DAYS.find(d => d.id === dayId);
-  if (!day || !day.stops[idx]) return key;
-  return day.stops[idx].title;
-}
-
-function renderCustomItemsList() {
-  const places = state.customPlaces || [];
-  const links = Object.entries(state.customLinks || {});
-  const notes = Object.entries(state.stopNotes || {});
-  if (places.length === 0 && links.length === 0 && notes.length === 0) {
-    return `<p class="text-xs text-zinc-500">Aucun élément personnalisé pour l'instant — les restos, liens et notes que vous ajoutez apparaîtront ici, chacun avec son propre bouton de suppression.</p>`;
-  }
-  return `
-    <div class="space-y-2">
-      ${places.map(p => `
-        <div class="flex items-center justify-between gap-3 rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2">
-          <div class="min-w-0">
-            <p class="text-xs font-semibold flex items-center gap-1.5">${icon("utensils",11)}${p.name}</p>
-            <p class="text-[10px] text-zinc-500 mt-0.5">${p.quartier || p.ville || ""}</p>
-          </div>
-          <button data-delplace="${p.id}" class="delplace-btn shrink-0 text-zinc-600">${icon("x",14)}</button>
-        </div>
-      `).join("")}
-      ${links.map(([key, url]) => `
-        <div class="flex items-center justify-between gap-3 rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2">
-          <div class="min-w-0">
-            <p class="text-xs font-semibold flex items-center gap-1.5">${icon("link",11)}${key}</p>
-            <p class="text-[10px] text-zinc-500 mt-0.5 truncate">${url}</p>
-          </div>
-          <button data-rmlink="${key}" class="rmlink-btn shrink-0 text-zinc-600">${icon("x",14)}</button>
-        </div>
-      `).join("")}
-      ${notes.map(([key, note]) => `
-        <div class="flex items-center justify-between gap-3 rounded-md border border-zinc-800 bg-zinc-950 px-3 py-2">
-          <div class="min-w-0">
-            <p class="text-xs font-semibold flex items-center gap-1.5">${icon("pencil",11)}${stopLabelFromKey(key)}</p>
-            <p class="text-[10px] text-zinc-500 mt-0.5">${note}</p>
-          </div>
-          <button data-rmnote="${key}" class="rmnote-btn shrink-0 text-zinc-600">${icon("x",14)}</button>
-        </div>
-      `).join("")}
-    </div>
-  `;
 }
 
 // ---------------------------------------------------------------
@@ -545,7 +612,8 @@ function renderItineraire() {
       <span class="w-3 h-3 rounded-full shrink-0" style="background:${day.color}"></span>
       <h2 class="uppercase font-black text-2xl tracking-tight">${day.weekday} ${day.date}</h2>
     </div>
-    <p class="text-zinc-500 text-sm mb-6 ml-6">${day.quartier}</p>
+    <p class="text-zinc-500 text-sm mb-2 ml-6">${day.quartier}</p>
+    ${renderWeather(day)}
 
     <div class="relative pl-8">
       <div class="absolute left-[11px] top-2 bottom-2 w-[3px] rounded-full" style="background:${day.color};opacity:0.35"></div>
@@ -560,11 +628,12 @@ function renderItineraire() {
               </button>
               <div class="rounded-lg border px-4 py-3 ${done ? "border-zinc-800 opacity-50" : "border-zinc-800 bg-zinc-900"}" style="background:${done ? '#0a0a0a' : ''}">
                 <span class="font-mono text-xs font-bold text-zinc-400 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
-                <p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>
+                ${s.loc
+                  ? `<a href="${wazeLink(s.loc)}" target="_blank" rel="noopener" class="font-semibold text-sm inline-flex items-center gap-1.5 text-white ${done ? "line-through" : ""}">${s.title}${icon("navigation",12,"text-yellow-400")}</a>`
+                  : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
                 <p class="text-zinc-400 text-xs mt-1">${s.desc}</p>
                 ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] text-yellow-400/90 mt-2">${icon("camera",12,"mt-0.5")}${s.tip}</p>` : ""}
                 ${state.stopNotes[key] ? `<p class="flex items-start gap-1.5 text-[11px] text-zinc-300 mt-2 italic">${icon("pencil",12,"mt-0.5 text-zinc-500")}${state.stopNotes[key]}</p>` : ""}
-                ${s.loc ? `<div class="flex items-center gap-2 mt-2">${linkChip(mapsLink(s.loc), "Maps", "map-pin")}${linkChip(wazeLink(s.loc), "Waze", "navigation")}</div>` : ""}
                 <button data-addnote="${key}" class="addnote-btn mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border border-zinc-700 text-zinc-400">
                   ${icon(state.stopNotes[key] ? "pencil" : "plus",10)}${state.stopNotes[key] ? "Modifier ma note" : "Ajouter une note"}
                 </button>
@@ -607,8 +676,6 @@ function renderLieux() {
             ${p.custom && p.note ? `<p class="text-zinc-400 text-xs mt-1">${p.note}</p>` : ""}
             <div class="flex items-center gap-2 mt-1 flex-wrap">
               <span class="text-[10px] uppercase tracking-wide font-bold" style="color:${CATEGORY_COLORS[p.category]}">${p.custom ? "Resto ajouté" : p.category}</span>
-              ${linkChip(mapsLink(p.name + ", " + p.quartier), "Maps", "map-pin")}
-              ${linkChip(wazeLink(p.name + ", " + p.quartier), "Waze", "navigation")}
               ${p.custom && p.link ? `<a href="${p.link}" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-200">${icon("external-link",10)}Lien</a>` : ""}
             </div>
           </div>
@@ -745,13 +812,6 @@ function renderInfos() {
         </div>
       `).join("")}
     </div>
-    <div class="mt-6 pt-5 border-t border-zinc-800">
-      <h3 class="uppercase text-xs font-black tracking-widest text-zinc-500 mb-3">Éléments ajoutés à ce voyage</h3>
-      ${renderCustomItemsList()}
-      <a href="${CONFIG.API_URL}?action=get" target="_blank" rel="noopener" class="mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded-full border border-zinc-800 text-zinc-300">
-        ${icon("code-2",10)}Voir les données brutes de ce voyage
-      </a>
-    </div>
   `;
 }
 
@@ -796,12 +856,6 @@ function attachEvents() {
   document.querySelectorAll(".addnote-btn").forEach(btn => {
     btn.onclick = () => { addNote(btn.dataset.addnote); };
   });
-  document.querySelectorAll(".rmlink-btn").forEach(btn => {
-    btn.onclick = () => { removeCustomLink(btn.dataset.rmlink); };
-  });
-  document.querySelectorAll(".rmnote-btn").forEach(btn => {
-    btn.onclick = () => { removeStopNote(btn.dataset.rmnote); };
-  });
   const addPlaceBtn = document.getElementById("btn-addplace");
   if (addPlaceBtn) addPlaceBtn.onclick = addPlace;
   const retryBtn = document.getElementById("btn-retry");
@@ -845,6 +899,7 @@ if ("serviceWorker" in navigator) {
 
 render();
 loadState();
+loadWeather();
 </script>
 </body>
 </html>
