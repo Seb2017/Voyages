@@ -352,6 +352,27 @@ function renderWeather(day) {
   `;
 }
 
+// Mini badge météo compact utilisé dans le sélecteur de jour (aperçu multi-jours).
+function miniWeather(day) {
+  if (!day.coords) return "";
+  const w = state.weather[day.id];
+  if (!w || w.status === "loading") {
+    return `<div class="mt-1 flex items-center justify-center">${icon("loader-circle",11,"animate-spin text-zinc-600")}</div>`;
+  }
+  if (w.status === "unavailable" || w.status === "error") {
+    return `<div class="mt-1 flex items-center justify-center">${icon("minus",11,"text-zinc-700")}</div>`;
+  }
+  const info = weatherInfo(w.code);
+  const hasAlert = weatherAlerts(day, w).length > 0;
+  return `
+    <div class="mt-1 flex items-center justify-center gap-0.5 relative">
+      ${icon(info.icon,12,"text-yellow-400")}
+      <span class="text-[9px] font-mono text-zinc-500">${w.tmax}°</span>
+      ${hasAlert ? `<span style="width:5px;height:5px;border-radius:9999px;background:#F0B054;position:absolute;top:-3px;right:-2px"></span>` : ""}
+    </div>
+  `;
+}
+
 async function loadState() {
   if (!CONFIG.API_URL || CONFIG.API_URL.includes("COLLE_ICI")) {
     state.isLoaded = true;
@@ -563,6 +584,9 @@ function render() {
         <button id="btn-share" class="flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2 px-3 border border-zinc-700 text-zinc-200">
           ${icon("share-2",14)}
         </button>
+        <button id="btn-backup" class="flex items-center justify-center gap-2 text-xs font-semibold rounded-full py-2 px-3 border border-zinc-700 text-zinc-200">
+          ${icon("download",14)}
+        </button>
       </div>
     </div>
 
@@ -622,6 +646,7 @@ function renderItineraire() {
             <div class="w-6 h-6 rounded-full mx-auto mb-1 flex items-center justify-center text-[10px] font-black text-black" style="background:${d.color}">${d.id}</div>
             <p class="text-[10px] uppercase font-bold text-zinc-400">${d.weekday}</p>
             <p class="text-xs font-mono text-zinc-500">${done}/${d.stops.length}</p>
+            ${miniWeather(d)}
           </button>
         `;
       }).join("")}
@@ -883,6 +908,29 @@ function attachEvents() {
   if (resetBtn) resetBtn.onclick = resetProgress;
   const shareBtn = document.getElementById("btn-share");
   if (shareBtn) shareBtn.onclick = shareApp;
+  const backupBtn = document.getElementById("btn-backup");
+  if (backupBtn) backupBtn.onclick = exportBackup;
+}
+
+function exportBackup() {
+  const backup = {
+    trip: "nyc",
+    exportedAt: new Date().toISOString(),
+    checkedStops: state.checkedStops,
+    checkedRes: state.checkedRes,
+    customLinks: state.customLinks,
+    customPlaces: state.customPlaces,
+    stopNotes: state.stopNotes,
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `nyc-sauvegarde-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 async function shareApp() {

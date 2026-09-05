@@ -448,6 +448,28 @@ function renderWeather(day) {
   `;
 }
 
+// Mini badge météo compact utilisé dans le sélecteur de jour (aperçu multi-jours).
+// Reste discret tant que TRIP_START n'est pas fixé.
+function miniWeather(day) {
+  if (!day.coords || !TRIP_START) return "";
+  const w = state.weather[day.id];
+  if (!w || w.status === "loading") {
+    return `<div class="mt-1 flex items-center justify-center">${icon("loader-circle",11,"animate-spin text-[#F2ECE1]/40")}</div>`;
+  }
+  if (w.status === "unavailable" || w.status === "error") {
+    return `<div class="mt-1 flex items-center justify-center">${icon("minus",11,"text-[#F2ECE1]/30")}</div>`;
+  }
+  const info = weatherInfo(w.code);
+  const hasAlert = weatherAlerts(day, w).length > 0;
+  return `
+    <div class="mt-1 flex items-center justify-center gap-0.5 relative">
+      ${icon(info.icon,12,"text-[#D4A24C]")}
+      <span class="text-[9px] font-mono text-[#F2ECE1]/60">${w.tmax}°</span>
+      ${hasAlert ? `<span style="width:5px;height:5px;border-radius:9999px;background:#F0B054;position:absolute;top:-3px;right:-2px"></span>` : ""}
+    </div>
+  `;
+}
+
 async function loadState() {
   if (!CONFIG.API_URL) { state.isLoaded = true; state.syncStatus = "error"; state.syncError = "Aucune URL Apps Script configurée."; render(); return; }
   try {
@@ -632,6 +654,7 @@ function render() {
             ${state.isLoaded && state.syncStatus==="error" ? icon("cloud-off",12) + '<span style="color:#C15060">Échec de synchronisation</span>' : ""}
           </span>
           ${state.isLoaded && state.syncStatus==="error" ? `<button id="btn-retry" class="flex items-center gap-1 underline decoration-dotted" style="color:#C15060">${icon("refresh-cw",12)}Réessayer</button>` : ""}
+          <button id="btn-backup" class="flex items-center gap-1 text-[#F2ECE1]/50">${icon("download",12)}Sauvegarder</button>
           <button id="btn-reset" class="flex items-center gap-1 text-[#F2ECE1]/50">${icon("rotate-ccw",12)}Réinitialiser</button>
         </div>
         ${state.isLoaded && state.syncStatus==="error" && state.syncError ? `<p class="w-full font-mono text-[10px] break-all" style="color:#C15060">Détail : ${state.syncError}</p>` : ""}
@@ -692,6 +715,7 @@ function renderItineraire() {
           <button data-day="${d.id}" class="day-btn shrink-0 w-16 rounded-lg border px-1.5 py-2 text-center transition-colors" style="border-color:${active?'#F2ECE1':'#2E241B'};background:${active?'#211C17':'#161311'}">
             <div class="w-6 h-6 shield mx-auto mb-1 flex items-center justify-center text-[10px] font-black" style="background:${d.color};color:#161311">${d.id}</div>
             <p class="text-[9px] font-mono text-[#F2ECE1]/50">${done}/${d.stops.length}</p>
+            ${miniWeather(d)}
           </button>
         `;
       }).join("")}
@@ -910,6 +934,29 @@ function attachEvents() {
   if (retryBtn) retryBtn.onclick = saveState;
   const resetBtn = document.getElementById("btn-reset");
   if (resetBtn) resetBtn.onclick = resetProgress;
+  const backupBtn = document.getElementById("btn-backup");
+  if (backupBtn) backupBtn.onclick = exportBackup;
+}
+
+function exportBackup() {
+  const backup = {
+    trip: CONFIG.TRIP_ID,
+    exportedAt: new Date().toISOString(),
+    checkedStops: state.checkedStops,
+    checkedChecklist: state.checkedChecklist,
+    customLinks: state.customLinks,
+    customPlaces: state.customPlaces,
+    stopNotes: state.stopNotes,
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ouest-americain-sauvegarde-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // ---------------------------------------------------------------
