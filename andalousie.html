@@ -362,7 +362,7 @@ async function loadWeather() {
         };
       }
     } catch (err) {
-      state.weather[day.id] = { status: "error" };
+      state.weather[day.id] = { status: "error", errorMsg: err && err.message ? err.message : String(err) };
     }
     render();
   }));
@@ -407,7 +407,10 @@ function renderWeather(day) {
     return `<div class="ml-6 mb-4 flex items-center gap-2 text-xs text-[#F1E9DC]/50">${icon("calendar-clock",12)}Prévision pas encore disponible (visible à partir de J-16)</div>`;
   }
   if (w.status === "error") {
-    return `<div class="ml-6 mb-4 flex items-center gap-2 text-xs" style="color:#C15060">${icon("cloud-off",12)}Météo indisponible</div>`;
+    return `<div class="ml-6 mb-4 flex flex-col gap-1 text-xs" style="color:#C15060">
+      <span class="flex items-center gap-2">${icon("cloud-off",12)}Météo indisponible</span>
+      ${w.errorMsg ? `<span class="font-mono text-[10px] opacity-75 break-all">${w.errorMsg}</span>` : ""}
+    </div>`;
   }
   const info = weatherInfo(w.code);
   const alerts = weatherAlerts(day, w);
