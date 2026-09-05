@@ -47,7 +47,6 @@
     <a href="index.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🗽 New York</a>
     <a href="andalousie.html" class="flex-1 text-center py-2.5" style="color:#fff;border-bottom:2px solid #C1502E">☀️ Andalousie</a>
     <a href="ouest-americain.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🏜️ Ouest US</a>
-    <a href="madrid.html" class="flex-1 text-center py-2.5" style="color:rgba(255,255,255,0.45);border-bottom:2px solid transparent">🇪🇸 Madrid</a>
   </div>
 </div>
 
@@ -67,63 +66,76 @@ const LEG = {
   ronda:    "#6B7A5E", // pierre / gorge
 };
 
+// Coordonnées par ville (pour la météo) + tags d'activité (pour les alertes)
+const COORDS = {
+  malaga:  {lat:36.7213, lon:-4.4214},
+  grenade: {lat:37.1773, lon:-3.5986},
+  cordoue: {lat:37.8882, lon:-4.7794},
+  seville: {lat:37.3891, lon:-5.9845},
+  cadix:   {lat:36.5297, lon:-6.2926},
+  tarifa:  {lat:36.0128, lon:-5.6072},
+  ronda:   {lat:36.7429, lon:-5.1665},
+  chorro:  {lat:36.9083, lon:-4.7550}, // Caminito del Rey
+  banus:   {lat:36.4848, lon:-4.9526}, // Puerto Banús
+};
+
 const DAYS = [
-  { id:1, date:"15 SEP", weekday:"MARDI", ville:"Départ", color:LEG.malaga, hotel:"Hôtel Romerito, Málaga", stops:[
+  { id:1, date:"15 SEP", weekday:"MARDI", ville:"Départ", color:LEG.malaga, hotel:"Hôtel Romerito, Málaga", coords:COORDS.malaga, tags:[], stops:[
     {time:"21:55", title:"Vol Lyon → Málaga — EJU7048", desc:"easyJet, terminal T1 à Lyon. Arrivée 00h15 à Málaga (terminal non précisé). 3 adultes.", tip:"Enregistrement en ligne ouvre 30 jours avant le vol.", loc:"Aéroport de Lyon-Saint Exupéry"},
     {time:"00:15", title:"Atterrissage à Málaga (16/09)", desc:"Arrivée de nuit.", tip:null, loc:"Aeropuerto de Málaga-Costa del Sol"},
     {time:"00:30", title:"Récupération voiture — Thrifty", desc:"Réservation #762525400 — Peugeot 3008 (cat. Intermédiaire) ou similaire. Comptoir Thrifty, hall de location de voitures du terminal aéroport de Málaga.", tip:"Automatique, climatisation, 5 places, 4 portes, 1 grande + 1 petite valise. Thrifty : +34 647 617 992. Vérifier le plein et l'état des lieux avant de partir.", loc:"Thrifty, Avenida del Comandante García Morato, Málaga"},
     {time:"01:15", title:"Check-in Hôtel Romerito", desc:"Málaga.", tip:null, loc:"Hôtel Romerito, Málaga"},
   ]},
-  { id:2, date:"16 SEP", weekday:"MERCREDI", ville:"Málaga → Grenade", color:LEG.grenade, hotel:"Mercader de Sedas by Maxi Hoteles, Grenade", stops:[
+  { id:2, date:"16 SEP", weekday:"MERCREDI", ville:"Málaga → Grenade", color:LEG.grenade, hotel:"Mercader de Sedas by Maxi Hoteles, Grenade", coords:COORDS.grenade, tags:[], stops:[
     {time:"10:00", title:"Route vers Grenade", desc:"~130 km depuis Málaga.", tip:null, loc:"Granada, España"},
     {time:"14:00", title:"Check-in — Mercader de Sedas", desc:"Grenade.", tip:"L'hôtel a un parking, mais non réservable (premier arrivé, premier servi) — arriver plutôt tôt dans l'après-midi. En dépannage : parking San Cristóbal, hors centre restreint.", loc:"Mercader de Sedas by Maxi Hoteles, Granada"},
   ]},
-  { id:3, date:"17 SEP", weekday:"JEUDI", ville:"Grenade → Cordoue", color:LEG.grenade, hotel:"Los Patios de la Judería, Cordoue", stops:[
+  { id:3, date:"17 SEP", weekday:"JEUDI", ville:"Grenade → Cordoue", color:LEG.grenade, hotel:"Los Patios de la Judería, Cordoue", coords:COORDS.grenade, tags:["exterieur"], stops:[
     {time:"10:00", title:"Alhambra & Generalife", desc:"Visite guidée — réservée sur GetYourGuide.", tip:"Le Patio de los Arrayanes offre le reflet miroir le plus célèbre du palais — lumière la plus douce en tout début de matinée, avant la foule.", loc:"Alhambra, Granada"},
     {time:"16:00", title:"Route vers Cordoue", desc:"~165 km depuis Grenade.", tip:null, loc:"Córdoba, España"},
     {time:"18:30", title:"Check-in — Los Patios de la Judería", desc:"Cordoue.", tip:"Judería en grande partie piétonne : parking El Vial (près de la gare) ou gratuit au sud du pont romain.", loc:"Los Patios de la Judería, Córdoba"},
   ]},
-  { id:4, date:"18 SEP", weekday:"VENDREDI", ville:"Cordoue", color:LEG.cordoue, hotel:"Los Patios de la Judería, Cordoue", stops:[
+  { id:4, date:"18 SEP", weekday:"VENDREDI", ville:"Cordoue", color:LEG.cordoue, hotel:"Los Patios de la Judería, Cordoue", coords:COORDS.cordoue, tags:["exterieur"], stops:[
     {time:"10:15", title:"Visite guidée de Cordoue", desc:"Réservée sur GetYourGuide.", tip:"Prévoir de l'eau — les patios peuvent être bondés en fin de matinée.", loc:"Mezquita-Catedral de Córdoba"},
   ]},
-  { id:5, date:"19 SEP", weekday:"SAMEDI", ville:"Cordoue → Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", stops:[
+  { id:5, date:"19 SEP", weekday:"SAMEDI", ville:"Cordoue → Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", coords:COORDS.seville, tags:["bateau"], stops:[
     {time:"10:00", title:"Route vers Séville", desc:"~140 km depuis Cordoue.", tip:null, loc:"Sevilla, España"},
     {time:"14:00", title:"Check-in — Hôtel Alcázar", desc:"Séville.", tip:"ZBE permanente sur le Casco Antiguo — vignette DGT nécessaire. Parkings Plaza de Armas ou Plaza de la Concordia, hors zone.", loc:"Hotel Alcázar, Sevilla"},
     {time:"17:00", title:"Croisière sur le Guadalquivir", desc:"Durée 1h — réservée sur GetYourGuide.", tip:"Depuis le bateau, viser la Torre del Oro et la Giralda en fond — la lumière dorée de fin d'après-midi sublime les façades.", loc:"Torre del Oro, Sevilla"},
     {time:"19:30", title:"Flamenco & Tapas", desc:"Soirée réservée sur GetYourGuide.", tip:null, loc:"Triana, Sevilla"},
   ]},
-  { id:6, date:"20 SEP", weekday:"DIMANCHE", ville:"Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", stops:[
+  { id:6, date:"20 SEP", weekday:"DIMANCHE", ville:"Séville", color:LEG.seville, hotel:"Hôtel Alcázar, Séville", coords:COORDS.seville, tags:["exterieur"], stops:[
     {time:"13:30", title:"Cathédrale & Giralda", desc:"Visite guidée, durée 1h30.", tip:"Monter à la Giralda pour la vue sur la ville.", loc:"Catedral de Sevilla"},
     {time:"15:30", title:"Alcázar de Séville", desc:"Visite guidée.", tip:"Les patios et jardins mudéjars sont superbes en lumière filtrée — le Patio de las Doncellas offre un beau jeu de reflets dans le bassin central.", loc:"Real Alcázar de Sevilla"},
   ]},
-  { id:7, date:"21 SEP", weekday:"LUNDI", ville:"Séville → Cadix", color:LEG.cadix, hotel:"Hôtel Boutique Vento, Cadix", stops:[
+  { id:7, date:"21 SEP", weekday:"LUNDI", ville:"Séville → Cadix", color:LEG.cadix, hotel:"Hôtel Boutique Vento, Cadix", coords:COORDS.cadix, tags:[], stops:[
     {time:"12:00", title:"Bodegas & dégustation de vin", desc:"Visite réservée sur GetYourGuide.", tip:null, loc:"Bodegas Jerez de la Frontera"},
     {time:"17:00", title:"Route vers Cadix", desc:"Arrivée en fin d'après-midi.", tip:null, loc:"Cádiz, España"},
     {time:"18:30", title:"Check-in — Hôtel Vento", desc:"Cadix.", tip:"Quasiment aucune place gratuite dans le Casco Antiguo — réserver un parking payant à l'avance plutôt que d'en chercher un sur place.", loc:"Hotel Boutique Vento, Cádiz"},
   ]},
-  { id:8, date:"22 SEP", weekday:"MARDI", ville:"Cadix → Tarifa", color:LEG.tarifa, hotel:"Even Tarifa by Q Hotels, Tarifa", stops:[
+  { id:8, date:"22 SEP", weekday:"MARDI", ville:"Cadix → Tarifa", color:LEG.tarifa, hotel:"Even Tarifa by Q Hotels, Tarifa", coords:COORDS.tarifa, tags:["surf","plage"], stops:[
     {time:"10:00", title:"Route vers Tarifa", desc:"~100 km depuis Cadix.", tip:null, loc:"Tarifa, España"},
     {time:"13:00", title:"Check-in — Even Tarifa", desc:"Tarifa.", tip:null, loc:"Even Tarifa by Q Hotels"},
     {time:"16:00", title:"Cours de surf", desc:"El Palmar — réservé sur GetYourGuide.", tip:null, loc:"Playa de El Palmar, Vejer de la Frontera"},
   ]},
-  { id:9, date:"23 SEP", weekday:"MERCREDI", ville:"Tarifa → Ronda", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", stops:[
+  { id:9, date:"23 SEP", weekday:"MERCREDI", ville:"Tarifa → Ronda", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", coords:COORDS.ronda, tags:["exterieur"], stops:[
     {time:"11:00", title:"Rocher de Gibraltar", desc:"Visite guidée, durée 2h30.", tip:"Prendre son passeport — passage de frontière.", loc:"Rock of Gibraltar"},
     {time:"15:30", title:"Route vers Ronda", desc:"~100 km depuis Gibraltar.", tip:null, loc:"Ronda, España"},
     {time:"18:00", title:"Check-in — Catalonia Reina Victoria", desc:"Ronda.", tip:"Le Puente Nuevo est désormais interdit à la circulation — privilégier un parking dédié plutôt que le centre historique.", loc:"Hotel Catalonia Reina Victoria, Ronda"},
   ]},
-  { id:10, date:"24 SEP", weekday:"JEUDI", ville:"Ronda — Villages blancs", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", stops:[
+  { id:10, date:"24 SEP", weekday:"JEUDI", ville:"Ronda — Villages blancs", color:LEG.ronda, hotel:"Hôtel Catalonia Reina Victoria, Ronda", coords:COORDS.ronda, tags:["exterieur","marche"], stops:[
     {time:"09:00", title:"Setenil de las Bodegas", desc:"Village troglodyte, maisons construites sous la roche — le plus proche de Ronda (~20 min).", tip:"Calle Cuevas del Sol et Calle Cuevas de la Sombra pour les maisons encastrées dans la roche.", loc:"Setenil de las Bodegas"},
     {time:"11:00", title:"Grazalema", desc:"Village blanc au cœur du Parc naturel de la Sierra de Grazalema (~35 min depuis Setenil).", tip:"Le meilleur point de vue est en arrivant par la route depuis Ronda — s'arrêter avant l'entrée du village pour le cadrer en contre-plongée, maisons blanches contre la roche.", loc:"Grazalema"},
     {time:"13:30", title:"Zahara de la Sierra", desc:"Village perché avec vue sur son réservoir turquoise (~20 min depuis Grazalema).", tip:"Monter jusqu'au château (Castillo) pour la vue sur le lac.", loc:"Zahara de la Sierra"},
     {time:"15:30", title:"Arcos de la Frontera", desc:"Village blanc perché sur une falaise au-dessus du Guadalete (~40 min depuis Zahara).", tip:"Plaza del Cabildo — mirador vertigineux au bord de la falaise, juste derrière l'église Santa María.", loc:"Arcos de la Frontera"},
     {time:"18:00", title:"Retour à Ronda", desc:"~1h depuis Arcos de la Frontera.", tip:null, loc:"Ronda, España"},
   ]},
-  { id:11, date:"25 SEP", weekday:"VENDREDI", ville:"Ronda → Málaga", color:LEG.malaga, hotel:"Hôtel Catalonia Málaga", stops:[
+  { id:11, date:"25 SEP", weekday:"VENDREDI", ville:"Ronda → Málaga", color:LEG.malaga, hotel:"Hôtel Catalonia Málaga", coords:COORDS.chorro, tags:["exterieur","marche"], stops:[
     {time:"10:30", title:"Caminito del Rey", desc:"Réservé sur GetYourGuide.", tip:"Chaussures fermées indispensables.", loc:"Caminito del Rey, El Chorro"},
     {time:"15:00", title:"Route vers Málaga", desc:"~100 km depuis Ronda/Caminito.", tip:null, loc:"Málaga, España"},
     {time:"17:00", title:"Check-in — Hôtel Catalonia Málaga", desc:"Málaga.", tip:null, loc:"Hotel Catalonia Málaga"},
   ]},
-  { id:12, date:"26 SEP", weekday:"SAMEDI", ville:"Málaga → Puerto Banús (Marbella) → Retour", color:LEG.malaga, hotel:"—", stops:[
+  { id:12, date:"26 SEP", weekday:"SAMEDI", ville:"Málaga → Puerto Banús (Marbella) → Retour", color:LEG.malaga, hotel:"—", coords:COORDS.banus, tags:["bateau"], stops:[
     {time:"10:00", title:"Route vers Puerto Banús", desc:"~60 km depuis Málaga (Marbella), compter 45-60 min selon trafic.", tip:null, loc:"Puerto Banús, Marbella"},
     {time:"11:30", title:"Croisière à Puerto Banús", desc:"Marbella — durée 2h30, réservée sur GetYourGuide.", tip:"Les yachts de Puerto Banús avec la Sierra Blanca en toile de fond — meilleure lumière en fin de matinée.", loc:"Puerto Banús, Marbella"},
     {time:"14:30", title:"Route retour vers Málaga", desc:"~60 km, compter 45-60 min.", tip:null, loc:"Málaga, España"},
@@ -276,6 +288,7 @@ const state = {
   stopNotes: {},
   customPlaces: [],
   placeFilter: "Toutes",
+  weather: {},
   isLoaded: false,
   syncStatus: "idle",
   syncError: "",
@@ -287,6 +300,133 @@ function scheduleSave() { clearTimeout(saveTimer); saveTimer = setTimeout(saveSt
 
 function apiUrl(action) {
   return `${CONFIG.API_URL}?action=${action}&trip=${encodeURIComponent(CONFIG.TRIP_ID)}`;
+}
+
+// ---------------------------------------------------------------
+// MÉTÉO (Open-Meteo — gratuit, sans clé, ~16 jours de prévision)
+// ---------------------------------------------------------------
+const TRIP_START = new Date("2026-09-15T00:00:00");
+function dayISODate(day) {
+  const d = new Date(TRIP_START);
+  d.setDate(d.getDate() + (day.id - 1));
+  return d.toISOString().slice(0, 10);
+}
+
+const WEATHER_CODES = {
+  0:  {icon:"sun",           label:"Ciel dégagé"},
+  1:  {icon:"cloud-sun",     label:"Peu nuageux"},
+  2:  {icon:"cloud-sun",     label:"Partiellement nuageux"},
+  3:  {icon:"cloud",         label:"Couvert"},
+  45: {icon:"cloud-fog",     label:"Brouillard"},
+  48: {icon:"cloud-fog",     label:"Brouillard givrant"},
+  51: {icon:"cloud-drizzle", label:"Bruine légère"},
+  53: {icon:"cloud-drizzle", label:"Bruine"},
+  55: {icon:"cloud-drizzle", label:"Bruine forte"},
+  61: {icon:"cloud-rain",    label:"Pluie légère"},
+  63: {icon:"cloud-rain",    label:"Pluie"},
+  65: {icon:"cloud-rain",    label:"Pluie forte"},
+  71: {icon:"cloud-snow",    label:"Neige légère"},
+  73: {icon:"cloud-snow",    label:"Neige"},
+  75: {icon:"cloud-snow",    label:"Neige forte"},
+  80: {icon:"cloud-rain",    label:"Averses"},
+  81: {icon:"cloud-rain",    label:"Averses fortes"},
+  82: {icon:"cloud-rain",    label:"Averses violentes"},
+  95: {icon:"cloud-lightning", label:"Orage"},
+  96: {icon:"cloud-lightning", label:"Orage avec grêle"},
+  99: {icon:"cloud-lightning", label:"Orage violent"},
+};
+function weatherInfo(code) {
+  return WEATHER_CODES[code] || {icon:"cloud", label:"—"};
+}
+
+async function loadWeather() {
+  const targets = DAYS.filter(d => d.coords);
+  await Promise.all(targets.map(async day => {
+    const dateISO = dayISODate(day);
+    state.weather[day.id] = { status: "loading" };
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${day.coords.lat}&longitude=${day.coords.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max&timezone=Europe%2FMadrid&start_date=${dateISO}&end_date=${dateISO}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      if (!data.daily || !data.daily.time || !data.daily.time.length) {
+        state.weather[day.id] = { status: "unavailable" };
+      } else {
+        state.weather[day.id] = {
+          status: "ok",
+          code: data.daily.weathercode[0],
+          tmax: Math.round(data.daily.temperature_2m_max[0]),
+          tmin: Math.round(data.daily.temperature_2m_min[0]),
+          rainProb: data.daily.precipitation_probability_max[0],
+          windMax: Math.round(data.daily.windspeed_10m_max[0]),
+        };
+      }
+    } catch (err) {
+      state.weather[day.id] = { status: "error" };
+    }
+    render();
+  }));
+}
+
+// Règles d'alerte : croise la météo du jour avec les tags d'activité du jour
+function weatherAlerts(day, w) {
+  if (!w || w.status !== "ok") return [];
+  const tags = day.tags || [];
+  const alerts = [];
+  if (w.rainProb >= 60 && tags.includes("exterieur")) {
+    alerts.push(`Pluie probable (${w.rainProb}%) — journée avec visites en extérieur`);
+  } else if (w.rainProb >= 60 && tags.includes("marche")) {
+    alerts.push(`Pluie probable (${w.rainProb}%) — prévoir des chaussures adaptées pour la marche`);
+  } else if (w.rainProb >= 75) {
+    alerts.push(`Forte probabilité de pluie (${w.rainProb}%)`);
+  }
+  if (w.windMax >= 40 && tags.includes("surf")) {
+    alerts.push(`Vent fort annoncé (${w.windMax} km/h) — peut impacter le cours de surf, se renseigner auprès du moniteur`);
+  }
+  if (w.windMax >= 40 && tags.includes("bateau")) {
+    alerts.push(`Vent fort annoncé (${w.windMax} km/h) — vérifier le maintien de la sortie en bateau`);
+  }
+  if (w.tmax >= 36 && tags.includes("marche")) {
+    alerts.push(`Chaleur importante (${w.tmax}°C) — prévoir beaucoup d'eau et éviter les heures chaudes pour la marche`);
+  } else if (w.tmax >= 38) {
+    alerts.push(`Chaleur extrême (${w.tmax}°C) — s'hydrater, éviter le plein soleil aux heures chaudes`);
+  }
+  if (w.tmin <= 12 && tags.includes("plage")) {
+    alerts.push(`Températures fraîches (${w.tmin}°C le matin) — prévoir une tenue chaude avant la baignade`);
+  }
+  return alerts;
+}
+
+function renderWeather(day) {
+  if (!day.coords) return "";
+  const w = state.weather[day.id];
+  if (!w || w.status === "loading") {
+    return `<div class="ml-6 mb-4 flex items-center gap-2 text-xs text-[#F1E9DC]/50">${icon("loader-circle",12,"animate-spin")}Chargement météo…</div>`;
+  }
+  if (w.status === "unavailable") {
+    return `<div class="ml-6 mb-4 flex items-center gap-2 text-xs text-[#F1E9DC]/50">${icon("calendar-clock",12)}Prévision pas encore disponible (visible à partir de J-16)</div>`;
+  }
+  if (w.status === "error") {
+    return `<div class="ml-6 mb-4 flex items-center gap-2 text-xs" style="color:#C15060">${icon("cloud-off",12)}Météo indisponible</div>`;
+  }
+  const info = weatherInfo(w.code);
+  const alerts = weatherAlerts(day, w);
+  return `
+    <div class="ml-6 mb-4">
+      <div class="inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border px-3 py-2 text-xs" style="border-color:#2E241B;background:#241C15">
+        ${icon(info.icon,18,"text-[#C9972C]")}
+        <span class="font-semibold">${info.label}</span>
+        <span class="text-[#F1E9DC]/70">${w.tmin}° / ${w.tmax}°C</span>
+        <span class="flex items-center gap-1 text-[#F1E9DC]/70">${icon("droplets",11)}${w.rainProb}%</span>
+        <span class="flex items-center gap-1 text-[#F1E9DC]/70">${icon("wind",11)}${w.windMax} km/h</span>
+      </div>
+      ${alerts.map(a => `
+        <div class="mt-2 flex items-start gap-2 rounded-lg px-3 py-2 text-xs font-semibold" style="background:#3A2A14;color:#F0B054;border:1px solid #5A3E1E">
+          ${icon("triangle-alert",14,"mt-0.5 shrink-0")}<span>${a}</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
 }
 
 async function loadState() {
@@ -398,65 +538,6 @@ function deletePlace(id) {
   state.customPlaces = state.customPlaces.filter(p => p.id !== id);
   render();
   scheduleSave();
-}
-
-function removeCustomLink(key) {
-  delete state.customLinks[key];
-  render();
-  scheduleSave();
-}
-
-function removeStopNote(key) {
-  delete state.stopNotes[key];
-  render();
-  scheduleSave();
-}
-
-function stopLabelFromKey(key) {
-  const [dayId, idx] = key.split("-").map(Number);
-  const day = DAYS.find(d => d.id === dayId);
-  if (!day || !day.stops[idx]) return key;
-  return day.stops[idx].title;
-}
-
-function renderCustomItemsList() {
-  const places = state.customPlaces || [];
-  const links = Object.entries(state.customLinks || {});
-  const notes = Object.entries(state.stopNotes || {});
-  if (places.length === 0 && links.length === 0 && notes.length === 0) {
-    return `<p class="text-xs text-[#F1E9DC]/55">Aucun élément personnalisé pour l'instant — les restos, liens et notes que vous ajoutez apparaîtront ici, chacun avec son propre bouton de suppression.</p>`;
-  }
-  return `
-    <div class="space-y-2">
-      ${places.map(p => `
-        <div class="flex items-center justify-between gap-3 rounded-md border px-3 py-2" style="border-color:#2E241B;background:#1C1712">
-          <div class="min-w-0">
-            <p class="text-xs font-semibold flex items-center gap-1.5">${icon("utensils",11)}${p.name}</p>
-            <p class="text-[10px] text-[#F1E9DC]/55 mt-0.5">${p.ville || ""}</p>
-          </div>
-          <button data-delplace="${p.id}" class="delplace-btn shrink-0" style="color:#8A7A6A">${icon("x",14)}</button>
-        </div>
-      `).join("")}
-      ${links.map(([key, url]) => `
-        <div class="flex items-center justify-between gap-3 rounded-md border px-3 py-2" style="border-color:#2E241B;background:#1C1712">
-          <div class="min-w-0">
-            <p class="text-xs font-semibold flex items-center gap-1.5">${icon("link",11)}${key}</p>
-            <p class="text-[10px] text-[#F1E9DC]/55 mt-0.5 truncate">${url}</p>
-          </div>
-          <button data-rmlink="${key}" class="rmlink-btn shrink-0" style="color:#8A7A6A">${icon("x",14)}</button>
-        </div>
-      `).join("")}
-      ${notes.map(([key, note]) => `
-        <div class="flex items-center justify-between gap-3 rounded-md border px-3 py-2" style="border-color:#2E241B;background:#1C1712">
-          <div class="min-w-0">
-            <p class="text-xs font-semibold flex items-center gap-1.5">${icon("pencil",11)}${stopLabelFromKey(key)}</p>
-            <p class="text-[10px] text-[#F1E9DC]/55 mt-0.5">${note}</p>
-          </div>
-          <button data-rmnote="${key}" class="rmnote-btn shrink-0" style="color:#8A7A6A">${icon("x",14)}</button>
-        </div>
-      `).join("")}
-    </div>
-  `;
 }
 
 // ---------------------------------------------------------------
@@ -616,7 +697,8 @@ function renderItineraire() {
       <h2 class="font-display font-black text-2xl tracking-tight">${day.weekday} ${day.date}</h2>
     </div>
     <p class="text-[#F1E9DC]/70 text-sm mb-1 ml-6">${day.ville}</p>
-    ${day.hotel !== "—" ? `<p class="text-[#F1E9DC]/65 text-xs mb-6 ml-6 flex items-center gap-1">${icon("bed",11)}${day.hotel}</p>` : `<div class="mb-6"></div>`}
+    <p class="text-[#F1E9DC]/65 text-xs mb-2 ml-6 flex items-center gap-1">${day.hotel !== "—" ? icon("bed",11) + day.hotel : ""}</p>
+    ${renderWeather(day)}
 
     <div class="relative pl-8">
       <div class="absolute left-[11px] top-2 bottom-2 w-[3px] rounded-full" style="background:${day.color};opacity:0.3"></div>
@@ -631,11 +713,12 @@ function renderItineraire() {
               </button>
               <div class="rounded-lg border px-4 py-3" style="border-color:#2E241B;background:${done ? '#1C1712' : '#241C15'};opacity:${done?0.5:1}">
                 <span class="font-mono text-xs font-bold text-[#F1E9DC]/70 flex items-center gap-1 mb-1">${icon("clock",12)}${s.time}</span>
-                <p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>
+                ${s.loc
+                  ? `<a href="${wazeLink(s.loc)}" target="_blank" rel="noopener" class="font-semibold text-sm inline-flex items-center gap-1.5 ${done ? "line-through" : ""}" style="color:#F1E9DC">${s.title}${icon("navigation",12,"text-[#C9972C]")}</a>`
+                  : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
                 <p class="text-[#F1E9DC]/70 text-xs mt-1">${s.desc}</p>
                 ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] mt-2" style="color:#C9972C">${icon("info",12,"mt-0.5")}${s.tip}</p>` : ""}
                 ${state.stopNotes[key] ? `<p class="flex items-start gap-1.5 text-[11px] mt-2 italic" style="color:#F1E9DC">${icon("pencil",12,"mt-0.5 text-[#8A7A6A]")}${state.stopNotes[key]}</p>` : ""}
-                ${s.loc ? `<div class="flex items-center gap-2 mt-2">${linkChip(mapsLink(s.loc), "Maps", "map-pin")}${linkChip(wazeLink(s.loc), "Waze", "navigation")}</div>` : ""}
                 <button data-addnote="${key}" class="addnote-btn mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A2E23;color:#F1E9DC">
                   ${icon(state.stopNotes[key] ? "pencil" : "plus",10)}${state.stopNotes[key] ? "Modifier ma note" : "Ajouter une note"}
                 </button>
@@ -746,7 +829,6 @@ function renderLieux() {
               ${p.badge ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#2A3A1E;color:#9FD671">${icon("thumbs-up",10)} ${p.badge}</span>` : ""}
               ${p.custom ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full" style="background:#2E241B;color:#C9972C">${icon("user",10)} Ajouté par vous</span>` : ""}
               ${linkChip(mapsLink(p.name + ", " + p.ville), "Maps", "map-pin")}
-              ${linkChip(wazeLink(p.name + ", " + p.ville), "Waze", "navigation")}
               ${p.custom && p.link ? linkChip(p.link, "Lien", "external-link") : ""}
             </div>
           </div>
@@ -774,13 +856,6 @@ function renderInfos() {
           </div>
         </div>
       `).join("")}
-    </div>
-    <div class="mt-6 pt-5 border-t" style="border-color:#2E241B">
-      <h3 class="uppercase text-xs font-black tracking-widest text-[#F1E9DC]/65 mb-3">Éléments ajoutés à ce voyage</h3>
-      ${renderCustomItemsList()}
-      <a href="${apiUrl('get')}" target="_blank" rel="noopener" class="mt-4 inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A2E20;color:#F1E9DC">
-        ${icon("code-2",10)}Voir les données brutes de ce voyage
-      </a>
     </div>
   `;
 }
@@ -846,12 +921,6 @@ function attachEvents() {
   document.querySelectorAll(".editplace-btn").forEach(btn => {
     btn.onclick = () => { editPlace(btn.dataset.editplace); };
   });
-  document.querySelectorAll(".rmlink-btn").forEach(btn => {
-    btn.onclick = () => { removeCustomLink(btn.dataset.rmlink); };
-  });
-  document.querySelectorAll(".rmnote-btn").forEach(btn => {
-    btn.onclick = () => { removeStopNote(btn.dataset.rmnote); };
-  });
   const addPlaceBtn = document.getElementById("btn-addplace");
   if (addPlaceBtn) addPlaceBtn.onclick = addPlace;
   const retryBtn = document.getElementById("btn-retry");
@@ -905,6 +974,7 @@ if ("serviceWorker" in navigator) {
 
 render();
 loadState();
+loadWeather();
 </script>
 </body>
 </html>
