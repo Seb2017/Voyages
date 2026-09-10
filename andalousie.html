@@ -94,7 +94,7 @@ const DAYS = [
   { id:3, date:"17 SEP", weekday:"JEUDI", ville:"Grenade → Cordoue", color:LEG.grenade, hotel:"Los Patios de la Judería, Cordoue", coords:COORDS.grenade, tags:["exterieur"], stops:[
     {time:"10:00", title:"Alhambra & Generalife", desc:"Visite guidée — réservée sur GetYourGuide.", tip:"Le Patio de los Arrayanes offre le reflet miroir le plus célèbre du palais — lumière la plus douce en tout début de matinée, avant la foule.", loc:"Alhambra, Granada"},
     {time:"16:00", title:"Route vers Cordoue", desc:"~165 km depuis Grenade.", tip:null, loc:"Córdoba, España"},
-    {time:"18:30", title:"Check-in — Los Patios de la Judería", desc:"Cordoue.", tip:"Judería en grande partie piétonne : parking El Vial (près de la gare) ou gratuit au sud du pont romain.", loc:"Los Patios de la Judería, Córdoba"},
+    {time:"18:30", title:"Check-in — Los Patios de la Judería", desc:"8, Calle Martínez Rucker, 14003 Córdoba. Zone d'accès restreint : sonner à l'interphone et indiquer le numéro de plaque.", tip:"Itinéraire : passer le pont San Rafael, tourner aussitôt à droite le long du fleuve vers l'Avenida del Alcázar, puis à gauche au 1er carrefour (panneau sens interdit). Monter la rue et tourner à droite dans Amador de los Ríos (zone restreinte — interphone + n° de plaque). Se garer aux Patios de la Judería ou parking du 22, rue Osío, puis continuer à pied par Corregidor Luis de la Cerda jusqu'à la maison blanche et bleue, 3e à gauche (Alfayatas) devant le restaurant La Tranquera. Dépose bagages possible Plaza de Abades.", loc:"8 Calle Martínez Rucker, Córdoba"},
   ]},
   { id:4, date:"18 SEP", weekday:"VENDREDI", ville:"Cordoue", color:LEG.cordoue, hotel:"Los Patios de la Judería, Cordoue", coords:COORDS.cordoue, tags:["exterieur"], stops:[
     {time:"10:15", title:"Visite guidée de Cordoue", desc:"Réservée sur GetYourGuide.", tip:"Prévoir de l'eau — les patios peuvent être bondés en fin de matinée.", loc:"Mezquita-Catedral de Córdoba"},
@@ -149,7 +149,7 @@ const DAYS = [
 const STAGES = [
   {ville:"Málaga", dates:"15 → 16 sept.", logement:"Hôtel Romerito", color:LEG.malaga},
   {ville:"Grenade", dates:"16 → 17 sept.", logement:"Mercader de Sedas by Maxi Hoteles", color:LEG.grenade},
-  {ville:"Cordoue", dates:"17 → 19 sept.", logement:"Los Patios de la Judería (appartement)", color:LEG.cordoue},
+  {ville:"Cordoue", dates:"17 → 19 sept.", logement:"Los Patios de la Judería (appartement) — 8 Calle Martínez Rucker", color:LEG.cordoue},
   {ville:"Séville", dates:"19 → 21 sept.", logement:"Hôtel Alcázar", color:LEG.seville},
   {ville:"Cadix", dates:"21 → 22 sept.", logement:"Hôtel Boutique Vento", color:LEG.cadix},
   {ville:"Tarifa", dates:"22 → 23 sept.", logement:"Even Tarifa by Q Hotels", color:LEG.tarifa},
@@ -796,6 +796,7 @@ function renderItineraire() {
                   : `<p class="font-semibold text-sm ${done ? "line-through" : ""}">${s.title}</p>`}
                 <p class="text-[#F1E9DC]/70 text-xs mt-1">${s.desc}</p>
                 ${s.tip ? `<p class="flex items-start gap-1.5 text-[11px] mt-2" style="color:#C9972C">${icon("info",12,"mt-0.5")}${s.tip}</p>` : ""}
+                ${s.loc ? `<div class="mt-2">${linkChip(mapsLink(s.loc), "Maps", "map-pin")}</div>` : ""}
                 ${state.stopNotes[key] ? `<p class="flex items-start gap-1.5 text-[11px] mt-2 italic" style="color:#F1E9DC">${icon("pencil",12,"mt-0.5 text-[#8A7A6A]")}${state.stopNotes[key]}</p>` : ""}
                 <button data-addnote="${key}" class="addnote-btn mt-2 inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-1 rounded-full border" style="border-color:#3A2E23;color:#F1E9DC">
                   ${icon(state.stopNotes[key] ? "pencil" : "plus",10)}${state.stopNotes[key] ? "Modifier ma note" : "Ajouter une note"}
